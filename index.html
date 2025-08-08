@@ -18,6 +18,7 @@
         <div id="title">
             <h1 onclick="cycleClass()">Class Name</h1>
             <h2 id="timeRange">Time Range</h2>
+            <div id="countdowns"></div>
         </div>
         <div id="date">
             <p><h3>Date:</h3></p>
@@ -184,7 +185,10 @@
                 if (cls.days.includes(currentDay)) {
                     const start = cls.startTime.hours * 60 + cls.startTime.minutes;
                     const end = cls.endTime.hours * 60 + cls.endTime.minutes;
-                    if (currentTime >= start - 30 && currentTime < start) {
+                    // Check for start countdown (30 minutes before start) or conclusion/pack-up (10 minutes before end)
+                    if (currentTime >= start - 30 && currentTime <= start) {
+                        return i;
+                    } else if (currentTime >= end - 10 && currentTime <= end) {
                         return i;
                     }
                 }
@@ -211,12 +215,15 @@
                     if (currentTime >= start - 30 && currentTime <= start) {
                         currentClassIndex = nextIndex;
                         updateClassDisplay();
+                        updateCountdowns();
                         return;
                     }
                 }
             } while (nextIndex !== currentClassIndex && attempts < classes.length);
             
+            currentClassIndex = (currentClassIndex + 1) % classes.length;
             updateClassDisplay();
+            updateCountdowns();
         }
 
         function updateClassDisplay() {
@@ -232,6 +239,63 @@
                 populateStudents();
             }
             updateHotkeysDisplay();
+            updateCountdowns();
+        }
+
+        function updateCountdowns() {
+            const countdownContainer = document.getElementById('countdowns');
+            countdownContainer.innerHTML = '';
+
+            const currentClass = classes[currentClassIndex];
+            const now = new Date();
+            const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
+
+            if (!currentClass.days.includes(currentDay)) {
+                return;
+            }
+
+            const startTime = new Date(now);
+            startTime.setHours(currentClass.startTime.hours, currentClass.startTime.minutes, 0, 0);
+
+            const endTime = new Date(now);
+            endTime.setHours(currentClass.endTime.hours, currentClass.endTime.minutes, 0, 0);
+
+            let startDiff = (startTime - now) / 1000;
+            let endDiff = (endTime - now) / 1000;
+
+            // Handle classes that span midnight
+            if (startDiff < -86400) startDiff += 86400;
+            if (endDiff < -86400) endDiff += 86400;
+
+            // Start countdown (30 minutes before)
+            if (startDiff > 0 && startDiff <= 1800) {
+                const minutes = Math.floor(startDiff / 60);
+                const seconds = Math.floor(startDiff % 60);
+                const startDiv = document.createElement('div');
+                startDiv.className = 'start-countdown';
+                startDiv.textContent = `Class begins in ${minutes}m ${seconds}s`;
+                countdownContainer.appendChild(startDiv);
+            }
+
+            // Conclusion countdown (10 minutes before end, show 5m 0s to 0m 0s)
+            if (endDiff <= 600 && endDiff > 300) {
+                const conclusionDiff = endDiff - 300; // Show countdown from 5 minutes
+                const minutes = Math.floor(conclusionDiff / 60);
+                const seconds = Math.floor(conclusionDiff % 60);
+                const conclusionDiv = document.createElement('div');
+                conclusionDiv.className = 'conclusion-countdown';
+                conclusionDiv.textContent = `Conclusion: ${minutes}m ${seconds}s`;
+                countdownContainer.appendChild(conclusionDiv);
+            }
+            // Pack up countdown (5 minutes before end)
+            else if (endDiff <= 300 && endDiff > 0) {
+                const minutes = Math.floor(endDiff / 60);
+                const seconds = Math.floor(endDiff % 60);
+                const packupDiv = document.createElement('div');
+                packupDiv.className = 'packup-countdown';
+                packupDiv.textContent = `♫ Pack up: ${minutes}m ${seconds}s ♫`;
+                countdownContainer.appendChild(packupDiv);
+            }
         }
 
         function loadObjectives(key) {
@@ -250,91 +314,87 @@
             objectiveList.innerHTML = objectives.map(obj => `<li class="editable" onclick="editObjective(this)">${obj}</li>`).join('');
         }
 
-        
         function editObjective(item) {
-    const cls = classes[currentClassIndex];
-    const currentItem = item.textContent;
-    const index = Array.from(item.parentElement.children).indexOf(item);
-    const dialog = document.createElement('div');
-    dialog.style.position = 'fixed';
-    dialog.style.top = '50%';
-    dialog.style.left = '50%';
-    dialog.style.transform = 'translate(-50%, -50%)';
-    dialog.style.backgroundColor = 'white';
-    dialog.style.padding = '20px';
-    dialog.style.borderRadius = '5px';
-    dialog.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-    dialog.style.zIndex = '1000';
-    dialog.style.textAlign = 'center';
-    dialog.style.lineHeight = '1.3';
-    dialog.style.width = '400px';
+            const cls = classes[currentClassIndex];
+            const currentItem = item.textContent;
+            const index = Array.from(item.parentElement.children).indexOf(item);
+            const dialog = document.createElement('div');
+            dialog.style.position = 'fixed';
+            dialog.style.top = '50%';
+            dialog.style.left = '50%';
+            dialog.style.transform = 'translate(-50%, -50%)';
+            dialog.style.backgroundColor = 'white';
+            dialog.style.padding = '20px';
+            dialog.style.borderRadius = '5px';
+            dialog.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+            dialog.style.zIndex = '1000';
+            dialog.style.textAlign = 'center';
+            dialog.style.lineHeight = '1.3';
+            dialog.style.width = '400px';
 
-    // Only use sampleObjectives for suggestions
-    const suggestions = cls.sampleObjectives.length > 0 
-        ? cls.sampleObjectives.map(obj => `
-            <a href="#" style="font-size: 0.85em; text-decoration: none; display: block; margin: 2px 0;" 
-               onclick="
-                   document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = '${obj}';
-                   saveObjectives('${cls.objectivesKey}'); 
-                   this.closest('div').remove(); 
-                   window.isObjectiveInputFocused = false; 
-                   return false;">
-                ${obj}
-            </a>
-          `).join('')
-        : '<p style="font-size: 0.85em; color: #999;">No sample objectives available</p>';
+            const suggestions = cls.sampleObjectives.length > 0 
+                ? cls.sampleObjectives.map(obj => `
+                    <a href="#" style="font-size: 0.85em; text-decoration: none; display: block; margin: 2px 0;" 
+                       onclick="
+                           document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = '${obj}';
+                           saveObjectives('${cls.objectivesKey}'); 
+                           this.closest('div').remove(); 
+                           window.isObjectiveInputFocused = false; 
+                           return false;">
+                        ${obj}
+                    </a>
+                  `).join('')
+                : '<p style="font-size: 0.85em; color: #999;">No sample objectives available</p>';
 
-    dialog.innerHTML = `
-        <h3>Edit Objective</h3>
-        <input type="text" id="objectiveInput" value="${currentItem}" style="width: 80%; padding: 5px;" data-original-value="${currentItem}">
-        <p style="text-align: left; margin-left: 33px; margin-top: 10px;">
-            ${suggestions}
-        </p>
-        <button onclick="
-            const input = document.getElementById('objectiveInput'); 
-            if (input.value.trim() !== '') { 
-                document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = input.value.trim(); 
-                saveObjectives('${cls.objectivesKey}'); 
-            } 
-            this.closest('div').remove(); 
-            window.isObjectiveInputFocused = false;">
-            Save
-        </button>
-        <button onclick="this.closest('div').remove(); window.isObjectiveInputFocused = false;">Cancel</button>
-    `;
+            dialog.innerHTML = `
+                <h3>Edit Objective</h3>
+                <input type="text" id="objectiveInput" value="${currentItem}" style="width: 80%; padding: 5px;" data-original-value="${currentItem}">
+                <p style="text-align: left; margin-left: 33px; margin-top: 10px;">
+                    ${suggestions}
+                </p>
+                <button onclick="
+                    const input = document.getElementById('objectiveInput'); 
+                    if (input.value.trim() !== '') { 
+                        document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = input.value.trim(); 
+                        saveObjectives('${cls.objectivesKey}'); 
+                    } 
+                    this.closest('div').remove(); 
+                    window.isObjectiveInputFocused = false;">
+                    Save
+                </button>
+                <button onclick="this.closest('div').remove(); window.isObjectiveInputFocused = false;">Cancel</button>
+            `;
 
-    document.body.appendChild(dialog);
-    const input = document.getElementById('objectiveInput');
-    input.focus();
-    input.select();
-    window.isObjectiveInputFocused = true;
+            document.body.appendChild(dialog);
+            const input = document.getElementById('objectiveInput');
+            input.focus();
+            input.select();
+            window.isObjectiveInputFocused = true;
 
-    input.addEventListener('focus', () => { window.isObjectiveInputFocused = true; });
-    input.addEventListener('blur', () => { window.isObjectiveInputFocused = false; });
+            input.addEventListener('focus', () => { window.isObjectiveInputFocused = true; });
+            input.addEventListener('blur', () => { window.isObjectiveInputFocused = false; });
 
-    // Close on Escape
-    const handleKeydown = (event) => {
-        if (event.key === 'Escape') {
-            dialog.remove();
-            window.isObjectiveInputFocused = false;
-            document.removeEventListener('keydown', handleKeydown);
+            const handleKeydown = (event) => {
+                if (event.key === 'Escape') {
+                    dialog.remove();
+                    window.isObjectiveInputFocused = false;
+                    document.removeEventListener('keydown', handleKeydown);
+                }
+            };
+            document.addEventListener('keydown', handleKeydown);
+
+            const handleOutsideClick = (event) => {
+                if (!dialog.contains(event.target)) {
+                    dialog.remove();
+                    window.isObjectiveInputFocused = false;
+                    document.removeEventListener('click', handleOutsideClick);
+                }
+            };
+
+            setTimeout(() => {
+                document.addEventListener('click', handleOutsideClick);
+            }, 0);
         }
-    };
-    document.addEventListener('keydown', handleKeydown);
-
-    // Close on outside click
-    const handleOutsideClick = (event) => {
-        if (!dialog.contains(event.target)) {
-            dialog.remove();
-            window.isObjectiveInputFocused = false;
-            document.removeEventListener('click', handleOutsideClick);
-        }
-    };
-
-    setTimeout(() => {
-        document.addEventListener('click', handleOutsideClick);
-    }, 0);
-}
 
         let menuStack = [];
         let currentZIndex = 1000;
@@ -1006,7 +1066,8 @@
                     currentClassIndex = newIndex;
                     updateClassDisplay();
                 }
-            }, 60000);
+            }, 1000); // Check every second to catch countdown starts
+            setInterval(updateCountdowns, 1000);
         };
     </script>
 </body>

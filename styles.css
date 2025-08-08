@@ -36,6 +36,26 @@ body, html {
     font-weight: normal; 
     font-size: 24px;
 }
+#countdowns {
+    margin-top: 0px;
+    font-size: 20px;
+    position: relative;
+    z-index: 1000;
+}
+
+#countdowns .start-countdown {
+    color: red;
+}
+
+#countdowns .conclusion-countdown,
+#countdowns .packup-countdown {
+    color: blue;
+}
+
+#title {
+    cursor: pointer;
+}
+
  hr {
         border: 0;
         border-top: 1px solid white;

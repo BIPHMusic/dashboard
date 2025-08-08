@@ -6,7 +6,8 @@ const hotkeys = [
     { key: "↑", description: "Increase participation by 10." },
     { key: "↓", description: "Decrease participation by 10." },
     { key: "Cmd + →", description: "Cycle to next class." },
-    { key: "Cmd + ←", description: "Cycle to previous class." }
+    { key: "Cmd + ←", description: "Cycle to previous class." },
+    { key: "Click Title", description: "Cycle to next class." }
 ];
 
 function getMenuHotkeys() {
@@ -183,7 +184,6 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    // Rest of the existing handleGlobalHotkeys logic remains unchanged
     if (currentMode !== MODES.GLOBAL) return;
 
     if (event.key === '?' || (event.altKey && event.key === '/')) {
@@ -209,6 +209,7 @@ function handleGlobalHotkeys(event) {
             (currentClassIndex - 1 + classes.length) % classes.length;
         updateClassDisplay();
         updateHotkeysDisplay();
+        updateCountdowns();
         return;
     }
 

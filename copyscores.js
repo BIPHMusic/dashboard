@@ -22,7 +22,10 @@ function copyScores() {
         ? `Tardies:\n${tardiesItemized.join('\n')}`
         : 'No tardies';
 
-    const plainTextContent = `Scores:\n${scores.join('\t')}\n\nHouse points for today:\n${housePointsMessage}\n\n${tardiesMessage}`;
+    // Create plain text table for scores
+    const scoreTable = scores.join('\t'); // Tab-separated for Excel compatibility
+
+    const plainTextContent = `Scores:\n${scoreTable}\n\nHouse points for today:\n${housePointsMessage}\n\n${tardiesMessage}`;
 
     // Check if user is on macOS
     const isMacOS = /Macintosh|Mac OS X/i.test(navigator.userAgent);
@@ -50,7 +53,9 @@ function copyScores() {
         });
     } else {
         // For non-macOS, open email client
-        const subject = encodeURIComponent(`Class Scores - ${classes[currentClassIndex].name}`);
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const subject = encodeURIComponent(`${classes[currentClassIndex].name} Participation - ${dateStr}`);
         const body = encodeURIComponent(plainTextContent);
         const mailtoLink = `mailto:garrison.tubbs-biph@basischina.com?subject=${subject}&body=${body}`;
         window.location.href = mailtoLink;

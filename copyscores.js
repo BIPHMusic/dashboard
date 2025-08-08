@@ -25,6 +25,7 @@ function copyScores() {
     // Create plain text table for scores
     const scoreTable = scores.join('\t'); // Tab-separated for Excel compatibility
 
+    // Format plain text content with a clear table-like structure
     const plainTextContent = `Scores:\n${scoreTable}\n\nHouse points for today:\n${housePointsMessage}\n\n${tardiesMessage}`;
 
     // Check if user is on macOS
@@ -66,6 +67,12 @@ function copyScores() {
         showTemporaryMessage('Email draft opened');
     }
 }
+
+
+
+
+
+
 
 // Rest of the file remains unchanged
 function showCustomAlert(message) {

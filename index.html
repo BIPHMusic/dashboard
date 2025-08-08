@@ -58,7 +58,6 @@
 
     <script src="studentlist.js"></script>
     <script src="hotkeys.js"></script>
-    <script src="copyscores.js"></script>
     <script>
         const classes = [
             {
@@ -251,6 +250,7 @@
             const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
 
             if (!currentClass.days.includes(currentDay)) {
+                hasCopiedScores = false; // Reset flag if not a class day
                 return;
             }
 
@@ -295,6 +295,25 @@
                 packupDiv.className = 'packup-countdown';
                 packupDiv.textContent = `♫ Pack up: ${minutes}m ${seconds}s ♫`;
                 countdownContainer.appendChild(packupDiv);
+                // Uncheck all "Returned" boxes when pack-up starts, if applicable
+                if (currentClass.criteria.includes('returned')) {
+                    const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${currentClass.criteria.indexOf('returned') + 3}) input[type="checkbox"]`);
+                    checkboxes.forEach((checkbox, index) => {
+                        if (checkbox.checked) {
+                            checkbox.checked = false;
+                            const studentName = teacherModeOrder[index];
+                            if (studentName) {
+                                syncCheckbox(studentName, checkbox, 'returned');
+                            }
+                        }
+                    });
+                }
+                hasCopiedScores = false; // Reset flag during pack-up
+            }
+            // Trigger copyScores when pack-up countdown reaches 0 or just past
+            else if (endDiff <= 0 && endDiff > -2 && !hasCopiedScores) {
+                copyScores();
+                hasCopiedScores = true; // Set flag to prevent multiple calls
             }
         }
 
@@ -408,6 +427,7 @@
         let searchBox = null;
         let searchResults = null;
         let selectedIndex = 0;
+        let hasCopiedScores = false;
 
         function globalKeydownHandler(event) {
             switch(currentMode) {
@@ -1070,5 +1090,6 @@
             setInterval(updateCountdowns, 1000);
         };
     </script>
+    <script src="copyscores.js"></script>
 </body>
 </html>

@@ -3,14 +3,6 @@ function copyScores() {
         student.score === 'EX' ? 'EX' : `${student.score}%`
     );
 
-    const htmlTable = `
-        <table style="border-collapse: collapse; font-family: 'Arial Narrow'; font-size: 22pt;">
-            <tr>
-                ${scores.map(score => `<td style="border: 2pt solid black;">${score}</td>`).join('')}
-            </tr>
-        </table>
-    `;
-
     const housePointsItemized = students
         .filter(student => student.housePoints !== 0)
         .map(student => ({
@@ -22,29 +14,55 @@ function copyScores() {
         .filter(student => student.attendance === 'Tardy')
         .map(student => student.name);
 
-    navigator.clipboard.write([
-        new ClipboardItem({
-            'text/html': new Blob([htmlTable], { type: 'text/html' }),
-            'text/plain': new Blob([scores.join('\t')], { type: 'text/plain' })
-        })
-    ]).then(() => {
-        const housePointsMessage = housePointsItemized.map(item => 
-            `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`
-        ).join('\n');
+    const housePointsMessage = housePointsItemized.map(item => 
+        `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`
+    ).join('\n');
 
-        const tardiesMessage = tardiesItemized.length > 0 
-            ? `Tardies:\n${tardiesItemized.join('\n')}`
-            : 'No tardies';
+    const tardiesMessage = tardiesItemized.length > 0 
+        ? `Tardies:\n${tardiesItemized.join('\n')}`
+        : 'No tardies';
 
+    const plainTextContent = `Scores:\n${scores.join('\t')}\n\nHouse points for today:\n${housePointsMessage}\n\n${tardiesMessage}`;
+
+    // Check if user is on macOS
+    const isMacOS = /Macintosh|Mac OS X/i.test(navigator.userAgent);
+
+    if (isMacOS) {
+        const htmlTable = `
+            <table style="border-collapse: collapse; font-family: 'Arial Narrow'; font-size: 22pt;">
+                <tr>
+                    ${scores.map(score => `<td style="border: 2pt solid black;">${score}</td>`).join('')}
+                </tr>
+            </table>
+        `;
+
+        navigator.clipboard.write([
+            new ClipboardItem({
+                'text/html': new Blob([htmlTable], { type: 'text/html' }),
+                'text/plain': new Blob([scores.join('\t')], { type: 'text/plain' })
+            })
+        ]).then(() => {
+            const message = `House points for today:\n${housePointsMessage}\n\n${tardiesMessage}\n\nReset scores?`;
+            showCustomAlert(message);
+            showTemporaryMessage('Copied to clipboard');
+        }).catch(err => {
+            console.error('Failed to copy scores: ', err);
+        });
+    } else {
+        // For non-macOS, open email client
+        const subject = encodeURIComponent(`Class Scores - ${classes[currentClassIndex].name}`);
+        const body = encodeURIComponent(plainTextContent);
+        const mailtoLink = `mailto:garrison.tubbs-biph@basischina.com?subject=${subject}&body=${body}`;
+        window.location.href = mailtoLink;
+
+        // Still show the alert for consistency
         const message = `House points for today:\n${housePointsMessage}\n\n${tardiesMessage}\n\nReset scores?`;
-        
         showCustomAlert(message);
-        showTemporaryMessage('Copied to clipboard');
-    }).catch(err => {
-        console.error('Failed to copy scores: ', err);
-    });
+        showTemporaryMessage('Email draft opened');
+    }
 }
 
+// Rest of the file remains unchanged
 function showCustomAlert(message) {
     const alertOverlay = document.createElement('div');
     alertOverlay.id = 'alert-overlay';
@@ -66,11 +84,11 @@ function showCustomAlert(message) {
     alertBox.style.maxWidth = '80%';
     alertBox.style.maxHeight = '80%';
     alertBox.style.overflow = 'auto';
-    alertBox.style.position = 'relative'; // For close button positioning
-    alertBox.style.transition = 'transform 0.3s ease-in-out'; // Smooth appearance
-    alertBox.style.transform = 'scale(0.8)'; // Start slightly scaled down
+    alertBox.style.position = 'relative';
+    alertBox.style.transition = 'transform 0.3s ease-in-out';
+    alertBox.style.transform = 'scale(0.8)';
     setTimeout(() => {
-        alertBox.style.transform = 'scale(1)'; // Animate to full size
+        alertBox.style.transform = 'scale(1)';
     }, 10);
 
     const messageElement = document.createElement('pre');
@@ -113,7 +131,7 @@ function closeAlert() {
         alertBox.style.opacity = '0';
         setTimeout(() => {
             document.body.removeChild(alertOverlay);
-        }, 300); // Match transition duration
+        }, 300);
     }
 }
 
@@ -165,14 +183,13 @@ function resetAllStudents() {
         span.textContent = '0';
     });
 
-    // Smooth bar animation
-    const bars = document.querySelectorAll('.bar'); // Assuming bars have this class
+    const bars = document.querySelectorAll('.bar');
     bars.forEach(bar => {
         bar.style.transition = 'height 0.5s ease-in-out, width 0.5s ease-in-out';
-        bar.style.height = '0px'; // Assuming bars animate height
+        bar.style.height = '0px';
     });
     setTimeout(() => {
-        createBars(); // Recreate bars after animation
+        createBars();
     }, 500);
 }
 

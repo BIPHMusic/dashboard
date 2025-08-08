@@ -22,12 +22,6 @@ function copyScores() {
         ? `Tardies:\n${tardiesItemized.join('\n')}`
         : 'No tardies';
 
-    // Create plain text table for scores
-    const scoreTable = scores.join('\t'); // Tab-separated for Excel compatibility
-
-    // Format plain text content with a clear table-like structure
-    const plainTextContent = `Scores:\n${scoreTable}\n\nHouse points for today:\n${housePointsMessage}\n\n${tardiesMessage}`;
-
     // Check if user is on macOS
     const isMacOS = /Macintosh|Mac OS X/i.test(navigator.userAgent);
 
@@ -53,18 +47,36 @@ function copyScores() {
             console.error('Failed to copy scores: ', err);
         });
     } else {
-        // For non-macOS, open email client
+        // For non-macOS, create CSV file and open email client
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        const subject = encodeURIComponent(`${classes[currentClassIndex].name} Participation - ${dateStr}`);
-        const body = encodeURIComponent(plainTextContent);
+        const className = classes[currentClassIndex].name;
+
+        // Create CSV content for scores
+        const csvContent = scores.map(score => `"${score}"`).join(','); // Quote values to handle special characters
+        const csvDataUri = `data:text/csv;charset=utf-8,Scores\n${csvContent}`;
+
+        // Create a temporary link to trigger CSV download
+        const downloadLink = document.createElement('a');
+        downloadLink.href = csvDataUri;
+        downloadLink.download = `${className}_Participation_${now.toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        // Email body with house points, tardies, and instructions
+        const emailBody = `Please attach the downloaded CSV file (${downloadLink.download}) containing the participation scores.\n\nHouse points for today:\n${housePointsMessage}\n\n${tardiesMessage}`;
+
+        // Open email client
+        const subject = encodeURIComponent(`${className} Participation - ${dateStr}`);
+        const body = encodeURIComponent(emailBody);
         const mailtoLink = `mailto:garrison.tubbs-biph@basischina.com?subject=${subject}&body=${body}`;
         window.location.href = mailtoLink;
 
-        // Still show the alert for consistency
+        // Show alert and message
         const message = `House points for today:\n${housePointsMessage}\n\n${tardiesMessage}\n\nReset scores?`;
         showCustomAlert(message);
-        showTemporaryMessage('Email draft opened');
+        showTemporaryMessage('Email draft opened and CSV downloaded');
     }
 }
 

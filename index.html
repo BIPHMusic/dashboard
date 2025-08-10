@@ -482,11 +482,6 @@ function openMenu(menuId) {
         menu.style.zIndex = currentZIndex;
         menu.style.display = 'block';
         menuStack.push(menu);
-        console.log(`Menu opened: ${menuId}, menuStack: ${menuStack.map(m => m.id).join(',')}`);
-    } else if (menu) {
-        console.log(`Menu ${menuId} already in menuStack, skipping`);
-    } else {
-        console.error(`Menu ${menuId} not found`);
     }
 }
 
@@ -950,7 +945,7 @@ function navigateStudentMenu(direction) {
         currentStudentIndex = (currentStudentIndex + direction + students.length) % students.length;
     }
     const newStudent = students[currentStudentIndex];
-    resetBarHighlights(); // Reset all bars before highlighting the new one
+    resetBarHighlights();
     showFloatingMenu(null, newStudent.name);
 }
 
@@ -960,7 +955,6 @@ function showFloatingMenu(event, studentName) {
     const isProductionTech = classes[currentClassIndex].name === "Production Tech";
     currentStudentIndex = students.findIndex(s => s.name === studentName);
     if (currentStudentIndex === -1) {
-        console.error('Student not found:', studentName);
         return;
     }
     floatingMenu.innerHTML = `
@@ -1198,19 +1192,16 @@ function activateHouseshield() {
         }
     }
     if (currentStudentIndex === -1 || currentStudentIndex >= students.length) {
-        console.error('No valid student selected');
         return;
     }
     const student = students[currentStudentIndex];
     const houseInfo = masterList.find(s => s.name === student.name);
     if (!houseInfo) {
-        console.error('No house information found for student:', student.name);
         return;
     }
     if (houseshield) {
         houseshield.style.backgroundImage = `url('https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${houseInfo.house.toLowerCase()}.png')`;
         houseshield.style.display = 'block';
-        // Force reflow to ensure animation plays
         void houseshield.offsetWidth;
         houseshield.classList.add('active');
     }
@@ -1239,7 +1230,7 @@ function applyHousePointsChange() {
     const student = students[currentStudentIndex];
     const change = currentPoints - student.housePoints;
     updateHousePoints(student.name, change);
-    closeFloatingMenu(); // Close floating menu when points are awarded
+    closeFloatingMenu();
     deactivateHouseshield();
 }
 
@@ -1248,13 +1239,10 @@ function deactivateHouseshield() {
     const points = document.getElementById('points');
     const studentName = document.getElementById('student-name');
     if (houseshield) {
-        // Ensure element is in active state before transitioning
         houseshield.style.display = 'block';
         houseshield.classList.add('active');
-        // Force reflow to reset position
         void houseshield.offsetWidth;
         houseshield.classList.remove('active');
-        // Hide after transition completes
         const handler = (event) => {
             if (event.propertyName === 'opacity' && !houseshield.classList.contains('active')) {
                 houseshield.style.display = 'none';
@@ -1262,13 +1250,12 @@ function deactivateHouseshield() {
             }
         };
         houseshield.addEventListener('transitionend', handler);
-        // Fallback in case transitionend doesn't fire
         setTimeout(() => {
             if (!houseshield.classList.contains('active') && houseshield.style.display !== 'none') {
                 houseshield.style.display = 'none';
                 houseshield.removeEventListener('transitionend', handler);
             }
-        }, 600); // Slightly longer than 0.5s transition
+        }, 600);
     }
     if (points) {
         points.classList.remove('active');
@@ -1278,7 +1265,6 @@ function deactivateHouseshield() {
     }
     isActive = false;
     closeSpecificMenu('houseshield');
-    // Reset mode to GLOBAL unless another modal (except floating-menu) is open
     const floatingMenu = document.getElementById('floating-menu');
     if (menuStack.length === 0 || (menuStack.length === 1 && menuStack[0] === floatingMenu)) {
         currentMode = MODES.GLOBAL;
@@ -1320,9 +1306,7 @@ const LONG_PRESS_DURATION = 1000;
 
 function toggleFullscreen() {
     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-            console.error(`Error attempting to enable fullscreen: ${err.message}`);
-        });
+        document.documentElement.requestFullscreen();
     } else {
         document.exitFullscreen();
     }

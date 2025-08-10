@@ -468,7 +468,7 @@ opacity: 1;
 @media (max-width: 1200px) {
     .bar {
         margin: 0 2px; 
-        margin-bottom: -15px;
+        margin-bottom: -10px;
         height: 110%;
     }
     

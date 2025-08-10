@@ -11,7 +11,7 @@ const hotkeys = [
 
 function getMenuHotkeys() {
     const isProductionTech = classes[currentClassIndex].name === "Production Tech";
-    const hotkeys = [
+    return [
         { key: "a", description: "Toggle Attendance." },
         { key: isProductionTech ? "d" : "s", description: `Toggle ${isProductionTech ? 'Devices' : 'Stands'} checkbox(es).` },
         { key: isProductionTech ? "e" : "i", description: `Toggle ${isProductionTech ? 'Engagement' : 'iPads'} checkbox(es).` },
@@ -20,7 +20,6 @@ function getMenuHotkeys() {
         { key: "h", description: "Toggle House Shield." },
         { key: "Esc", description: "Close current window or House Shield." }
     ];
-    return hotkeys;
 }
 
 function populateHotkeys(hotkeys, elementId) {
@@ -49,51 +48,36 @@ function handleHouseShieldHotkey(event) {
 }
 
 function handleFloatingMenuHotkeys(event, studentName) {
-    if (window.isObjectiveInputFocused) {
-        console.log(`Floating menu hotkeys blocked: Objective input focused`);
-        return;
-    }
+    if (window.isObjectiveInputFocused) return;
 
     const student = students.find(s => s.name === studentName);
-    if (!student) {
-        console.error(`Student not found: ${studentName}`);
-        return;
-    }
+    if (!student) return;
 
     if (currentStudentIndex === -1) {
         currentStudentIndex = students.findIndex(s => s.name === studentName);
-        console.log(`Set currentStudentIndex to ${currentStudentIndex} for ${studentName}`);
     }
 
     const isProductionTech = classes[currentClassIndex].name === "Production Tech";
     
     switch (event.key) {
         case 'a':
-            console.log(`Cycling attendance for ${studentName}`);
             cycleAttendanceForStudent(student);
             break;
         case isProductionTech ? 'd' : 's':
-            console.log(`Toggling ${isProductionTech ? 'devices' : 'stands'} for ${studentName}`);
             toggleCheckboxForStudent(student, isProductionTech ? 'devices' : 'stands');
             break;
         case isProductionTech ? 'e' : 'i':
-            console.log(`Toggling ${isProductionTech ? 'engagement' : 'ipads'} for ${studentName}`);
             toggleCheckboxForStudent(student, isProductionTech ? 'engagement' : 'ipads');
             break;
         case 'r':
-            console.log(`Toggling ${isProductionTech ? 'review' : 'returned'} for ${studentName}`);
             toggleCheckboxForStudent(student, isProductionTech ? 'review' : 'returned');
             break;
         case isProductionTech ? 'p' : 'e':
-            console.log(`Toggling ${isProductionTech ? 'progress' : 'engagement'} for ${studentName}`);
             toggleCheckboxForStudent(student, isProductionTech ? 'progress' : 'engagement');
             break;
         case 'h':
-            console.log(`Toggling house shield for ${studentName}`);
             toggleHouseShield();
             break;
-        default:
-            console.log(`Key ${event.key} not handled in floating menu for ${studentName}`);
     }
     updateFloatingMenu(student);
 }
@@ -148,32 +132,23 @@ function handleSearchBoxKeys(event) {
 }
 
 function handleActiveHouseshield(event) {
-    console.log(`handleActiveHouseshield: key=${event.key}, currentPoints=${currentPoints}, currentStudentIndex=${currentStudentIndex}`);
     if (currentStudentIndex === -1 || currentStudentIndex >= students.length) {
-        console.error(`Invalid currentStudentIndex: ${currentStudentIndex}`);
         deactivateHouseshield();
         return;
     }
     if (event.key.toLowerCase() === 'h') {
-        console.log(`Toggling house shield`);
         toggleHouseShield();
     } else if (event.key === 'ArrowUp') {
         currentPoints = Math.min(currentPoints + 10, 100);
-        console.log(`Increased points to ${currentPoints}`);
         updatePoints();
     } else if (event.key === 'ArrowDown') {
         currentPoints = Math.max(currentPoints - 10, -100);
-        console.log(`Decreased points to ${currentPoints}`);
         updatePoints();
     } else if (event.key === 'Enter') {
-        console.log(`Applying house points change for student ${students[currentStudentIndex].name}`);
         applyHousePointsChange();
         deactivateHouseshield();
     } else if (event.key === 'Escape') {
-        console.log(`Deactivating house shield`);
         deactivateHouseshield();
-    } else {
-        console.log(`Key ${event.key} not handled in HOUSESHIELD mode`);
     }
 }
 
@@ -204,11 +179,7 @@ function handleObjectiveInputKeys(event) {
 }
 
 function handleGlobalHotkeys(event) {
-    console.log(`handleGlobalHotkeys: key=${event.key}, metaKey=${event.metaKey}, ctrlKey=${event.ctrlKey}, altKey=${event.altKey}, currentMode=${currentMode}, currentStudentIndex=${currentStudentIndex}, menuStack=${menuStack.map(m => m.id).join(',')}, floatingMenu=${document.getElementById('floating-menu').style.display}, teacherMode=${document.getElementById('teacher-mode').style.display}`);
-    
-    // Handle input focus
     if (window.isObjectiveInputFocused) {
-        console.log(`Hotkeys blocked: Objective input focused`);
         if (['Control', 'Meta', 'Alt', 'Shift'].includes(event.key)) return;
         if (event.metaKey || event.ctrlKey) {
             const allowedShortcuts = ['a', 'c', 'v', 'x', 'z', 'y', '='];
@@ -224,17 +195,13 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    // Handle Escape when modals are open
     if (event.key === 'Escape' && menuStack.length > 0) {
-        console.log(`Escape pressed, closing top menu: ${menuStack[menuStack.length - 1]?.id}`);
         closeTopMenu();
         event.preventDefault();
         return;
     }
 
-    // Handle overlay toggle
     if (event.key === '?' || (event.altKey && event.key === '/')) {
-        console.log(`Toggling overlay with key: ${event.key}`);
         toggleOverlay();
         event.preventDefault();
         return;
@@ -244,18 +211,13 @@ function handleGlobalHotkeys(event) {
     const floatingMenu = document.getElementById('floating-menu');
     const teacherMode = document.getElementById('teacher-mode');
 
-    // Define valid keys
     const validKeys = ['t', 'a', isProductionTech ? 'd' : 's', isProductionTech ? 'e' : 'i', 'r', isProductionTech ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'h', '=', '+'];
 
-    // Log if key is not valid
     if (!validKeys.includes(event.key) && !(event.metaKey && ['ArrowLeft', 'ArrowRight'].includes(event.key))) {
-        console.log(`Key ignored: ${event.key} is not a valid hotkey in GLOBAL mode`);
         return;
     }
 
-    // Handle meta key combinations
     if (event.metaKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
-        console.log(`Cycling class: ${event.key === 'ArrowRight' ? 'next' : 'previous'}`);
         event.preventDefault();
         currentClassIndex = event.key === 'ArrowRight' ? 
             (currentClassIndex + 1) % classes.length : 
@@ -266,19 +228,14 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    // Handle specific hotkeys
     switch (event.key) {
         case 'h':
             if (currentStudentIndex !== -1 || floatingMenu.style.display === 'block') {
-                console.log(`Toggling house shield for studentIndex: ${currentStudentIndex}`);
                 toggleHouseShield();
                 event.preventDefault();
-            } else {
-                console.log(`Cannot toggle house shield: No student selected (currentStudentIndex=${currentStudentIndex})`);
             }
             break;
         case 't':
-            console.log(`Toggling teacher mode: Current state=${teacherMode.style.display}`);
             if (teacherMode.style.display === 'block') {
                 exitTeacherMode();
             } else {
@@ -288,18 +245,15 @@ function handleGlobalHotkeys(event) {
             break;
         case '/':
             if (!document.getElementById('search-box')) {
-                console.log(`Opening search box`);
                 createSearchBox();
                 event.preventDefault();
             }
             break;
         case 'ArrowRight':
-            console.log(`Navigating to next student`);
             navigateStudentMenu(1);
             event.preventDefault();
             break;
         case 'ArrowLeft':
-            console.log(`Navigating to previous student`);
             navigateStudentMenu(-1);
             event.preventDefault();
             break;
@@ -307,30 +261,22 @@ function handleGlobalHotkeys(event) {
             if (floatingMenu.style.display === 'block') {
                 const studentName = floatingMenu.querySelector('h3').textContent;
                 if (event.altKey) {
-                    console.log(`Increasing house points for ${studentName}`);
                     updateHousePoints(studentName, 10);
                 } else {
-                    console.log(`Increasing participation score for ${studentName}`);
                     updateScore(studentName, 10);
                 }
                 event.preventDefault();
-            } else {
-                console.log(`ArrowUp ignored: Floating menu not open`);
             }
             break;
         case 'ArrowDown':
             if (floatingMenu.style.display === 'block') {
                 const studentName = floatingMenu.querySelector('h3').textContent;
                 if (event.altKey) {
-                    console.log(`Decreasing house points for ${studentName}`);
                     updateHousePoints(studentName, -10);
                 } else {
-                    console.log(`Decreasing participation score for ${studentName}`);
                     updateScore(studentName, -10);
                 }
                 event.preventDefault();
-            } else {
-                console.log(`ArrowDown ignored: Floating menu not open`);
             }
             break;
         case 'a':
@@ -342,11 +288,9 @@ function handleGlobalHotkeys(event) {
         case 'p':
             if (floatingMenu.style.display === 'block') {
                 const studentName = floatingMenu.querySelector('h3').textContent;
-                console.log(`Handling floating menu hotkey: ${event.key} for ${studentName}`);
                 handleFloatingMenuHotkeys(event, studentName);
                 event.preventDefault();
             } else if (teacherMode.style.display === 'block') {
-                console.log(`Handling teacher mode hotkey: ${event.key}`);
                 switch (event.key) {
                     case 'a':
                         cycleAttendance();
@@ -365,19 +309,14 @@ function handleGlobalHotkeys(event) {
                         break;
                 }
                 event.preventDefault();
-            } else {
-                console.log(`Hotkey ${event.key} ignored: Neither floating menu nor teacher mode open`);
             }
             break;
         case '=':
         case '+':
             if (event.shiftKey && !event.ctrlKey && !event.metaKey) {
-                console.log(`Toggling add student mode`);
                 toggleAddStudentMode();
                 event.preventDefault();
             }
             break;
-        default:
-            console.log(`Key ${event.key} not handled in GLOBAL mode`);
     }
 }

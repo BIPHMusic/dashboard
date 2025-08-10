@@ -151,6 +151,10 @@ margin-top: -13px;
     transition: background-color 0.8s ease;
 }
 
+.bar, .bar-label {
+    transition: opacity 0.5s ease, height 0.3s ease-in-out;
+}
+
 .bar.bdaycolorful {
 animation: barColorCycle 6s infinite;
 }
@@ -255,6 +259,7 @@ justify-content: flex-end;
 height: auto; 
 }
 
+
 .secondary-labels {
 position: absolute; 
 left: 50%; 
@@ -263,11 +268,13 @@ transform: translateX(-50%);
 display: flex;
 flex-direction: column;
 align-items: center;
+cursor: default;
 }
 
 .tardy-label {
     font-size: 1.1em;
     color: red;
+    cursor: default;
 }
 
 .house-points {
@@ -458,7 +465,6 @@ opacity: 1;
     transform: translate(-50%, -50%); 
 }
 
-/* for narrow screens */
 @media (max-width: 1200px) {
     .bar {
         margin: 0 2px; 
@@ -486,22 +492,29 @@ opacity: 1;
         align-items: flex-start;
         justify-content: center;
         text-align: right;
+        z-index: 500;
     }
 
     .bar-label .main-labels span:first-child {
         color: white;
+        z-index: 500;
     }
 
     .ex-score .bar-label .main-labels span:first-child {
         color: black;
+        z-index: 500;
     }
 
     .house-points {
-        font-size: 1vw;
+        font-size: clamp(10px, 1vw, 14px);
         font-weight: bold;
         transition: background-color 1.0s ease, backdrop-filter 1.0s ease;
         border-radius: 4px;
         padding: 2px 6px;
+        position: fixed;
+        top: -65px;
+        transform: translateX(50%) rotate(90deg);
+        z-index: 10;
     }
     
     .value-label {
@@ -517,8 +530,15 @@ opacity: 1;
     }
     
     .secondary-labels {
-        font-size: 1vw;
-        bottom: -150%;       
+        font-size: clamp(10px, 1vw, 14px);
+        bottom: -150%;  
+        cursor: pointer;  
+        z-index: 5;   
+    }
+
+    .tardy-label {
+        cursor: pointer;  
+        z-index: 5;   
     }
 
     .bar-label .score {
@@ -559,44 +579,44 @@ background-color: #f0f0f0;
 }
 
 #houseshield {
-        position: fixed;
-        bottom: -200px;
-        left: 50%;
-        transform: translatex(-50%);
-        width: 100px;
-        height: 120px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        transition: all 0.5s ease-out;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    position: fixed;
+    bottom: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 120px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: bottom 0.5s ease-out, opacity 0.5s ease-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+}
 
-    #houseshield.active {
-        bottom: 50%;
-        left: 50%;
-        transform: translate(-50%, 50%);
-    }
+#houseshield.active {
+    bottom: calc(50% - 60px); /* Adjusted to center vertically, accounting for height */
+    transform: translateX(-50%);
+    opacity: 1;
+}
 
-    #points {
-        width: 100px;
-        transform: translate(calc(-50% + 48px), calc(50% - 30px));
-        font-size: 36px;
-        font-weight: bold;
-        text-align: center;
-        align-items: center;
-        color: #ffffff;
-        text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);
-        opacity: 0;
-        transition: opacity 0.3s ease-out;
-    }
+#points {
+    width: 100px;
+    transform: translate(calc(-50% + 49px), calc(50% + 5px));
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    align-items: center;
+    color: #ffffff;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
 
-    #points.active {
-        text-align: center;
-        opacity: 1;
-    }
+#points.active {
+    opacity: 1;
+}
 
     #student-name {
         position: absolute;

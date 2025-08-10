@@ -59,752 +59,773 @@
     <script src="studentlist.js"></script>
     <script src="hotkeys.js"></script>
     <script>
-        const positiveEffects = [
-            'sounds/villager-positive1.mp3',
-            'sounds/villager-positive2.mp3',
-            'sounds/villager-positive3.mp3',
-            'sounds/villager-positive4.mp3'
-        ];
+const positiveEffects = [
+    'sounds/villager-positive1.mp3',
+    'sounds/villager-positive2.mp3',
+    'sounds/villager-positive3.mp3',
+    'sounds/villager-positive4.mp3'
+];
 
-        const negativeEffects50Plus = [
-            'sounds/villager-negative0.5.mp3',
-            'sounds/villager-negative0.9.mp3',
-            'sounds/villager-negative1.5.mp3',
-            'sounds/villager-negative3.5.mp3'
-        ];
+const negativeEffects50Plus = [
+    'sounds/villager-negative0.5.mp3',
+    'sounds/villager-negative0.9.mp3',
+    'sounds/villager-negative1.5.mp3',
+    'sounds/villager-negative3.5.mp3'
+];
 
-        const negativeEffects10to50 = [
-            'sounds/villager-negative3.mp3',
-            'sounds/villager-negative4.mp3',
-            'sounds/villager-negative5.mp3'
-        ];
+const negativeEffects10to50 = [
+    'sounds/villager-negative3.mp3',
+    'sounds/villager-negative4.mp3',
+    'sounds/villager-negative5.mp3'
+];
 
-        const negativeEffect0 = 'sounds/villager-negative6.mp3';
+const negativeEffect0 = 'sounds/villager-negative6.mp3';
 
-        function playRandomSound(soundArray) {
-            const randomIndex = Math.floor(Math.random() * soundArray.length);
-            const audio = new Audio(soundArray[randomIndex]);
-            audio.volume = 0.25; 
-            audio.play();
-        }
+function playRandomSound(soundArray) {
+    const randomIndex = Math.floor(Math.random() * soundArray.length);
+    const audio = new Audio(soundArray[randomIndex]);
+    audio.volume = 0.25;
+    audio.play();
+}
 
-        const classes = [
-            {
-                name: "Production Tech",
-                timeRange: "10:45 - 11:35",
-                days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                startTime: { hours: 10, minutes: 45 },
-                endTime: { hours: 11, minutes: 35 },
-                students: productionTechStudents,
-                teacherModeOrder: productionTechTeacherModeOrder,
-                objectivesKey: "productionTechObjectives",
-                defaultObjectives: [
-                    'Review',
-                    'Group Work',
-                    'Housekeeping'
-                ],
-                sampleObjectives: [
-                    'Review',
-                    'Hardware',
-                    'Software',
-                    'QLab skills',
-                    'Independent work',
-                    'Group work',
-                    'Troubleshooting',
-                    'Housekeeping'
-                ],
-                criteria: ['devices', 'engagement', 'review', 'progress']
-            },
-            {
-                name: "MS Band",
-                timeRange: "12:40 - 1:30",
-                days: ["Monday", "Tuesday", "Wednesday"],
-                startTime: { hours: 12, minutes: 40 },
-                endTime: { hours: 13, minutes: 30 },
-                students: msBandStudents,
-                teacherModeOrder: msBandTeacherModeOrder,
-                objectivesKey: "msBandObjectives",
-                defaultObjectives: [
-                    'New members!',
-                    'This year at a glance',
-                    'Instrument Selection'
-                ],
-                sampleObjectives: [
-                    'Review',
-                    'Music for Winter Concert',
-                    'The Nutcracker Music',
-                    'Independent work',
-                    'Sectionals',
-                    'Playing Tests',
-                    'Announcements',
-                    'Housekeeping'
-                ],
-                criteria: ['stands', 'ipads', 'returned', 'engagement']
-            },
-            {
-                name: "MS Band ᵀᴴᵁᴿˢ",
-                timeRange: "12:40 - 1:30",
-                days: ["Thursday"],
-                startTime: { hours: 12, minutes: 40 },
-                endTime: { hours: 13, minutes: 30 },
-                students: msBandThursdayStudents,
-                teacherModeOrder: msBandThursdayTeacherModeOrder,
-                objectivesKey: "msBandThursdayObjectives",
-                defaultObjectives: [
-                    'First pieces for this year',
-                    'Individual / sectional work',
-                    'Detail work'
-                ],
-                sampleObjectives: [
-                    'Review',
-                    'Music for Winter Concert',
-                    'The Nutcracker Music',
-                    'Independent work',
-                    'Sectionals',
-                    'Playing Tests',
-                    'Announcements',
-                    'Housekeeping'
-                ],
-                criteria: ['stands', 'ipads', 'returned', 'engagement']
-            },
-            {
-                name: "HS Band",
-                timeRange: "3:25 - 4:30",
-                days: ["Monday", "Tuesday", "Wednesday", "Thursday"],
-                startTime: { hours: 15, minutes: 25 },
-                endTime: { hours: 16, minutes: 30 },
-                students: hsBandStudents,
-                teacherModeOrder: hsBandTeacherModeOrder,
-                objectivesKey: "hsBandObjectives",
-                defaultObjectives: [
-                    'First pieces for this year',
-                    'Individual / sectional work',
-                    'Housekeeping'
-                ],
-                sampleObjectives: [
-                    'Review',
-                    'Music for Winter Concert',
-                    'The Nutcracker Music',
-                    'Independent work',
-                    'Sectionals',
-                    'Playing Tests',
-                    'Announcements',
-                    'Housekeeping'
-                ],
-                criteria: ['stands', 'ipads', 'returned', 'engagement']
+const classes = [
+    {
+        name: "Production Tech",
+        timeRange: "10:45 - 11:35",
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        startTime: { hours: 10, minutes: 45 },
+        endTime: { hours: 11, minutes: 35 },
+        students: productionTechStudents,
+        teacherModeOrder: productionTechTeacherModeOrder,
+        objectivesKey: "productionTechObjectives",
+        defaultObjectives: [
+            'Review',
+            'Group Work',
+            'Housekeeping'
+        ],
+        sampleObjectives: [
+            'Review',
+            'Hardware',
+            'Software',
+            'QLab skills',
+            'Independent work',
+            'Group work',
+            'Troubleshooting',
+            'Housekeeping'
+        ],
+        criteria: ['devices', 'engagement', 'review', 'progress']
+    },
+    {
+        name: "MS Band",
+        timeRange: "12:40 - 1:30",
+        days: ["Monday", "Tuesday", "Wednesday"],
+        startTime: { hours: 12, minutes: 40 },
+        endTime: { hours: 13, minutes: 30 },
+        students: msBandStudents,
+        teacherModeOrder: msBandTeacherModeOrder,
+        objectivesKey: "msBandObjectives",
+        defaultObjectives: [
+            'New members!',
+            'This year at a glance',
+            'Instrument Selection'
+        ],
+        sampleObjectives: [
+            'Review',
+            'Music for Winter Concert',
+            'The Nutcracker Music',
+            'Independent work',
+            'Sectionals',
+            'Playing Tests',
+            'Announcements',
+            'Housekeeping'
+        ],
+        criteria: ['stands', 'ipads', 'returned', 'engagement']
+    },
+    {
+        name: "MS Band ᵀᴴᵁᴿˢ",
+        timeRange: "12:40 - 1:30",
+        days: ["Thursday"],
+        startTime: { hours: 12, minutes: 40 },
+        endTime: { hours: 13, minutes: 30 },
+        students: msBandThursdayStudents,
+        teacherModeOrder: msBandThursdayTeacherModeOrder,
+        objectivesKey: "msBandThursdayObjectives",
+        defaultObjectives: [
+            'First pieces for this year',
+            'Individual / sectional work',
+            'Detail work'
+        ],
+        sampleObjectives: [
+            'Review',
+            'Music for Winter Concert',
+            'The Nutcracker Music',
+            'Independent work',
+            'Sectionals',
+            'Playing Tests',
+            'Announcements',
+            'Housekeeping'
+        ],
+        criteria: ['stands', 'ipads', 'returned', 'engagement']
+    },
+    {
+        name: "HS Band",
+        timeRange: "3:25 - 4:30",
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday"],
+        startTime: { hours: 15, minutes: 25 },
+        endTime: { hours: 16, minutes: 30 },
+        students: hsBandStudents,
+        teacherModeOrder: hsBandTeacherModeOrder,
+        objectivesKey: "hsBandObjectives",
+        defaultObjectives: [
+            'First pieces for this year',
+            'Individual / sectional work',
+            'Housekeeping'
+        ],
+        sampleObjectives: [
+            'Review',
+            'Music for Winter Concert',
+            'The Nutcracker Music',
+            'Independent work',
+            'Sectionals',
+            'Playing Tests',
+            'Announcements',
+            'Housekeeping'
+        ],
+        criteria: ['stands', 'ipads', 'returned', 'engagement']
+    }
+];
+
+let currentClassIndex = 0;
+let students = classes[0].students;
+let teacherModeOrder = classes[0].teacherModeOrder;
+let currentCriteria = classes[0].criteria;
+let isObjectiveInputFocused = false;
+let isAddingStudent = false;
+
+function getCurrentClass() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
+    const currentTime = currentHour * 60 + currentMinute;
+
+    for (let i = 0; i < classes.length; i++) {
+        const cls = classes[i];
+        if (cls.days.includes(currentDay)) {
+            const start = cls.startTime.hours * 60 + cls.startTime.minutes;
+            const end = cls.endTime.hours * 60 + cls.endTime.minutes;
+            if (currentTime >= start - 30 && currentTime <= start) {
+                return i;
+            } else if (currentTime >= end - 10 && currentTime <= end) {
+                return i;
             }
-        ];
-
-        let currentClassIndex = 0;
-        let students = classes[0].students;
-        let teacherModeOrder = classes[0].teacherModeOrder;
-        let currentCriteria = classes[0].criteria;
-        let isObjectiveInputFocused = false;
-        let isAddingStudent = false;
-
-        function getCurrentClass() {
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
-            const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
-            const currentTime = currentHour * 60 + currentMinute;
-
-            for (let i = 0; i < classes.length; i++) {
-                const cls = classes[i];
-                if (cls.days.includes(currentDay)) {
-                    const start = cls.startTime.hours * 60 + cls.startTime.minutes;
-                    const end = cls.endTime.hours * 60 + cls.endTime.minutes;
-                    if (currentTime >= start - 30 && currentTime <= start) {
-                        return i;
-                    } else if (currentTime >= end - 10 && currentTime <= end) {
-                        return i;
-                    }
-                }
-            }
-            return currentClassIndex;
         }
+    }
+    return currentClassIndex;
+}
 
-        function cycleClass() {
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
-            const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
-            const currentTime = currentHour * 60 + currentMinute;
-            
-            let nextIndex = currentClassIndex;
-            let attempts = 0;
-            
-            do {
-                nextIndex = (nextIndex + 1) % classes.length;
-                attempts++;
-                const cls = classes[nextIndex];
-                if (cls.days.includes(currentDay)) {
-                    const start = cls.startTime.hours * 60 + cls.startTime.minutes;
-                    if (currentTime >= start - 30 && currentTime <= start) {
-                        currentClassIndex = nextIndex;
-                        updateClassDisplay();
-                        updateCountdowns();
-                        return;
-                    }
-                }
-            } while (nextIndex !== currentClassIndex && attempts < classes.length);
-            
-            currentClassIndex = (currentClassIndex + 1) % classes.length;
-            updateClassDisplay();
-            updateCountdowns();
-        }
-
-        function updateClassDisplay() {
-            const cls = classes[currentClassIndex];
-            document.querySelector('#title h1').textContent = cls.name;
-            document.querySelector('#timeRange').textContent = cls.timeRange;
-            students = cls.students;
-            teacherModeOrder = cls.teacherModeOrder;
-            currentCriteria = cls.criteria;
-            loadObjectives(cls.objectivesKey);
-            createBars();
-            if (document.getElementById('teacher-mode').style.display === 'block') {
-                populateStudents();
-            }
-            updateHotkeysDisplay();
-            updateCountdowns();
-        }
-
-        function updateCountdowns() {
-            const countdownContainer = document.getElementById('countdowns');
-            countdownContainer.innerHTML = '';
-
-            const currentClass = classes[currentClassIndex];
-            const now = new Date();
-            const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
-
-            if (!currentClass.days.includes(currentDay)) {
-                hasCopiedScores = false;
+function cycleClass() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
+    const currentTime = currentHour * 60 + currentMinute;
+    
+    let nextIndex = currentClassIndex;
+    let attempts = 0;
+    
+    do {
+        nextIndex = (nextIndex + 1) % classes.length;
+        attempts++;
+        const cls = classes[nextIndex];
+        if (cls.days.includes(currentDay)) {
+            const start = cls.startTime.hours * 60 + cls.startTime.minutes;
+            if (currentTime >= start - 30 && currentTime <= start) {
+                currentClassIndex = nextIndex;
+                updateClassDisplay();
+                updateCountdowns();
                 return;
             }
+        }
+    } while (nextIndex !== currentClassIndex && attempts < classes.length);
+    
+    currentClassIndex = (currentClassIndex + 1) % classes.length;
+    updateClassDisplay();
+    updateCountdowns();
+}
 
-            const startTime = new Date(now);
-            startTime.setHours(currentClass.startTime.hours, currentClass.startTime.minutes, 0, 0);
+function updateClassDisplay() {
+    const cls = classes[currentClassIndex];
+    document.querySelector('#title h1').textContent = cls.name;
+    document.querySelector('#timeRange').textContent = cls.timeRange;
+    students = cls.students;
+    teacherModeOrder = cls.teacherModeOrder;
+    currentCriteria = cls.criteria;
+    loadObjectives(cls.objectivesKey);
+    createBars();
+    if (document.getElementById('teacher-mode').style.display === 'block') {
+        populateStudents();
+    }
+    updateHotkeysDisplay();
+    updateCountdowns();
+}
 
-            const endTime = new Date(now);
-            endTime.setHours(currentClass.endTime.hours, currentClass.endTime.minutes, 0, 0);
+function updateCountdowns() {
+    const countdownContainer = document.getElementById('countdowns');
+    countdownContainer.innerHTML = '';
 
-            let startDiff = (startTime - now) / 1000;
-            let endDiff = (endTime - now) / 1000;
+    const currentClass = classes[currentClassIndex];
+    const now = new Date();
+    const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
 
-            if (startDiff < -86400) startDiff += 86400;
-            if (endDiff < -86400) endDiff += 86400;
+    if (!currentClass.days.includes(currentDay)) {
+        hasCopiedScores = false;
+        return;
+    }
 
-            if (startDiff > 0 && startDiff <= 1800) {
-                const minutes = Math.floor(startDiff / 60);
-                const seconds = Math.floor(startDiff % 60);
-                const startDiv = document.createElement('div');
-                startDiv.className = 'start-countdown';
-                startDiv.textContent = `Class begins in ${minutes}m ${seconds}s`;
-                countdownContainer.appendChild(startDiv);
-            }
+    const startTime = new Date(now);
+    startTime.setHours(currentClass.startTime.hours, currentClass.startTime.minutes, 0, 0);
 
-            if (endDiff <= 600 && endDiff > 300) {
-                const conclusionDiff = endDiff - 300;
-                const minutes = Math.floor(conclusionDiff / 60);
-                const seconds = Math.floor(conclusionDiff % 60);
-                const conclusionDiv = document.createElement('div');
-                conclusionDiv.className = 'conclusion-countdown';
-                conclusionDiv.textContent = `Conclusion: ${minutes}m ${seconds}s`;
-                countdownContainer.appendChild(conclusionDiv);
-            }
-            else if (endDiff <= 300 && endDiff > 0) {
-                const minutes = Math.floor(endDiff / 60);
-                const seconds = Math.floor(endDiff % 60);
-                const packupDiv = document.createElement('div');
-                packupDiv.className = 'packup-countdown';
-                packupDiv.textContent = `♫ Pack up: ${minutes}m ${seconds}s ♫`;
-                countdownContainer.appendChild(packupDiv);
-                if (currentClass.criteria.includes('returned')) {
-                    const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${currentClass.criteria.indexOf('returned') + 3}) input[type="checkbox"]`);
-                    checkboxes.forEach((checkbox, index) => {
-                        if (checkbox.checked) {
-                            checkbox.checked = false;
-                            const studentName = teacherModeOrder[index];
-                            if (studentName) {
-                                syncCheckbox(studentName, checkbox, 'returned');
-                            }
-                        }
-                    });
+    const endTime = new Date(now);
+    endTime.setHours(currentClass.endTime.hours, currentClass.endTime.minutes, 0, 0);
+
+    let startDiff = (startTime - now) / 1000;
+    let endDiff = (endTime - now) / 1000;
+
+    if (startDiff < -86400) startDiff += 86400;
+    if (endDiff < -86400) endDiff += 86400;
+
+    if (startDiff > 0 && startDiff <= 1800) {
+        const minutes = Math.floor(startDiff / 60);
+        const seconds = Math.floor(startDiff % 60);
+        const startDiv = document.createElement('div');
+        startDiv.className = 'start-countdown';
+        startDiv.textContent = `Class begins in ${minutes}m ${seconds}s`;
+        countdownContainer.appendChild(startDiv);
+    }
+
+    if (endDiff <= 600 && endDiff > 300) {
+        const conclusionDiff = endDiff - 300;
+        const minutes = Math.floor(conclusionDiff / 60);
+        const seconds = Math.floor(conclusionDiff % 60);
+        const conclusionDiv = document.createElement('div');
+        conclusionDiv.className = 'conclusion-countdown';
+        conclusionDiv.textContent = `Conclusion: ${minutes}m ${seconds}s`;
+        countdownContainer.appendChild(conclusionDiv);
+    }
+    else if (endDiff <= 300 && endDiff > 0) {
+        const minutes = Math.floor(endDiff / 60);
+        const seconds = Math.floor(endDiff % 60);
+        const packupDiv = document.createElement('div');
+        packupDiv.className = 'packup-countdown';
+        packupDiv.textContent = `♫ Pack up: ${minutes}m ${seconds}s ♫`;
+        countdownContainer.appendChild(packupDiv);
+        if (currentClass.criteria.includes('returned')) {
+            const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${currentClass.criteria.indexOf('returned') + 3}) input[type="checkbox"]`);
+            checkboxes.forEach((checkbox, index) => {
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                    const studentName = teacherModeOrder[index];
+                    if (studentName) {
+                        syncCheckbox(studentName, checkbox, 'returned');
+                    }
                 }
-                hasCopiedScores = false;
-            }
-            else if (endDiff <= 0 && endDiff > -2 && !hasCopiedScores) {
-                copyScores();
-                hasCopiedScores = true;
-            }
-        }
-
-        function loadObjectives(key) {
-            const cls = classes.find(c => c.objectivesKey === key);
-            const objectives = JSON.parse(localStorage.getItem(key)) || cls.defaultObjectives;
-            updateObjectiveList(objectives);
-        }
-
-        function saveObjectives(key) {
-            const objectives = Array.from(document.querySelectorAll('#objectiveList li')).map(li => li.textContent);
-            localStorage.setItem(key, JSON.stringify(objectives));
-        }
-
-        function updateObjectiveList(objectives) {
-            const objectiveList = document.getElementById('objectiveList');
-            objectiveList.innerHTML = objectives.map(obj => `<li class="editable" onclick="editObjective(this)">${obj}</li>`).join('');
-        }
-
-        function editObjective(item) {
-            const cls = classes[currentClassIndex];
-            const currentItem = item.textContent;
-            const index = Array.from(item.parentElement.children).indexOf(item);
-            const dialog = document.createElement('div');
-            dialog.style.position = 'fixed';
-            dialog.style.top = '50%';
-            dialog.style.left = '50%';
-            dialog.style.transform = 'translate(-50%, -50%)';
-            dialog.style.backgroundColor = 'white';
-            dialog.style.padding = '20px';
-            dialog.style.borderRadius = '5px';
-            dialog.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-            dialog.style.zIndex = '1000';
-            dialog.style.textAlign = 'center';
-            dialog.style.lineHeight = '1.3';
-            dialog.style.width = '400px';
-
-            const suggestions = cls.sampleObjectives.length > 0 
-                ? cls.sampleObjectives.map(obj => `
-                    <a href="#" style="font-size: 0.85em; text-decoration: none; display: block; margin: 2px 0;" 
-                       onclick="
-                           document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = '${obj}';
-                           saveObjectives('${cls.objectivesKey}'); 
-                           this.closest('div').remove(); 
-                           window.isObjectiveInputFocused = false; 
-                           return false;">
-                        ${obj}
-                    </a>
-                  `).join('')
-                : '<p style="font-size: 0.85em; color: #999;">No sample objectives available</p>';
-
-            dialog.innerHTML = `
-                <h3>Edit Objective</h3>
-                <input type="text" id="objectiveInput" value="${currentItem}" style="width: 80%; padding: 5px;" data-original-value="${currentItem}">
-                <p style="text-align: left; margin-left: 33px; margin-top: 10px;">
-                    ${suggestions}
-                </p>
-                <button onclick="
-                    const input = document.getElementById('objectiveInput'); 
-                    if (input.value.trim() !== '') { 
-                        document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = input.value.trim(); 
-                        saveObjectives('${cls.objectivesKey}'); 
-                    } 
-                    this.closest('div').remove(); 
-                    window.isObjectiveInputFocused = false;">
-                    Save
-                </button>
-                <button onclick="this.closest('div').remove(); window.isObjectiveInputFocused = false;">Cancel</button>
-            `;
-
-            document.body.appendChild(dialog);
-            const input = document.getElementById('objectiveInput');
-            input.focus();
-            input.select();
-            window.isObjectiveInputFocused = true;
-
-            input.addEventListener('focus', () => { window.isObjectiveInputFocused = true; });
-            input.addEventListener('blur', () => { window.isObjectiveInputFocused = false; });
-
-            const handleKeydown = (event) => {
-                if (event.key === 'Escape') {
-                    dialog.remove();
-                    window.isObjectiveInputFocused = false;
-                    document.removeEventListener('keydown', handleKeydown);
-                }
-            };
-            document.addEventListener('keydown', handleKeydown);
-
-            const handleOutsideClick = (event) => {
-                if (!dialog.contains(event.target)) {
-                    dialog.remove();
-                    window.isObjectiveInputFocused = false;
-                    document.removeEventListener('click', handleOutsideClick);
-                }
-            };
-
-            setTimeout(() => {
-                document.addEventListener('click', handleOutsideClick);
-            }, 0);
-        }
-
-        let menuStack = [];
-        let currentZIndex = 1000;
-        const MODES = {
-            GLOBAL: 'global',
-            SEARCH: 'search',
-            HOUSESHIELD: 'houseshield'
-        };
-        let currentMode = MODES.GLOBAL;
-        let currentStudentIndex = -1;
-        let searchBox = null;
-        let searchResults = null;
-        let selectedIndex = 0;
-        let hasCopiedScores = false;
-
-        function globalKeydownHandler(event) {
-            switch(currentMode) {
-                case MODES.GLOBAL:
-                    handleGlobalHotkeys(event);
-                    break;
-                case MODES.SEARCH:
-                    handleSearchBoxKeys(event);
-                    break;
-                case MODES.HOUSESHIELD:
-                    handleActiveHouseshield(event);
-                    break;
-            }
-        }
-
-        document.addEventListener('keydown', globalKeydownHandler);
-
-        function openMenu(menuId) {
-            const menu = document.getElementById(menuId);
-            if (menu) {
-                currentZIndex++;
-                menu.style.zIndex = currentZIndex;
-                menu.style.display = 'block';
-                menuStack.push(menu);
-            }
-        }
-
-        function closeTopMenu() {
-            if (menuStack.length > 0) {
-                const topMenu = menuStack.pop();
-                topMenu.style.display = 'none';
-                if (topMenu.id === 'search-box') {
-                    currentMode = MODES.GLOBAL;
-                    isAddingStudent = false;
-                }
-            }
-        }
-
-        function closeSpecificMenu(menuId) {
-            const menuIndex = menuStack.findIndex(menu => menu.id === menuId);
-            if (menuIndex !== -1) {
-                const menu = menuStack.splice(menuIndex, 1)[0];
-                menu.style.display = 'none';
-                if (menu.id === 'search-box') {
-                    currentMode = MODES.GLOBAL;
-                    isAddingStudent = false;
-                }
-            }
-        }
-
-        function populateStudents() {
-            const spreadsheet = document.querySelector('.spreadsheet');
-            const isProductionTech = classes[currentClassIndex].name === "Production Tech";
-            spreadsheet.innerHTML = `
-                <div class="spreadsheet-header"><strong>Student</strong></div>
-                <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
-                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[0]}')">${isProductionTech ? 'Devices' : 'Stands'}</strong></div>
-                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[1]}')">${isProductionTech ? 'Engagement' : 'iPads'}</strong></div>
-                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[2]}')">${isProductionTech ? 'Review' : 'Returned'}</strong></div>
-                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[3]}')">${isProductionTech ? 'Progress' : 'Engagement'}</strong></div>
-                <div class="spreadsheet-header"><strong>Participation</strong></div>
-                <div class="spreadsheet-header"><strong>House Points</strong></div>
-            `;
-            teacherModeOrder.forEach(name => {
-                const student = students.find(s => s.name === name);
-                const row = document.createElement('div');
-                row.className = 'spreadsheet-row';
-                row.dataset.studentName = student.name;
-                row.innerHTML = `
-                    <div class="student-name">${student.name}</div>
-                    <div class="attendance-dropdown">
-                        <select onchange="syncAttendance('${student.name}', this)">
-                            <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
-                            <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
-                            <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
-                        </select>
-                    </div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" ${student[currentCriteria[0]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
-                    </div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" ${student[currentCriteria[1]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
-                    </div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" ${student[currentCriteria[2]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
-                    </div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" ${student[currentCriteria[3]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
-                    </div>
-                    <div class="stepper">
-                        <button onclick="updateScore('${student.name}', -10)">-</button>
-                        <span class="score">${student.score === 'EX' ? student.score : student.score + '%'}</span>
-                        <button onclick="updateScore('${student.name}', 10)">+</button>
-                    </div>
-                    <div class="stepper">
-                        <button onclick="updateHousePoints('${student.name}', -10)">-</button>
-                        <span>${student.housePoints}</span>
-                        <button onclick="updateHousePoints('${student.name}', 10)">+</button>
-                    </div>
-                `;
-                spreadsheet.appendChild(row);
             });
         }
+        hasCopiedScores = false;
+    }
+    else if (endDiff <= 0 && endDiff > -2 && !hasCopiedScores) {
+        copyScores();
+        hasCopiedScores = true;
+    }
+}
 
-        function updateHousePoints(name, change) {
-            const student = students.find(s => s.name === name);
-            if (student) {
-                student.housePoints += change;
-                updateScoreDisplay(student);
-                const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
-                if (housePointsSpan) {
-                    housePointsSpan.textContent = student.housePoints;
-                }
-                updateFloatingMenu(student);
-                updateBarGraph(student);
-                const housePointsElement = document.querySelector(`#bar-${CSS.escape(student.name)} .house-points`);
-                if (housePointsElement) {
-                    const houseInfo = masterList.find(s => s.name === student.name);
-                    const houseColor = getHouseColor(houseInfo.house);
-                    housePointsElement.style.transition = 'background-color 1.0s ease, backdrop-filter 1.0s ease';
-                    housePointsElement.style.backgroundColor = `${houseColor}CC`;
-                    setTimeout(() => {
-                        housePointsElement.style.backgroundColor = `${houseColor}66`;
-                    }, 500);
-                }
+function loadObjectives(key) {
+    const cls = classes.find(c => c.objectivesKey === key);
+    const objectives = JSON.parse(localStorage.getItem(key)) || cls.defaultObjectives;
+    updateObjectiveList(objectives);
+}
+
+function saveObjectives(key) {
+    const objectives = Array.from(document.querySelectorAll('#objectiveList li')).map(li => li.textContent);
+    localStorage.setItem(key, JSON.stringify(objectives));
+}
+
+function updateObjectiveList(objectives) {
+    const objectiveList = document.getElementById('objectiveList');
+    objectiveList.innerHTML = objectives.map(obj => `<li class="editable" onclick="editObjective(this)">${obj}</li>`).join('');
+}
+
+function editObjective(item) {
+    const cls = classes[currentClassIndex];
+    const currentItem = item.textContent;
+    const index = Array.from(item.parentElement.children).indexOf(item);
+    const dialog = document.createElement('div');
+    dialog.style.position = 'fixed';
+    dialog.style.top = '50%';
+    dialog.style.left = '50%';
+    dialog.style.transform = 'translate(-50%, -50%)';
+    dialog.style.backgroundColor = 'white';
+    dialog.style.padding = '20px';
+    dialog.style.borderRadius = '5px';
+    dialog.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+    dialog.style.zIndex = '1000';
+    dialog.style.textAlign = 'center';
+    dialog.style.lineHeight = '1.3';
+    dialog.style.width = '400px';
+
+    const suggestions = cls.sampleObjectives.length > 0 
+        ? cls.sampleObjectives.map(obj => `
+            <a href="#" style="font-size: 0.85em; text-decoration: none; display: block; margin: 2px 0;" 
+               onclick="
+                   document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = '${obj}';
+                   saveObjectives('${cls.objectivesKey}'); 
+                   this.closest('div').remove(); 
+                   window.isObjectiveInputFocused = false; 
+                   return false;">
+                ${obj}
+            </a>
+          `).join('')
+        : '<p style="font-size: 0.85em; color: #999;">No sample objectives available</p>';
+
+    dialog.innerHTML = `
+        <h3>Edit Objective</h3>
+        <input type="text" id="objectiveInput" value="${currentItem}" style="width: 80%; padding: 5px;" data-original-value="${currentItem}">
+        <p style="text-align: left; margin-left: 33px; margin-top: 10px;">
+            ${suggestions}
+        </p>
+        <button onclick="
+            const input = document.getElementById('objectiveInput'); 
+            if (input.value.trim() !== '') { 
+                document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = input.value.trim(); 
+                saveObjectives('${cls.objectivesKey}'); 
+            } 
+            this.closest('div').remove(); 
+            window.isObjectiveInputFocused = false;">
+            Save
+        </button>
+        <button onclick="this.closest('div').remove(); window.isObjectiveInputFocused = false;">Cancel</button>
+    `;
+
+    document.body.appendChild(dialog);
+    const input = document.getElementById('objectiveInput');
+    input.focus();
+    input.select();
+    window.isObjectiveInputFocused = true;
+
+    input.addEventListener('focus', () => { window.isObjectiveInputFocused = true; });
+    input.addEventListener('blur', () => { window.isObjectiveInputFocused = false; });
+
+    const handleKeydown = (event) => {
+        if (event.key === 'Escape') {
+            dialog.remove();
+            window.isObjectiveInputFocused = false;
+            document.removeEventListener('keydown', handleKeydown);
+        }
+    };
+    document.addEventListener('keydown', handleKeydown);
+
+    const handleOutsideClick = (event) => {
+        if (!dialog.contains(event.target)) {
+            dialog.remove();
+            window.isObjectiveInputFocused = false;
+            document.removeEventListener('click', handleOutsideClick);
+        }
+    };
+
+    setTimeout(() => {
+        document.addEventListener('click', handleOutsideClick);
+    }, 0);
+}
+
+let menuStack = [];
+let currentZIndex = 1000;
+const MODES = {
+    GLOBAL: 'global',
+    SEARCH: 'search',
+    HOUSESHIELD: 'houseshield'
+};
+let currentMode = MODES.GLOBAL;
+let currentStudentIndex = -1;
+let searchBox = null;
+let searchResults = null;
+let selectedIndex = 0;
+let hasCopiedScores = false;
+let isActive = false;
+let currentPoints = 0;
+
+function globalKeydownHandler(event) {
+    if (event.key === 'Escape' && menuStack.length > 0) {
+        closeTopMenu();
+        return;
+    }
+
+    switch(currentMode) {
+        case MODES.GLOBAL:
+            handleGlobalHotkeys(event);
+            break;
+        case MODES.SEARCH:
+            handleSearchBoxKeys(event);
+            break;
+        case MODES.HOUSESHIELD:
+            handleActiveHouseshield(event);
+            break;
+    }
+}
+
+document.addEventListener('keydown', globalKeydownHandler);
+
+function openMenu(menuId) {
+    const menu = document.getElementById(menuId);
+    if (menu) {
+        currentZIndex++;
+        menu.style.zIndex = currentZIndex;
+        menu.style.display = 'block';
+        menuStack.push(menu);
+    }
+}
+
+function closeTopMenu() {
+    if (menuStack.length > 0) {
+        const topMenu = menuStack.pop();
+        topMenu.style.display = 'none';
+        if (topMenu.id === 'search-box') {
+            currentMode = MODES.GLOBAL;
+            isAddingStudent = false;
+        } else if (topMenu.id === 'houseshield') {
+            deactivateHouseshield();
+        } else if (topMenu.id === 'floating-menu') {
+            resetBarHighlights();
+        }
+        if (menuStack.length === 0) {
+            currentMode = MODES.GLOBAL;
+        }
+    }
+}
+
+function closeSpecificMenu(menuId) {
+    const menuIndex = menuStack.findIndex(menu => menu.id === menuId);
+    if (menuIndex !== -1) {
+        const menu = menuStack.splice(menuIndex, 1)[0];
+        menu.style.display = 'none';
+        if (menu.id === 'search-box') {
+            currentMode = MODES.GLOBAL;
+            isAddingStudent = false;
+        } else if (menu.id === 'houseshield') {
+            deactivateHouseshield();
+        } else if (menu.id === 'floating-menu') {
+            resetBarHighlights();
+        }
+        if (menuStack.length === 0) {
+            currentMode = MODES.GLOBAL;
+        }
+    }
+}
+
+function populateStudents() {
+    const spreadsheet = document.querySelector('.spreadsheet');
+    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    spreadsheet.innerHTML = `
+        <div class="spreadsheet-header"><strong>Student</strong></div>
+        <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[0]}')">${isProductionTech ? 'Devices' : 'Stands'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[1]}')">${isProductionTech ? 'Engagement' : 'iPads'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[2]}')">${isProductionTech ? 'Review' : 'Returned'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[3]}')">${isProductionTech ? 'Progress' : 'Engagement'}</strong></div>
+        <div class="spreadsheet-header"><strong>Participation</strong></div>
+        <div class="spreadsheet-header"><strong>House Points</strong></div>
+    `;
+    teacherModeOrder.forEach(name => {
+        const student = students.find(s => s.name === name);
+        const row = document.createElement('div');
+        row.className = 'spreadsheet-row';
+        row.dataset.studentName = student.name;
+        row.innerHTML = `
+            <div class="student-name">${student.name}</div>
+            <div class="attendance-dropdown">
+                <select onchange="syncAttendance('${student.name}', this)">
+                    <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
+                    <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
+                    <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+                </select>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[0]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[1]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[2]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[3]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
+            </div>
+            <div class="stepper">
+                <button onclick="updateScore('${student.name}', -10)">-</button>
+                <span class="score">${student.score === 'EX' ? student.score : student.score + '%'}</span>
+                <button onclick="updateScore('${student.name}', 10)">+</button>
+            </div>
+            <div class="stepper">
+                <button onclick="updateHousePoints('${student.name}', -10)">-</button>
+                <span>${student.housePoints}</span>
+                <button onclick="updateHousePoints('${student.name}', 10)">+</button>
+            </div>
+        `;
+        spreadsheet.appendChild(row);
+    });
+}
+
+function updateHousePoints(name, change) {
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student.housePoints += change;
+        updateScoreDisplay(student);
+        const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
+        if (housePointsSpan) {
+            housePointsSpan.textContent = student.housePoints;
+        }
+        updateFloatingMenu(student);
+        updateBarGraph(student);
+        const housePointsElement = document.querySelector(`#bar-${CSS.escape(student.name)} .house-points`);
+        if (housePointsElement) {
+            const houseInfo = masterList.find(s => s.name === student.name);
+            const houseColor = getHouseColor(houseInfo.house);
+            housePointsElement.style.transition = 'background-color 1.0s ease, backdrop-filter 1.0s ease';
+            housePointsElement.style.backgroundColor = `${houseColor}CC`;
+            setTimeout(() => {
+                housePointsElement.style.backgroundColor = `${houseColor}66`;
+            }, 500);
+        }
+    }
+}
+
+function getHouseColor(house) {
+    switch (house.toLowerCase()) {
+        case 'red': return '#FF3333';
+        case 'blue': return '#3366FF';
+        case 'green': return '#00A300';
+        case 'yellow': return '#FFCC00';
+        default: return '#808080';
+    }
+}
+
+function toggleTeacherMode() {
+    const teacherMode = document.getElementById('teacher-mode');
+    if (teacherMode.style.display === 'block') {
+        closeSpecificMenu('teacher-mode');
+    } else {
+        openMenu('teacher-mode');
+        populateStudents();
+    }
+}
+
+function enterTeacherMode() {
+    openMenu('teacher-mode');
+    populateStudents();
+}
+
+function exitTeacherMode() {
+    closeSpecificMenu('teacher-mode');
+}
+
+function syncAttendance(name, select) {
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student.attendance = select.value;
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+        updateBarGraph(student);
+        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
+        if (teacherRow) {
+            const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+            if (attendanceSelect) {
+                attendanceSelect.value = student.attendance;
             }
         }
+        updateFloatingMenu(student);
+    }
+}
 
-        function getHouseColor(house) {
-            switch (house.toLowerCase()) {
-                case 'red': return '#FF3333';
-                case 'blue': return '#3366FF';
-                case 'green': return '#00A300';
-                case 'yellow': return '#FFCC00';
-                default: return '#808080';
-            }
-        }
+function syncCheckbox(name, checkbox, type) {
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student[type] = checkbox.checked;
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateBarGraph(student);
+        updateTeacherMenu(student);
+        updateFloatingMenu(student);
+    }
+}
 
-        function toggleTeacherMode() {
-            const teacherMode = document.getElementById('teacher-mode');
-            if (teacherMode.style.display === 'block') {
-                closeSpecificMenu('teacher-mode');
+function updateScore(name, change) {
+    const student = students.find(s => s.name === name);
+    if (student && student.score !== 'EX') {
+        const newScore = Math.max(0, Math.min(100, student.score + change));
+        if (newScore !== student.score) {
+            student.manualAdjustment = (student.manualAdjustment || 0) + (newScore - student.score);
+            student.score = newScore;
+            const bar = document.getElementById(`bar-${name}`);
+            bar.style.height = `${student.score}%`;
+            bar.querySelector('.bar-label').innerHTML = `${name}<br>${student.score}%`;
+            bar.style.setProperty('--flash-color', change > 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
+            bar.classList.remove('flash-animation');
+            void bar.offsetWidth;
+            bar.classList.add('flash-animation');
+            updateScoreDisplay(student);
+            updateFloatingMenu(student);
+            if (change > 0) {
+                playRandomSound(positiveEffects);
             } else {
-                openMenu('teacher-mode');
-                populateStudents();
-            }
-        }
-
-        function enterTeacherMode() {
-            openMenu('teacher-mode');
-            populateStudents();
-        }
-
-        function exitTeacherMode() {
-            closeSpecificMenu('teacher-mode');
-        }
-
-        function syncAttendance(name, select) {
-            const student = students.find(s => s.name === name);
-            if (student) {
-                student.attendance = select.value;
-                calculateScore(student);
-                updateScoreDisplay(student);
-                updateTardyLabel(student);
-                updateBarGraph(student);
-                const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
-                if (teacherRow) {
-                    const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
-                    if (attendanceSelect) {
-                        attendanceSelect.value = student.attendance;
-                    }
-                }
-                updateFloatingMenu(student);
-            }
-        }
-
-        function syncCheckbox(name, checkbox, type) {
-            const student = students.find(s => s.name === name);
-            if (student) {
-                student[type] = checkbox.checked;
-                calculateScore(student);
-                updateScoreDisplay(student);
-                updateBarGraph(student);
-                updateTeacherMenu(student);
-                updateFloatingMenu(student);
-            }
-        }
-
-        function updateScore(name, change) {
-            const student = students.find(s => s.name === name);
-            if (student && student.score !== 'EX') {
-                const newScore = Math.max(0, Math.min(100, student.score + change));
-                if (newScore !== student.score) {
-                    student.manualAdjustment = (student.manualAdjustment || 0) + (newScore - student.score);
-                    student.score = newScore;
-                    const bar = document.getElementById(`bar-${name}`);
-                    bar.style.height = `${student.score}%`;
-                    bar.querySelector('.bar-label').innerHTML = `${name}<br>${student.score}%`;
-                    bar.style.setProperty('--flash-color', change > 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
-                    bar.classList.remove('flash-animation');
-                    void bar.offsetWidth;
-                    bar.classList.add('flash-animation');
-                    updateScoreDisplay(student);
-                    updateFloatingMenu(student);
-                    if (change > 0) {
-                        playRandomSound(positiveEffects);
-                    } else {
-                        if (newScore === 0) {
-                            const audio = new Audio(negativeEffect0);
-                            audio.play();
-                        } else if (newScore >= 50) {
-                            playRandomSound(negativeEffects50Plus);
-                        } else if (newScore >= 10) {
-                            playRandomSound(negativeEffects10to50);
-                        }
-                    }
+                if (newScore === 0) {
+                    const audio = new Audio(negativeEffect0);
+                    audio.play();
+                } else if (newScore >= 50) {
+                    playRandomSound(negativeEffects50Plus);
+                } else if (newScore >= 10) {
+                    playRandomSound(negativeEffects10to50);
                 }
             }
         }
+    }
+}
 
-        function calculateScore(student) {
-            if (student.attendance === 'Absent') {
-                student.score = 'EX';
-            } else {
-                let baseScore = 60;
-                if (student.attendance === 'Tardy') baseScore -= 20;
-                if (student[currentCriteria[0]]) baseScore += 10;
-                if (student[currentCriteria[1]]) baseScore += 10;
-                if (student[currentCriteria[2]]) baseScore += 10;
-                if (student[currentCriteria[3]]) baseScore += 10;
-                let manualAdjustment = student.manualAdjustment || 0;
-                student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
-            }
+function calculateScore(student) {
+    if (student.attendance === 'Absent') {
+        student.score = 'EX';
+    } else {
+        let baseScore = 60;
+        if (student.attendance === 'Tardy') baseScore -= 20;
+        if (student[currentCriteria[0]]) baseScore += 10;
+        if (student[currentCriteria[1]]) baseScore += 10;
+        if (student[currentCriteria[2]]) baseScore += 10;
+        if (student[currentCriteria[3]]) baseScore += 10;
+        let manualAdjustment = student.manualAdjustment || 0;
+        student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
+    }
+}
+
+function updateScoreDisplay(student) {
+    const bar = document.getElementById(`bar-${student.name}`);
+    if (bar) {
+        const isStudentsBirthday = isBirthday(student.birthdate);
+        if (isStudentsBirthday) {
+            bar.classList.add('bdaycolorful');
+        } else {
+            bar.classList.remove('bdaycolorful');
         }
-
-        function updateScoreDisplay(student) {
-            const bar = document.getElementById(`bar-${student.name}`);
-            if (bar) {
-                const isStudentsBirthday = isBirthday(student.birthdate);
-                if (isStudentsBirthday) {
-                    bar.classList.add('bdaycolorful');
-                } else {
-                    bar.classList.remove('bdaycolorful');
-                }
-                bar.style.transition = 'height 0.3s ease-in-out';
-                const houseInfo = masterList.find(s => s.name === student.name);
-                const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
-                if (student.score === 'EX') {
-                    bar.classList.add('ex-score');
-                    bar.style.height = '0%';
-                    bar.innerHTML = `
-                        <div class="bar-label">
-                            <div class="main-labels">
-                                <span>${student.name}</span>
-                                <span class="score">EX</span>
-                            </div>
-                            <div class="secondary-labels">
-                                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                                ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    bar.classList.remove('ex-score');
-                    bar.style.height = `${student.score}%`;
-                    bar.innerHTML = `
-                        <div class="value-label">${student.score}%</div>
-                        <div class="bar-label">
-                            <div class="main-labels">
-                                <span>${student.name}</span>
-                                <span class="score">${student.score}%</span>
-                            </div>
-                            <div class="secondary-labels">
-                                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                                ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                            </div>
-                        </div>
-                    `;
-                }
-                const scoreSpan = bar.querySelector('.score');
-                if (scoreSpan) {
-                    scoreSpan.removeAttribute('style');
-                }
-                updateTeacherMenu(student);
-                updateFloatingMenu(student);
-                const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
-                if (participationSpan) {
-                    participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
-                }
-            }
+        bar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
+        const houseInfo = masterList.find(s => s.name === student.name);
+        const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+        if (student.score === 'EX') {
+            bar.classList.add('ex-score');
+            bar.style.height = '0%';
+            bar.innerHTML = `
+                <div class="bar-label">
+                    <div class="main-labels">
+                        <span>${student.name}</span>
+                        <span class="score">EX</span>
+                    </div>
+                    <div class="secondary-labels">
+                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        } else {
+            bar.classList.remove('ex-score');
+            bar.style.height = `${student.score}%`;
+            bar.innerHTML = `
+                <div class="value-label">${student.score}%</div>
+                <div class="bar-label">
+                    <div class="main-labels">
+                        <span>${student.name}</span>
+                        <span class="score">${student.score}%</span>
+                    </div>
+                    <div class="secondary-labels">
+                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                    </div>
+                </div>
+            `;
         }
+        const scoreSpan = bar.querySelector('.score');
+        if (scoreSpan) {
+            scoreSpan.removeAttribute('style');
+        }
+        updateTeacherMenu(student);
+        updateFloatingMenu(student);
+        const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+        if (participationSpan) {
+            participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+        }
+    }
+}
 
-        window.addEventListener('resize', () => {
-            students.forEach(student => updateScoreDisplay(student));
+window.addEventListener('resize', () => {
+    students.forEach(student => updateScoreDisplay(student));
+});
+
+function updateTeacherMenu(student) {
+    const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+    if (participationSpan) {
+        participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+    }
+    const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
+    if (housePointsSpan) {
+        housePointsSpan.textContent = student.housePoints;
+    }
+}
+
+function updateFloatingMenu(student) {
+    const floatingMenu = document.getElementById('floating-menu');
+    if (floatingMenu && floatingMenu.style.display === 'block') {
+        const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+        const attendanceSelect = floatingMenu.querySelector('select');
+        if (attendanceSelect) {
+            attendanceSelect.value = student.attendance;
+        }
+        const checkboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            const property = checkbox.id.replace('checkbox-', '');
+            checkbox.checked = student[property];
         });
-
-        function updateTeacherMenu(student) {
-            const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
-            if (participationSpan) {
-                participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
-            }
-            const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
-            if (housePointsSpan) {
-                housePointsSpan.textContent = student.housePoints;
-            }
+        const participationSpan = floatingMenu.querySelector('.stepper:first-of-type span');
+        if (participationSpan) {
+            participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
         }
+        const housePointsSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
+        if (housePointsSpan) {
+            housePointsSpan.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
+        }
+    }
+}
 
-        function updateFloatingMenu(student) {
-            const floatingMenu = document.getElementById('floating-menu');
-            if (floatingMenu && floatingMenu.style.display === 'block') {
-                const isProductionTech = classes[currentClassIndex].name === "Production Tech";
-                const attendanceSelect = floatingMenu.querySelector('select');
-                if (attendanceSelect) {
-                    attendanceSelect.value = student.attendance;
+function updateTardyLabel(student) {
+    const bar = document.getElementById(`bar-${student.name}`);
+    if (bar) {
+        const secondaryLabels = bar.querySelector('.secondary-labels');
+        if (secondaryLabels) {
+            const tardyLabel = secondaryLabels.querySelector('.tardy-label');
+            if (student.attendance === 'Tardy') {
+                if (!tardyLabel) {
+                    const newTardyLabel = document.createElement('div');
+                    newTardyLabel.className = 'tardy-label';
+                    newTardyLabel.textContent = 'Tardy';
+                    secondaryLabels.appendChild(newTardyLabel);
                 }
-                const checkboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(checkbox => {
-                    const property = checkbox.id.replace('checkbox-', '');
-                    checkbox.checked = student[property];
-                });
-                const participationSpan = floatingMenu.querySelector('.stepper:first-of-type span');
-                if (participationSpan) {
-                    participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
-                }
-                const housePointsSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
-                if (housePointsSpan) {
-                    housePointsSpan.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
+            } else {
+                if (tardyLabel) {
+                    tardyLabel.remove();
                 }
             }
         }
+    }
+}
 
-        function updateTardyLabel(student) {
-            const bar = document.getElementById(`bar-${student.name}`);
-            if (bar) {
-                const secondaryLabels = bar.querySelector('.secondary-labels');
-                if (secondaryLabels) {
-                    const tardyLabel = secondaryLabels.querySelector('.tardy-label');
-                    if (student.attendance === 'Tardy') {
-                        if (!tardyLabel) {
-                            const newTardyLabel = document.createElement('div');
-                            newTardyLabel.className = 'tardy-label';
-                            newTardyLabel.textContent = 'Tardy';
-                            secondaryLabels.appendChild(newTardyLabel);
-                        }
-                    } else {
-                        if (tardyLabel) {
-                            tardyLabel.remove();
-                        }
-                    }
-                }
-            }
-        }
-
-        function createBars() {
+function createBars() {
     const container = document.getElementById('graph-container');
     container.innerHTML = '';
     students.forEach(student => {
@@ -817,6 +838,7 @@
         if (student.score === 'EX') {
             bar.classList.add('ex-score');
         }
+        bar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
         bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
         bar.id = `bar-${student.name}`;
         bar.dataset.studentName = student.name;
@@ -836,13 +858,18 @@
             </div>
         `;
         bar.addEventListener('mouseover', () => highlightBar(student.name));
-        bar.addEventListener('mouseout', resetBarHighlights);
+        bar.addEventListener('mouseout', () => resetBarHighlights());
         bar.addEventListener('click', (event) => {
-            if (event.target.closest('.main-labels span:first-child') || 
-                event.target.closest('.main-labels span.score') || 
-                event.target.closest('.secondary-labels')) {
+            const nameSpan = event.target.closest('.main-labels span:first-child');
+            const scoreSpan = event.target.closest('.main-labels span.score');
+            const tardyLabel = event.target.closest('.secondary-labels .tardy-label');
+            const housePoints = event.target.closest('.secondary-labels .house-points');
+            const isNarrowView = window.matchMedia('(max-width: 1200px)').matches;
+            if (nameSpan || (!isNarrowView && scoreSpan)) {
                 cycleAttendanceForStudent(student);
-            } else {
+            } else if (isNarrowView && (scoreSpan || tardyLabel || housePoints)) {
+                showFloatingMenu(event, student.name);
+            } else if (!nameSpan && !scoreSpan && !tardyLabel && !housePoints) {
                 showFloatingMenu(event, student.name);
             }
         });
@@ -850,17 +877,42 @@
     });
 }
 
-        function isBirthday(birthdate) {
-            if (!birthdate) return false;
-            const today = new Date();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            const todayFormatted = `${month}-${day}`;
-            const [, birthMonth, birthDay] = birthdate.split('-');
-            return `${birthMonth}-${birthDay}` === todayFormatted;
-        }
+function isBirthday(birthdate) {
+    if (!birthdate) return false;
+    const today = new Date();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayFormatted = `${month}-${day}`;
+    const [, birthMonth, birthDay] = birthdate.split('-');
+    return `${birthMonth}-${birthDay}` === todayFormatted;
+}
 
-        function updateBarGraph(student) {
+function highlightBar(name) {
+    document.querySelectorAll('.bar, .bar-label').forEach(el => {
+        if (el.id === `bar-${name}` || el.parentElement.id === `bar-${name}`) {
+            el.style.opacity = '1';
+            const nameSpan = el.querySelector('.main-labels span:first-child');
+            if (nameSpan) {
+                nameSpan.style.fontWeight = 'bold';
+            }
+        } else {
+            el.style.opacity = '0.7';
+        }
+    });
+}
+
+function resetBarHighlights() {
+    document.querySelectorAll('.bar, .bar-label').forEach(el => {
+        el.style.opacity = '1';
+        const nameSpan = el.querySelector('.main-labels span:first-child');
+        if (nameSpan) {
+            nameSpan.style.fontWeight = 'normal';
+            nameSpan.style.textDecoration = 'none';
+        }
+    });
+}
+
+function updateBarGraph(student) {
     const bar = document.getElementById(`bar-${student.name}`);
     if (bar) {
         const housePointsElement = bar.querySelector('.house-points');
@@ -886,493 +938,513 @@
     }
 }
 
-        function navigateStudentMenu(direction) {
-            if (currentStudentIndex === -1) {
-                currentStudentIndex = direction > 0 ? 0 : students.length - 1;
-            } else {
-                currentStudentIndex = (currentStudentIndex + direction + students.length) % students.length;
-            }
-            const newStudent = students[currentStudentIndex];
-            showFloatingMenu(null, newStudent.name);
-        }
+function navigateStudentMenu(direction) {
+    if (currentStudentIndex === -1) {
+        currentStudentIndex = direction > 0 ? 0 : students.length - 1;
+    } else {
+        currentStudentIndex = (currentStudentIndex + direction + students.length) % students.length;
+    }
+    const newStudent = students[currentStudentIndex];
+    showFloatingMenu(null, newStudent.name);
+}
 
-        function showFloatingMenu(event, studentName) {
-            const floatingMenu = document.getElementById('floating-menu');
-            const student = students.find(s => s.name === studentName);
-            const isProductionTech = classes[currentClassIndex].name === "Production Tech";
-            currentStudentIndex = students.findIndex(s => s.name === studentName);
-            if (currentStudentIndex === -1) {
-                console.error('Student not found:', studentName);
-                return;
-            }
-            floatingMenu.innerHTML = `
-                <span class="close-button" onclick="closeTopMenu()">&times;</span>
-                <h3 onclick="cycleAttendanceForStudent(students[${currentStudentIndex}])">${student.name}</h3>
-                <select onchange="syncAttendance('${student.name}', this)">
-                    <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
-                    <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
-                    <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
-                </select>
-                <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${isProductionTech ? 'Devices' : 'Stands'}</label>
-                <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${isProductionTech ? 'Engagement' : 'iPads'}</label>
-                <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${isProductionTech ? 'Review' : 'Returned'}</label>
-                <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${isProductionTech ? 'Progress' : 'Engagement'}</label>
-                <div class="stepper">
-                    <button onclick="updateScore('${student.name}', -10)">-</button>
-                    <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
-                    <button onclick="updateScore('${student.name}', 10)">+</button>
-                </div>
-                <div class="stepper">
-                    <span>House Points</span>
-                    <button onclick="updateHousePoints('${student.name}', -10)">-</button>
-                    <span>${student.housePoints > 0 ? '+' : ''}${student.housePoints}</span>
-                    <button onclick="updateHousePoints('${student.name}', 10)">+</button>
-                </div>
-                <button onclick="closeFloatingMenu()">Close</button>
-            `;
-            const menuWidth = floatingMenu.offsetWidth;
-            const menuHeight = floatingMenu.offsetHeight;
-            floatingMenu.style.left = `50%`;
-            floatingMenu.style.top = `50%`;
-            openMenu('floating-menu');
-            highlightBar(student.name);
-        }
+function showFloatingMenu(event, studentName) {
+    const floatingMenu = document.getElementById('floating-menu');
+    const student = students.find(s => s.name === studentName);
+    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    currentStudentIndex = students.findIndex(s => s.name === studentName);
+    if (currentStudentIndex === -1) {
+        console.error('Student not found:', studentName);
+        return;
+    }
+    floatingMenu.innerHTML = `
+        <span class="close-button" onclick="closeTopMenu()">&times;</span>
+        <h3 onclick="cycleAttendanceForStudent(students[${currentStudentIndex}])">${student.name}</h3>
+        <select onchange="syncAttendance('${student.name}', this)">
+            <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
+            <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
+            <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+        </select>
+        <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${isProductionTech ? 'Devices' : 'Stands'}</label>
+        <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${isProductionTech ? 'Engagement' : 'iPads'}</label>
+        <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${isProductionTech ? 'Review' : 'Returned'}</label>
+        <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${isProductionTech ? 'Progress' : 'Engagement'}</label>
+        <div class="stepper">
+            <button onclick="updateScore('${student.name}', -10)">-</button>
+            <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
+            <button onclick="updateScore('${student.name}', 10)">+</button>
+        </div>
+        <div class="stepper">
+            <span>House Points</span>
+            <button onclick="updateHousePoints('${student.name}', -10)">-</button>
+            <span>${student.housePoints > 0 ? '+' : ''}${student.housePoints}</span>
+            <button onclick="updateHousePoints('${student.name}', 10)">+</button>
+        </div>
+        <button onclick="closeFloatingMenu()">Close</button>
+    `;
+    const menuWidth = floatingMenu.offsetWidth;
+    const menuHeight = floatingMenu.offsetHeight;
+    floatingMenu.style.left = `50%`;
+    floatingMenu.style.top = `50%`;
+    openMenu('floating-menu');
+    highlightBar(student.name);
+}
 
-        function closeFloatingMenu() {
-            closeSpecificMenu('floating-menu');
-            resetBarHighlights();
-        }
+function closeFloatingMenu() {
+    closeSpecificMenu('floating-menu');
+    resetBarHighlights();
+}
 
-        function highlightBar(name) {
-    document.querySelectorAll('.bar, .bar-label').forEach(el => {
-        el.style.transition = 'opacity 0.5s ease'; // Add transition
-        if (el.id === `bar-${name}` || el.parentElement.id === `bar-${name}`) {
-            el.style.opacity = '1';
-            const nameSpan = el.querySelector('.main-labels span:first-child');
-            if (nameSpan) {
-                nameSpan.style.fontWeight = 'bold';
-            }
-        } else {
-            el.style.opacity = '0.7';
+function updateDateTime() {
+    const now = new Date();
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('currentDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
+}
+
+function cycleAttendance() {
+    const attendanceOptions = ['Absent', 'Present', 'Tardy'];
+    const currentIndex = attendanceOptions.indexOf(students[0].attendance);
+    const nextIndex = (currentIndex + 1) % attendanceOptions.length;
+    const nextAttendance = attendanceOptions[nextIndex];
+    students.forEach(student => {
+        student.attendance = nextAttendance;
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+    });
+    document.querySelectorAll('.attendance-dropdown select').forEach(select => {
+        select.value = nextAttendance;
+    });
+}
+
+function toggleAllCheckboxes(type) {
+    const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${currentCriteria.indexOf(type) + 3}) input[type="checkbox"]`);
+    const anyUnchecked = Array.from(checkboxes).some(cb => !cb.checked);
+    checkboxes.forEach((checkbox, index) => {
+        checkbox.checked = anyUnchecked;
+        const studentName = teacherModeOrder[index];
+        if (studentName) {
+            syncCheckbox(studentName, checkbox, type);
         }
     });
 }
 
-function resetBarHighlights() {
-    document.querySelectorAll('.bar, .bar-label').forEach(el => {
-        el.style.transition = 'opacity 0.5s ease'; // Add transition
-        el.style.opacity = '1';
-        const nameSpan = el.querySelector('.main-labels span:first-child');
-        if (nameSpan) {
-            nameSpan.style.fontWeight = 'normal';
-            nameSpan.style.textDecoration = 'none';
-        }
-    });
-}
-
-        function updateDateTime() {
-            const now = new Date();
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('currentDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
-        }
-
-        function cycleAttendance() {
-            const attendanceOptions = ['Absent', 'Present', 'Tardy'];
-            const currentIndex = attendanceOptions.indexOf(students[0].attendance);
-            const nextIndex = (currentIndex + 1) % attendanceOptions.length;
-            const nextAttendance = attendanceOptions[nextIndex];
-            students.forEach(student => {
-                student.attendance = nextAttendance;
-                calculateScore(student);
-                updateScoreDisplay(student);
-                updateTardyLabel(student);
-            });
-            document.querySelectorAll('.attendance-dropdown select').forEach(select => {
-                select.value = nextAttendance;
-            });
-        }
-
-        function toggleAllCheckboxes(type) {
-            const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${currentCriteria.indexOf(type) + 3}) input[type="checkbox"]`);
-            const anyUnchecked = Array.from(checkboxes).some(cb => !cb.checked);
-            checkboxes.forEach((checkbox, index) => {
-                checkbox.checked = anyUnchecked;
-                const studentName = teacherModeOrder[index];
-                if (studentName) {
-                    syncCheckbox(studentName, checkbox, type);
-                }
-            });
-        }
-
-        function addStudent(name) {
-            const masterStudent = masterList.find(s => s.name === name);
-            if (masterStudent && !students.some(s => s.name === name)) {
-                const newStudent = {
-                    name: masterStudent.name,
-                    birthdate: masterStudent.birthdate,
-                    house: masterStudent.house,
-                    attendance: 'Present',
-                    [currentCriteria[0]]: true,
-                    [currentCriteria[1]]: true,
-                    [currentCriteria[2]]: true,
-                    [currentCriteria[3]]: true,
-                    score: 100,
-                    housePoints: 0,
-                    manualAdjustment: 0,
-                    isAdditional: true
-                };
-                students.push(newStudent);
-                teacherModeOrder.push(name);
-                createBars();
-                const newBar = document.getElementById(`bar-${newStudent.name}`);
-                if (newBar) {
-                    newBar.style.height = '0%';
-                    setTimeout(() => {
-                        newBar.style.transition = 'height 0.5s ease-in-out';
-                        newBar.style.height = `${newStudent.score}%`;
-                        newBar.style.setProperty('--flash-color', 'rgba(46, 204, 113, 0.6)');
-                        newBar.classList.remove('flash-animation');
-                        void newBar.offsetWidth;
-                        newBar.classList.add('flash-animation');
-                    }, 10);
-                }
-                if (document.getElementById('teacher-mode').style.display === 'block') {
-                    populateStudents();
-                }
-                closeSearchBox();
-            }
-        }
-
-        function createSearchBox() {
-            if (!document.getElementById('search-box')) {
-                searchBox = document.createElement('div');
-                searchBox.id = 'search-box';
-                searchBox.innerHTML = `
-                    <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}" autocomplete="off">
-                    <div id="search-results"></div>
-                    ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
-                `;
-                document.body.appendChild(searchBox);
-                searchResults = document.getElementById('search-results');
-                const searchInput = document.getElementById('search-input');
-                searchInput.focus();
-                openMenu('search-box');
-                currentMode = MODES.SEARCH;
-
-                searchInput.addEventListener('input', () => {
-                    updateSearchResults(searchInput.value);
-                });
-
-                setTimeout(() => {
-                    document.addEventListener('click', handleSearchOutsideClick);
-                }, 0);
-            }
-        }
-
-        function toggleAddStudentMode() {
-            closeSearchBox();
-            isAddingStudent = true;
-            createSearchBox();
-        }
-
-        function toggleSearchBox() {
-            const searchBox = document.getElementById('search-box');
-            if (searchBox) {
-                closeSearchBox();
-            } else {
-                isAddingStudent = false;
-                createSearchBox();
-            }
-        }
-
-        function handleSearchOutsideClick(event) {
-            const searchBox = document.getElementById('search-box');
-            if (searchBox && !searchBox.contains(event.target) && !event.target.closest('.search-button')) {
-                closeSearchBox();
-                document.removeEventListener('click', handleSearchOutsideClick);
-            }
-        }
-
-        function updateSearchResults(query) {
-            let matchingStudents;
-            searchResults.innerHTML = '';
-            selectedIndex = 0;
-            if (query.trim() === '') {
-                const addStudentOption = document.getElementById('add-student-option');
-                if (addStudentOption) {
-                    addStudentOption.style.display = !isAddingStudent ? 'block' : 'none';
-                }
-                return;
-            }
-            if (isAddingStudent) {
-                const currentStudentNames = students.map(s => s.name);
-                matchingStudents = masterList
-                    .filter(student => !currentStudentNames.includes(student.name))
-                    .filter(student => student.name.toLowerCase().includes(query.toLowerCase()));
-            } else {
-                matchingStudents = students.filter(student => 
-                    student.name.toLowerCase().includes(query.toLowerCase())
-                );
-            }
-            matchingStudents.forEach((student, index) => {
-                const result = document.createElement('div');
-                result.textContent = student.name;
-                result.className = index === 0 ? 'selected' : '';
-                result.onclick = () => {
-                    if (isAddingStudent) {
-                        addStudent(student.name);
-                    } else {
-                        showFloatingMenu(null, student.name);
-                        closeSearchBox();
-                    }
-                };
-                searchResults.appendChild(result);
-            });
-            const addStudentOption = document.getElementById('add-student-option');
-            if (addStudentOption) {
-                addStudentOption.style.display = 'none';
-            }
-        }
-
-        function closeSearchBox() {
-            const searchBox = document.getElementById('search-box');
-            if (searchBox) {
-                document.body.removeChild(searchBox);
-                closeSpecificMenu('search-box');
-                document.removeEventListener('click', handleSearchOutsideClick);
-                isAddingStudent = false;
-            }
-        }
-
-        function toggleHouseShield() {
-            const houseshield = document.getElementById('houseshield');
-            if (houseshield.classList.contains('active')) {
-                deactivateHouseshield();
-            } else {
-                activateHouseshield();
-            }
-        }
-
-        function activateHouseshield() {
-            const houseshield = document.getElementById('houseshield');
-            const points = document.getElementById('points');
-            const studentName = document.getElementById('studentName');
-            currentZIndex++;
-            houseshield.style.zIndex = currentZIndex;
-            if (currentStudentIndex === -1) {
-                const floatingMenu = document.getElementById('floating-menu');
-                if (floatingMenu.style.display === 'block') {
-                    const currentStudentName = floatingMenu.querySelector('h3').textContent;
-                    currentStudentIndex = students.findIndex(s => s.name === currentStudentName);
-                }
-            }
-            if (currentStudentIndex === -1 || currentStudentIndex >= students.length) {
-                console.error('No valid student selected');
-                return;
-            }
-            const student = students[currentStudentIndex];
-            const houseInfo = masterList.find(s => s.name === student.name);
-            if (!houseInfo) {
-                console.error('No house information found for student:', student.name);
-                return;
-            }
-            if (houseshield) {
-                houseshield.style.backgroundImage = `url('https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${houseInfo.house.toLowerCase()}.png')`;
-                houseshield.classList.add('active');
-            }
-            if (points) {
-                points.classList.add('active');
-            }
-            if (studentName) {
-                studentName.textContent = student.name;
-                studentName.classList.add('active');
-            }
-            currentPoints = student.housePoints;
-            updatePoints();
-            isActive = true;
-            currentMode = MODES.HOUSESHIELD;
-        }
-
-        function updatePoints() {
-            points.textContent = currentPoints > 0 ? `+${currentPoints}` : currentPoints;
-        }
-
-        function applyHousePointsChange() {
-            const student = students[currentStudentIndex];
-            const change = currentPoints - student.housePoints;
-            updateHousePoints(student.name, change);
-        }
-
-        function deactivateHouseshield() {
-            isActive = false;
-            const houseshield = document.getElementById('houseshield');
-            const points = document.getElementById('points');
-            const studentName = document.getElementById('studentName');
-            houseshield.classList.remove('active');
-            points.classList.remove('active');
-            studentName.classList.remove('active');
-            currentMode = MODES.GLOBAL;
-        }
-
-        function cycleAttendanceForStudent(student) {
-            const attendanceOptions = ['Present', 'Tardy', 'Absent'];
-            const currentIndex = attendanceOptions.indexOf(student.attendance);
-            const nextIndex = (currentIndex + 1) % attendanceOptions.length;
-            student.attendance = attendanceOptions[nextIndex];
-            syncAttendance(student.name, { value: student.attendance });
-        }
-
-        function toggleCheckboxForStudent(student, property) {
-            student[property] = !student[property];
-            syncCheckbox(student.name, { checked: student[property] }, property);
-        }
-
-        function toggleOverlay() {
-            const overlay = document.getElementById('overlay');
-            if (overlay.style.display === 'block') {
-                closeTopMenu();
-            } else {
-                openMenu('overlay');
-            }
-        }
-
-        function preloadHouseImages() {
-            const houses = ['red', 'blue', 'green', 'yellow'];
-            houses.forEach(house => {
-                const img = new Image();
-                img.src = `https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${house}.png`;
-            });
-        }
-
-        // Long press detection variables
-        let longPressTimer = null;
-        const LONG_PRESS_DURATION = 1000; // 1 second in milliseconds
-        let isLongPressActive = false; // Flag to track long press completion
-
-        // Function to toggle fullscreen mode
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-            closeLongPressMenu();
-        }
-
-        // Function to show the long press menu
-        function showLongPressMenu(event) {
-            const longPressMenu = document.createElement('div');
-            longPressMenu.id = 'long-press-menu';
-            longPressMenu.style.position = 'fixed';
-            longPressMenu.style.left = `${event.clientX}px`;
-            longPressMenu.style.top = `${event.clientY}px`;
-            longPressMenu.style.backgroundColor = 'white';
-            longPressMenu.style.padding = '10px';
-            longPressMenu.style.borderRadius = '5px';
-            longPressMenu.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-            longPressMenu.style.zIndex = currentZIndex + 1;
-            const fullscreenText = document.fullscreenElement ? 'Exit Fullscreen' : 'Enter Fullscreen';
-            longPressMenu.innerHTML = `
-                <div style="cursor: pointer;" onclick="toggleFullscreen()">${fullscreenText}</div>
-            `;
-            document.body.appendChild(longPressMenu);
-            openMenu('long-press-menu');
-            isLongPressActive = true;
-
-            // Add Escape key handler for long press menu
-            const handleLongPressEscape = (event) => {
-                if (event.key === 'Escape') {
-                    closeLongPressMenu();
-                    document.removeEventListener('keydown', handleLongPressEscape);
-                }
-            };
-            document.addEventListener('keydown', handleLongPressEscape);
-
-            // Add outside click handler after a delay to avoid capturing the mouseup event
-            setTimeout(() => {
-                document.addEventListener('click', handleLongPressOutsideClick);
-            }, 0);
-        }
-
-        // Function to close the long press menu
-        function closeLongPressMenu() {
-            const longPressMenu = document.getElementById('long-press-menu');
-            if (longPressMenu) {
-                document.body.removeChild(longPressMenu);
-                closeSpecificMenu('long-press-menu');
-                document.removeEventListener('click', handleLongPressOutsideClick);
-            }
-            isLongPressActive = false;
-        }
-
-        // Function to handle outside clicks for long press menu
-        function handleLongPressOutsideClick(event) {
-            const longPressMenu = document.getElementById('long-press-menu');
-            if (longPressMenu && !longPressMenu.contains(event.target) && !isLongPressActive) {
-                closeLongPressMenu();
-            }
-            isLongPressActive = false;
-        }
-
-        // Long press event listeners for mouse
-        document.addEventListener('mousedown', (event) => {
-            if (event.target.closest('.bar, .search-button, .menu-icon, .spreadsheet, .floating-menu, #search-box, #overlay, #teacher-mode')) {
-                return;
-            }
-            longPressTimer = setTimeout(() => {
-                showLongPressMenu(event);
-            }, LONG_PRESS_DURATION);
-        });
-
-        document.addEventListener('mouseup', () => {
-            clearTimeout(longPressTimer);
-        });
-
-        document.addEventListener('click', function(event) {
-            const teacherMode = document.getElementById('teacher-mode');
-            const floatingMenu = document.getElementById('floating-menu');
-            if (!teacherMode.contains(event.target) && !event.target.closest('.menu-icon') && !teacherMode.contains(event.target.closest('.menu'))) {
-                closeSpecificMenu('teacher-mode');
-            }
-            if (!floatingMenu.contains(event.target) && !event.target.closest('.bar') && !floatingMenu.contains(event.target.closest('.menu'))) {
-                closeFloatingMenu();
-            }
-        });
-
-        document.addEventListener('click', function(event) {
-            if (event.target.closest('.spreadsheet-row .student-name')) {
-                const studentName = event.target.closest('.student-name').textContent;
-                const student = students.find(s => s.name === studentName);
-                if (student) {
-                    cycleAttendanceForStudent(student);
-                }
-            }
-        });
-
-        // Prevent Escape key from exiting fullscreen
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && document.fullscreenElement) {
-                event.preventDefault();
-            }
-        });
-
-        window.onload = function() {
-            preloadHouseImages();
-            currentClassIndex = getCurrentClass();
-            updateClassDisplay();
-            updateDateTime();
-            setInterval(updateDateTime, 60000);
-            setInterval(() => {
-                const newIndex = getCurrentClass();
-                if (newIndex !== currentClassIndex) {
-                    currentClassIndex = newIndex;
-                    updateClassDisplay();
-                }
-            }, 1000);
-            setInterval(updateCountdowns, 1000);
+function addStudent(name) {
+    const masterStudent = masterList.find(s => s.name === name);
+    if (masterStudent && !students.some(s => s.name === name)) {
+        const newStudent = {
+            name: masterStudent.name,
+            birthdate: masterStudent.birthdate,
+            house: masterStudent.house,
+            attendance: 'Present',
+            [currentCriteria[0]]: true,
+            [currentCriteria[1]]: true,
+            [currentCriteria[2]]: true,
+            [currentCriteria[3]]: true,
+            score: 100,
+            housePoints: 0,
+            manualAdjustment: 0,
+            isAdditional: true
         };
+        students.push(newStudent);
+        teacherModeOrder.push(name);
+        createBars();
+        const newBar = document.getElementById(`bar-${newStudent.name}`);
+        if (newBar) {
+            newBar.style.height = '0%';
+            setTimeout(() => {
+                newBar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
+                newBar.style.height = `${newStudent.score}%`;
+                newBar.style.setProperty('--flash-color', 'rgba(46, 204, 113, 0.6)');
+                newBar.classList.remove('flash-animation');
+                void newBar.offsetWidth;
+                newBar.classList.add('flash-animation');
+            }, 10);
+        }
+        if (document.getElementById('teacher-mode').style.display === 'block') {
+            populateStudents();
+        }
+        closeSearchBox();
+    }
+}
+
+function createSearchBox() {
+    if (!document.getElementById('search-box')) {
+        searchBox = document.createElement('div');
+        searchBox.id = 'search-box';
+        searchBox.innerHTML = `
+            <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}" autocomplete="off">
+            <div id="search-results"></div>
+            ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
+        `;
+        document.body.appendChild(searchBox);
+        searchResults = document.getElementById('search-results');
+        const searchInput = document.getElementById('search-input');
+        searchInput.focus();
+        openMenu('search-box');
+        currentMode = MODES.SEARCH;
+
+        searchInput.addEventListener('input', () => {
+            updateSearchResults(searchInput.value);
+        });
+
+        setTimeout(() => {
+            document.addEventListener('click', handleSearchOutsideClick);
+        }, 0);
+    }
+}
+
+function toggleAddStudentMode() {
+    closeSearchBox();
+    isAddingStudent = true;
+    createSearchBox();
+}
+
+function toggleSearchBox() {
+    const searchBox = document.getElementById('search-box');
+    if (searchBox) {
+        closeSearchBox();
+    } else {
+        isAddingStudent = false;
+        createSearchBox();
+    }
+}
+
+function handleSearchOutsideClick(event) {
+    const searchBox = document.getElementById('search-box');
+    if (searchBox && !searchBox.contains(event.target) && !event.target.closest('.search-button')) {
+        closeSearchBox();
+        document.removeEventListener('click', handleSearchOutsideClick);
+    }
+}
+
+function updateSearchResults(query) {
+    let matchingStudents;
+    searchResults.innerHTML = '';
+    selectedIndex = 0;
+    if (query.trim() === '') {
+        const addStudentOption = document.getElementById('add-student-option');
+        if (addStudentOption) {
+            addStudentOption.style.display = !isAddingStudent ? 'block' : 'none';
+        }
+        return;
+    }
+    if (isAddingStudent) {
+        const currentStudentNames = students.map(s => s.name);
+        matchingStudents = masterList
+            .filter(student => !currentStudentNames.includes(student.name))
+            .filter(student => student.name.toLowerCase().includes(query.toLowerCase()));
+    } else {
+        matchingStudents = students.filter(student => 
+            student.name.toLowerCase().includes(query.toLowerCase())
+        );
+    }
+    matchingStudents.forEach((student, index) => {
+        const result = document.createElement('div');
+        result.textContent = student.name;
+        result.className = index === 0 ? 'selected' : '';
+        result.onclick = () => {
+            if (isAddingStudent) {
+                addStudent(student.name);
+            } else {
+                showFloatingMenu(null, student.name);
+                closeSearchBox();
+            }
+        };
+        searchResults.appendChild(result);
+    });
+    const addStudentOption = document.getElementById('add-student-option');
+    if (addStudentOption) {
+        addStudentOption.style.display = 'none';
+    }
+}
+
+function closeSearchBox() {
+    const searchBox = document.getElementById('search-box');
+    if (searchBox) {
+        document.body.removeChild(searchBox);
+        closeSpecificMenu('search-box');
+        document.removeEventListener('click', handleSearchOutsideClick);
+        isAddingStudent = false;
+    }
+}
+
+function toggleHouseShield() {
+    const houseshield = document.getElementById('houseshield');
+    if (houseshield.classList.contains('active')) {
+        deactivateHouseshield();
+    } else {
+        activateHouseshield();
+    }
+}
+
+function activateHouseshield() {
+    const houseshield = document.getElementById('houseshield');
+    const points = document.getElementById('points');
+    const studentName = document.getElementById('student-name');
+    currentZIndex++;
+    houseshield.style.zIndex = currentZIndex;
+    if (currentStudentIndex === -1) {
+        const floatingMenu = document.getElementById('floating-menu');
+        if (floatingMenu && floatingMenu.style.display === 'block') {
+            const currentStudentName = floatingMenu.querySelector('h3').textContent;
+            currentStudentIndex = students.findIndex(s => s.name === currentStudentName);
+        }
+    }
+    if (currentStudentIndex === -1 || currentStudentIndex >= students.length) {
+        console.error('No valid student selected');
+        return;
+    }
+    const student = students[currentStudentIndex];
+    const houseInfo = masterList.find(s => s.name === student.name);
+    if (!houseInfo) {
+        console.error('No house information found for student:', student.name);
+        return;
+    }
+    if (houseshield) {
+        houseshield.style.backgroundImage = `url('https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${houseInfo.house.toLowerCase()}.png')`;
+        houseshield.style.display = 'block';
+        // Force reflow to ensure animation plays
+        void houseshield.offsetWidth;
+        houseshield.classList.add('active');
+    }
+    if (points) {
+        points.classList.add('active');
+    }
+    if (studentName) {
+        studentName.textContent = student.name;
+        studentName.classList.add('active');
+    }
+    currentPoints = student.housePoints;
+    updatePoints();
+    isActive = true;
+    currentMode = MODES.HOUSESHIELD;
+    openMenu('houseshield');
+}
+
+function updatePoints() {
+    const points = document.getElementById('points');
+    if (points) {
+        points.textContent = currentPoints > 0 ? `+${currentPoints}` : currentPoints;
+    }
+}
+
+function applyHousePointsChange() {
+    const student = students[currentStudentIndex];
+    const change = currentPoints - student.housePoints;
+    updateHousePoints(student.name, change);
+    closeFloatingMenu(); // Close floating menu when points are awarded
+    deactivateHouseshield();
+}
+
+function deactivateHouseshield() {
+    const houseshield = document.getElementById('houseshield');
+    const points = document.getElementById('points');
+    const studentName = document.getElementById('student-name');
+    if (houseshield) {
+        // Ensure element is in active state before transitioning
+        houseshield.style.display = 'block';
+        houseshield.classList.add('active');
+        // Force reflow to reset position
+        void houseshield.offsetWidth;
+        houseshield.classList.remove('active');
+        // Hide after transition completes
+        const handler = (event) => {
+            if (event.propertyName === 'opacity' && !houseshield.classList.contains('active')) {
+                houseshield.style.display = 'none';
+                houseshield.removeEventListener('transitionend', handler);
+            }
+        };
+        houseshield.addEventListener('transitionend', handler);
+        // Fallback in case transitionend doesn't fire
+        setTimeout(() => {
+            if (!houseshield.classList.contains('active') && houseshield.style.display !== 'none') {
+                houseshield.style.display = 'none';
+                houseshield.removeEventListener('transitionend', handler);
+            }
+        }, 600); // Slightly longer than 0.5s transition
+    }
+    if (points) {
+        points.classList.remove('active');
+    }
+    if (studentName) {
+        studentName.classList.remove('active');
+    }
+    isActive = false;
+    closeSpecificMenu('houseshield');
+    // Reset mode to GLOBAL unless another modal (except floating-menu) is open
+    const floatingMenu = document.getElementById('floating-menu');
+    if (menuStack.length === 0 || (menuStack.length === 1 && menuStack[0] === floatingMenu)) {
+        currentMode = MODES.GLOBAL;
+    }
+}
+
+function cycleAttendanceForStudent(student) {
+    const attendanceOptions = ['Present', 'Tardy', 'Absent'];
+    const currentIndex = attendanceOptions.indexOf(student.attendance);
+    const nextIndex = (currentIndex + 1) % attendanceOptions.length;
+    student.attendance = attendanceOptions[nextIndex];
+    syncAttendance(student.name, { value: student.attendance });
+}
+
+function toggleCheckboxForStudent(student, property) {
+    student[property] = !student[property];
+    syncCheckbox(student.name, { checked: student[property] }, property);
+}
+
+function toggleOverlay() {
+    const overlay = document.getElementById('overlay');
+    if (overlay.style.display === 'block') {
+        closeTopMenu();
+    } else {
+        openMenu('overlay');
+    }
+}
+
+function preloadHouseImages() {
+    const houses = ['red', 'blue', 'green', 'yellow'];
+    houses.forEach(house => {
+        const img = new Image();
+        img.src = `https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${house}.png`;
+    });
+}
+
+let longPressTimer = null;
+const LONG_PRESS_DURATION = 1000;
+let isLongPressActive = false;
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+    closeLongPressMenu();
+}
+
+function showLongPressMenu(event) {
+    const longPressMenu = document.createElement('div');
+    longPressMenu.id = 'long-press-menu';
+    longPressMenu.style.position = 'fixed';
+    longPressMenu.style.left = `${event.clientX}px`;
+    longPressMenu.style.top = `${event.clientY}px`;
+    longPressMenu.style.backgroundColor = 'white';
+    longPressMenu.style.padding = '10px';
+    longPressMenu.style.borderRadius = '5px';
+    longPressMenu.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+    longPressMenu.style.zIndex = currentZIndex + 1;
+    const fullscreenText = document.fullscreenElement ? 'Exit Fullscreen' : 'Enter Fullscreen';
+    longPressMenu.innerHTML = `
+        <div style="cursor: pointer;" onclick="toggleFullscreen()">${fullscreenText}</div>
+    `;
+    document.body.appendChild(longPressMenu);
+    openMenu('long-press-menu');
+    isLongPressActive = true;
+
+    const handleLongPressEscape = (event) => {
+        if (event.key === 'Escape') {
+            closeLongPressMenu();
+            document.removeEventListener('keydown', handleLongPressEscape);
+        }
+    };
+    document.addEventListener('keydown', handleLongPressEscape);
+
+    setTimeout(() => {
+        document.addEventListener('click', handleLongPressOutsideClick);
+    }, 0);
+}
+
+function closeLongPressMenu() {
+    const longPressMenu = document.getElementById('long-press-menu');
+    if (longPressMenu) {
+        document.body.removeChild(longPressMenu);
+        closeSpecificMenu('long-press-menu');
+        document.removeEventListener('click', handleLongPressOutsideClick);
+    }
+    isLongPressActive = false;
+}
+
+function handleLongPressOutsideClick(event) {
+    const longPressMenu = document.getElementById('long-press-menu');
+    if (longPressMenu && !longPressMenu.contains(event.target) && !isLongPressActive) {
+        closeLongPressMenu();
+    }
+    isLongPressActive = false;
+}
+
+document.addEventListener('mousedown', (event) => {
+    if (event.target.closest('.bar, .search-button, .menu-icon, .spreadsheet, .floating-menu, #search-box, #overlay, #teacher-mode')) {
+        return;
+    }
+    longPressTimer = setTimeout(() => {
+        showLongPressMenu(event);
+    }, LONG_PRESS_DURATION);
+});
+
+document.addEventListener('mouseup', () => {
+    clearTimeout(longPressTimer);
+});
+
+document.addEventListener('click', function(event) {
+    if (menuStack.length === 0) return;
+
+    const topMenu = menuStack[menuStack.length - 1];
+    const isClickOnMenuIcon = event.target.closest('.menu-icon');
+    const isClickOnBar = event.target.closest('.bar');
+
+    const exceptions = {
+        'teacher-mode': isClickOnMenuIcon,
+        'floating-menu': isClickOnBar || isClickOnMenuIcon,
+        'houseshield': isClickOnMenuIcon,
+        'search-box': isClickOnMenuIcon || event.target.closest('.search-button'),
+        'long-press-menu': isClickOnMenuIcon,
+        'overlay': isClickOnMenuIcon
+    };
+
+    if (!topMenu.contains(event.target) && !exceptions[topMenu.id]) {
+        if (topMenu.id === 'houseshield') {
+            deactivateHouseshield();
+        } else if (topMenu.id === 'floating-menu') {
+            closeFloatingMenu();
+        } else {
+            closeTopMenu();
+        }
+    }
+});
+
+document.addEventListener('click', function(event) {
+    if (event.target.closest('.spreadsheet-row .student-name')) {
+        const studentName = event.target.closest('.student-name').textContent;
+        const student = students.find(s => s.name === studentName);
+        if (student) {
+            cycleAttendanceForStudent(student);
+        }
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && document.fullscreenElement) {
+        event.preventDefault();
+    }
+});
+
+window.onload = function() {
+    preloadHouseImages();
+    currentClassIndex = getCurrentClass();
+    updateClassDisplay();
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+    setInterval(() => {
+        const newIndex = getCurrentClass();
+        if (newIndex !== currentClassIndex) {
+            currentClassIndex = newIndex;
+            updateClassDisplay();
+        }
+    }, 1000);
+    setInterval(updateCountdowns, 1000);
+};
     </script>
     <script src="copyscores.js"></script>
 </body>

@@ -11,14 +11,16 @@ const hotkeys = [
 
 function getMenuHotkeys() {
     const isProductionTech = classes[currentClassIndex].name === "Production Tech";
-    return [
+    const hotkeys = [
         { key: "a", description: "Toggle Attendance." },
         { key: isProductionTech ? "d" : "s", description: `Toggle ${isProductionTech ? 'Devices' : 'Stands'} checkbox(es).` },
         { key: isProductionTech ? "e" : "i", description: `Toggle ${isProductionTech ? 'Engagement' : 'iPads'} checkbox(es).` },
         { key: isProductionTech ? "r" : "r", description: `Toggle ${isProductionTech ? 'Review' : 'Returned'} checkbox(es).` },
         { key: isProductionTech ? "p" : "e", description: `Toggle ${isProductionTech ? 'Progress' : 'Engagement'} checkbox(es).` },
-        { key: "Esc", description: "Close current window." }
+        { key: "h", description: "Toggle House Shield." },
+        { key: "Esc", description: "Close current window or House Shield." }
     ];
+    return hotkeys;
 }
 
 function populateHotkeys(hotkeys, elementId) {
@@ -84,7 +86,7 @@ function handleSearchBoxKeys(event) {
     const results = searchResults.children;
 
     if (event.shiftKey && (event.key === '=' || event.key === '+')) {
-        event.preventDefault(); // Prevent typing '+' in the input
+        event.preventDefault();
         toggleAddStudentMode();
         return;
     }
@@ -127,28 +129,20 @@ function handleSearchBoxKeys(event) {
 }
 
 function handleActiveHouseshield(event) {
-    if (window.isObjectiveInputFocused) return;
-
-    switch (event.key) {
-        case 'ArrowUp':
-            currentPoints += 10;
-            updatePoints();
-            break;
-        case 'ArrowDown':
-            currentPoints -= 10;
-            updatePoints();
-            break;
-        case 'Enter':
-            currentMode = MODES.GLOBAL;
-            applyHousePointsChange();
-            deactivateHouseshield();
-            break;
-        case 'Escape':
-            currentMode = MODES.GLOBAL;
-            deactivateHouseshield();
-            break;
+    if (event.key.toLowerCase() === 'h') {
+        toggleHouseShield(); // Toggle shield on 'h' press
+    } else if (event.key === 'ArrowUp') {
+        currentPoints = Math.min(currentPoints + 10, 100);
+        updatePoints();
+    } else if (event.key === 'ArrowDown') {
+        currentPoints = Math.max(currentPoints - 10, -100);
+        updatePoints();
+    } else if (event.key === 'Enter') {
+        applyHousePointsChange();
+        deactivateHouseshield();
+    } else if (event.key === 'Escape') {
+        deactivateHouseshield();
     }
-    event.preventDefault();
 }
 
 function handleObjectiveInputKeys(event) {
@@ -194,7 +188,11 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    if (currentMode !== MODES.GLOBAL) return;
+    if (event.key === 'Escape' && menuStack.length > 0) {
+        closeTopMenu();
+        event.preventDefault();
+        return;
+    }
 
     if (event.key === '?' || (event.altKey && event.key === '/')) {
         toggleOverlay();
@@ -207,7 +205,7 @@ function handleGlobalHotkeys(event) {
 
     if (validKeys.includes(event.key)) {
         if (event.key === 'r' && event.metaKey) return;
-        if ((event.key === '=' || event.key === '+') && (event.metaKey || event.ctrlKey)) return; // Allow Cmd+=/Ctrl+= for browser zoom
+        if ((event.key === '=' || event.key === '+') && (event.metaKey || event.ctrlKey)) return;
         event.preventDefault();
     }
 
@@ -302,9 +300,6 @@ function handleGlobalHotkeys(event) {
                         break;
                 }
             }
-            break;
-        case 'Escape':
-            closeTopMenu();
             break;
     }
 }

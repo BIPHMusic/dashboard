@@ -1,5 +1,8 @@
 function copyScores() {
-    const scores = students.map(student => 
+    const regularStudents = students.filter(s => !s.isAdditional);
+    const additionalStudents = students.filter(s => s.isAdditional);
+
+    const scores = regularStudents.map(student => 
         student.score === 'EX' ? 'EX' : `${student.score}%`
     );
 
@@ -22,11 +25,15 @@ function copyScores() {
         ? `Tardies:\n${tardiesItemized.join('\n')}`
         : 'No tardies';
 
+    const additionalStudentsMessage = additionalStudents.length > 0
+        ? `Additional students:\n${additionalStudents.map(s => s.name).join('\n')}`
+        : '';
+
     // Create plain text table for scores
     const scoreTable = scores.join('\t'); // Tab-separated for Excel compatibility
 
-    // Format plain text content with scores, link, house points, and tardies
-    const plainTextContent = `Scores:\n${scoreTable}\n\nConvert string to table: http://biphmusic.github.io/stringtotable\n\nHouse points for today:\n${housePointsMessage}\n\n${tardiesMessage}`;
+    // Format plain text content with scores, link, house points, tardies, and additional students
+    const plainTextContent = `Scores:\n${scoreTable}\n\nConvert string to table: http://biphmusic.github.io/stringtotable\n\nHouse points for today:\n${housePointsMessage}\n\n${tardiesMessage}${additionalStudentsMessage ? `\n\n${additionalStudentsMessage}` : ''}`;
 
     // Check if user is on macOS
     const isMacOS = /Macintosh|Mac OS X/i.test(navigator.userAgent);
@@ -46,7 +53,7 @@ function copyScores() {
                 'text/plain': new Blob([scores.join('\t')], { type: 'text/plain' })
             })
         ]).then(() => {
-            const message = `House points for today:\n${housePointsMessage}\n\n${tardiesMessage}\n\nReset scores?`;
+            const message = `House points for today:\n${housePointsMessage}\n\n${tardiesMessage}${additionalStudentsMessage ? `\n\n${additionalStudentsMessage}` : ''}\n\nReset scores?`;
             showCustomAlert(message);
             showTemporaryMessage('Copied to clipboard');
         }).catch(err => {
@@ -62,19 +69,12 @@ function copyScores() {
         window.location.href = mailtoLink;
 
         // Still show the alert for consistency
-        const message = `House points for today:\n${housePointsMessage}\n\n${tardiesMessage}\n\nReset scores?`;
+        const message = `House points for today:\n${housePointsMessage}\n\n${tardiesMessage}${additionalStudentsMessage ? `\n\n${additionalStudentsMessage}` : ''}\n\nReset scores?`;
         showCustomAlert(message);
         showTemporaryMessage('Email draft opened');
     }
 }
 
-
-
-
-
-
-
-// Rest of the file remains unchanged
 function showCustomAlert(message) {
     const alertOverlay = document.createElement('div');
     alertOverlay.id = 'alert-overlay';

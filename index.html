@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <button class="search-button" onclick="createSearchBox()">🔍</button>
-    <div class="menu-icon" onclick="enterTeacherMode()">☰</div>
+    <button class="search-button" onclick="toggleSearchBox()">🔍</button>
+    <div class="menu-icon" onclick="toggleTeacherMode()">☰</div>
     <div id="header">
         <div id="objective">
             <h3>Objective:</h3>
@@ -27,9 +27,9 @@
         </div>
     </div>
     <div id="graph-container"></div>
-    <button class="copy-button" onclick="copyScores()">Copy Scores</button>
     <div id="teacher-mode">
         <span class="close-button" onclick="closeTopMenu()">&times;</span>
+        <button class="copy-button" onclick="copyScores()">Copy Scores</button>
         <button class="reset-button" onclick="resetAllStudents()">Reset All</button>
         <div class="spreadsheet">
             <div class="spreadsheet-header"><strong>Student</strong></div>
@@ -59,6 +59,34 @@
     <script src="studentlist.js"></script>
     <script src="hotkeys.js"></script>
     <script>
+        const positiveEffects = [
+            'sounds/villager-positive1.mp3',
+            'sounds/villager-positive2.mp3',
+            'sounds/villager-positive3.mp3',
+            'sounds/villager-positive4.mp3'
+        ];
+
+        const negativeEffects50Plus = [
+            'sounds/villager-negative0.5.mp3',
+            'sounds/villager-negative0.9.mp3',
+            'sounds/villager-negative1.5.mp3',
+            'sounds/villager-negative3.5.mp3'
+        ];
+
+        const negativeEffects10to50 = [
+            'sounds/villager-negative3.mp3',
+            'sounds/villager-negative4.mp3',
+            'sounds/villager-negative5.mp3'
+        ];
+
+        const negativeEffect0 = 'sounds/villager-negative6.mp3';
+
+        function playRandomSound(soundArray) {
+            const randomIndex = Math.floor(Math.random() * soundArray.length);
+            const audio = new Audio(soundArray[randomIndex]);
+            audio.play();
+        }
+
         const classes = [
             {
                 name: "Production Tech",
@@ -171,6 +199,7 @@
         let teacherModeOrder = classes[0].teacherModeOrder;
         let currentCriteria = classes[0].criteria;
         let isObjectiveInputFocused = false;
+        let isAddingStudent = false;
 
         function getCurrentClass() {
             const now = new Date();
@@ -184,7 +213,6 @@
                 if (cls.days.includes(currentDay)) {
                     const start = cls.startTime.hours * 60 + cls.startTime.minutes;
                     const end = cls.endTime.hours * 60 + cls.endTime.minutes;
-                    // Check for start countdown (30 minutes before start) or conclusion/pack-up (10 minutes before end)
                     if (currentTime >= start - 30 && currentTime <= start) {
                         return i;
                     } else if (currentTime >= end - 10 && currentTime <= end) {
@@ -250,7 +278,7 @@
             const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
 
             if (!currentClass.days.includes(currentDay)) {
-                hasCopiedScores = false; // Reset flag if not a class day
+                hasCopiedScores = false;
                 return;
             }
 
@@ -263,11 +291,9 @@
             let startDiff = (startTime - now) / 1000;
             let endDiff = (endTime - now) / 1000;
 
-            // Handle classes that span midnight
             if (startDiff < -86400) startDiff += 86400;
             if (endDiff < -86400) endDiff += 86400;
 
-            // Start countdown (30 minutes before)
             if (startDiff > 0 && startDiff <= 1800) {
                 const minutes = Math.floor(startDiff / 60);
                 const seconds = Math.floor(startDiff % 60);
@@ -277,9 +303,8 @@
                 countdownContainer.appendChild(startDiv);
             }
 
-            // Conclusion countdown (10 minutes before end, show 5m 0s to 0m 0s)
             if (endDiff <= 600 && endDiff > 300) {
-                const conclusionDiff = endDiff - 300; // Show countdown from 5 minutes
+                const conclusionDiff = endDiff - 300;
                 const minutes = Math.floor(conclusionDiff / 60);
                 const seconds = Math.floor(conclusionDiff % 60);
                 const conclusionDiv = document.createElement('div');
@@ -287,7 +312,6 @@
                 conclusionDiv.textContent = `Conclusion: ${minutes}m ${seconds}s`;
                 countdownContainer.appendChild(conclusionDiv);
             }
-            // Pack up countdown (5 minutes before end)
             else if (endDiff <= 300 && endDiff > 0) {
                 const minutes = Math.floor(endDiff / 60);
                 const seconds = Math.floor(endDiff % 60);
@@ -295,7 +319,6 @@
                 packupDiv.className = 'packup-countdown';
                 packupDiv.textContent = `♫ Pack up: ${minutes}m ${seconds}s ♫`;
                 countdownContainer.appendChild(packupDiv);
-                // Uncheck all "Returned" boxes when pack-up starts, if applicable
                 if (currentClass.criteria.includes('returned')) {
                     const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${currentClass.criteria.indexOf('returned') + 3}) input[type="checkbox"]`);
                     checkboxes.forEach((checkbox, index) => {
@@ -308,12 +331,11 @@
                         }
                     });
                 }
-                hasCopiedScores = false; // Reset flag during pack-up
+                hasCopiedScores = false;
             }
-            // Trigger copyScores when pack-up countdown reaches 0 or just past
             else if (endDiff <= 0 && endDiff > -2 && !hasCopiedScores) {
                 copyScores();
-                hasCopiedScores = true; // Set flag to prevent multiple calls
+                hasCopiedScores = true;
             }
         }
 
@@ -459,6 +481,10 @@
             if (menuStack.length > 0) {
                 const topMenu = menuStack.pop();
                 topMenu.style.display = 'none';
+                if (topMenu.id === 'search-box') {
+                    currentMode = MODES.GLOBAL;
+                    isAddingStudent = false;
+                }
             }
         }
 
@@ -467,6 +493,10 @@
             if (menuIndex !== -1) {
                 const menu = menuStack.splice(menuIndex, 1)[0];
                 menu.style.display = 'none';
+                if (menu.id === 'search-box') {
+                    currentMode = MODES.GLOBAL;
+                    isAddingStudent = false;
+                }
             }
         }
 
@@ -540,9 +570,9 @@
                     const houseInfo = masterList.find(s => s.name === student.name);
                     const houseColor = getHouseColor(houseInfo.house);
                     housePointsElement.style.transition = 'background-color 1.0s ease, backdrop-filter 1.0s ease';
-                    housePointsElement.style.backgroundColor = `${houseColor}80`;
+                    housePointsElement.style.backgroundColor = `${houseColor}CC`;
                     setTimeout(() => {
-                        housePointsElement.style.backgroundColor = `${houseColor}26`;
+                        housePointsElement.style.backgroundColor = `${houseColor}66`;
                     }, 500);
                 }
             }
@@ -550,11 +580,21 @@
 
         function getHouseColor(house) {
             switch (house.toLowerCase()) {
-                case 'red': return '#FF0000';
-                case 'blue': return '#0000FF';
-                case 'green': return '#005700';
-                case 'yellow': return '#FFC300';
+                case 'red': return '#FF3333';
+                case 'blue': return '#3366FF';
+                case 'green': return '#00A300';
+                case 'yellow': return '#FFCC00';
                 default: return '#808080';
+            }
+        }
+
+        function toggleTeacherMode() {
+            const teacherMode = document.getElementById('teacher-mode');
+            if (teacherMode.style.display === 'block') {
+                closeSpecificMenu('teacher-mode');
+            } else {
+                openMenu('teacher-mode');
+                populateStudents();
             }
         }
 
@@ -582,6 +622,7 @@
                         attendanceSelect.value = student.attendance;
                     }
                 }
+                updateFloatingMenu(student);
             }
         }
 
@@ -612,99 +653,130 @@
                     void bar.offsetWidth;
                     bar.classList.add('flash-animation');
                     updateScoreDisplay(student);
+                    updateFloatingMenu(student);
+                    if (change > 0) {
+                        playRandomSound(positiveEffects);
+                    } else {
+                        if (newScore === 0) {
+                            const audio = new Audio(negativeEffect0);
+                            audio.play();
+                        } else if (newScore >= 50) {
+                            playRandomSound(negativeEffects50Plus);
+                        } else if (newScore >= 10) {
+                            playRandomSound(negativeEffects10to50);
+                        }
+                    }
                 }
             }
         }
 
         function calculateScore(student) {
-            if (student.attendance === 'Absent') {
-                student.score = 'EX';
-            } else {
-                let baseScore = 60;
-                if (student.attendance === 'Tardy') baseScore -= 20;
-                if (student[currentCriteria[0]]) baseScore += 10;
-                if (student[currentCriteria[1]]) baseScore += 10;
-                if (student[currentCriteria[2]]) baseScore += 10;
-                if (student[currentCriteria[3]]) baseScore += 10;
-                let manualAdjustment = student.manualAdjustment || 0;
-                student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
-            }
+        if (student.attendance === 'Absent') {
+            student.score = 'EX';
+        } else {
+            let baseScore = 60;
+            if (student.attendance === 'Tardy') baseScore -= 20;
+            if (student[currentCriteria[0]]) baseScore += 10;
+            if (student[currentCriteria[1]]) baseScore += 10;
+            if (student[currentCriteria[2]]) baseScore += 10;
+            if (student[currentCriteria[3]]) baseScore += 10;
+            let manualAdjustment = student.manualAdjustment || 0;
+            student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
         }
+    }
 
-        function updateScoreDisplay(student) {
-            const bar = document.getElementById(`bar-${student.name}`);
-            if (bar) {
-                const isStudentsBirthday = isBirthday(student.birthdate);
-                if (isStudentsBirthday) {
-                    bar.classList.add('bdaycolorful');
-                } else {
-                    bar.classList.remove('bdaycolorful');
-                }
-                bar.style.transition = 'height 0.3s ease-in-out';
-                if (student.score === 'EX') {
-                    bar.style.height = '0%';
-                    bar.innerHTML = `
-                        <div class="bar-label">
-                            <div class="main-labels">
-                                <span>${student.name}</span>
-                                <span>EX</span>
-                            </div>
-                            <div class="secondary-labels">
-                                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                                ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                            </div>
+    function updateScoreDisplay(student) {
+        const bar = document.getElementById(`bar-${student.name}`);
+        if (bar) {
+            const isStudentsBirthday = isBirthday(student.birthdate);
+            if (isStudentsBirthday) {
+                bar.classList.add('bdaycolorful');
+            } else {
+                bar.classList.remove('bdaycolorful');
+            }
+            bar.style.transition = 'height 0.3s ease-in-out';
+            // Add or remove 'ex-score' class based on score
+            if (student.score === 'EX') {
+                bar.classList.add('ex-score');
+                bar.style.height = '0%';
+                bar.innerHTML = `
+                    <div class="bar-label">
+                        <div class="main-labels">
+                            <span>${student.name}</span>
+                            <span class="score">EX</span>
                         </div>
-                    `;
-                } else {
-                    bar.style.height = `${student.score}%`;
-                    bar.innerHTML = `
-                        <div class="value-label">${student.score}%</div>
-                        <div class="bar-label">
-                            <div class="main-labels">
-                                <span>${student.name}</span>
-                                <span class="score">${student.score}%</span>
-                            </div>
-                            <div class="secondary-labels">
-                                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                                ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                            </div>
+                        <div class="secondary-labels">
+                            ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                            ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
                         </div>
-                    `;
-                }
-                updateTeacherMenu(student);
-                updateFloatingMenu(student);
-                const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
-                if (participationSpan) {
-                    participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
-                }
+                    </div>
+                `;
+            } else {
+                bar.classList.remove('ex-score');
+                bar.style.height = `${student.score}%`;
+                bar.innerHTML = `
+                    <div class="value-label">${student.score}%</div>
+                    <div class="bar-label">
+                        <div class="main-labels">
+                            <span>${student.name}</span>
+                            <span class="score">${student.score}%</span>
+                        </div>
+                        <div class="secondary-labels">
+                            ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                            ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            // Remove inline style from .score to let CSS @media rule control visibility
+            const scoreSpan = bar.querySelector('.score');
+            if (scoreSpan) {
+                scoreSpan.removeAttribute('style');
+            }
+            updateTeacherMenu(student);
+            updateFloatingMenu(student);
+            const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+            if (participationSpan) {
+                participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
             }
         }
+    }
+
+window.addEventListener('resize', () => {
+    students.forEach(student => updateScoreDisplay(student));
+});
 
         function updateTeacherMenu(student) {
             const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
             if (participationSpan) {
                 participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
             }
+            const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
+            if (housePointsSpan) {
+                housePointsSpan.textContent = student.housePoints;
+            }
         }
 
         function updateFloatingMenu(student) {
             const floatingMenu = document.getElementById('floating-menu');
-            const isProductionTech = classes[currentClassIndex].name === "Production Tech";
-            if (floatingMenu.style.display === 'block') {
+            if (floatingMenu && floatingMenu.style.display === 'block') {
+                const isProductionTech = classes[currentClassIndex].name === "Production Tech";
                 const attendanceSelect = floatingMenu.querySelector('select');
-                attendanceSelect.value = student.attendance;
+                if (attendanceSelect) {
+                    attendanceSelect.value = student.attendance;
+                }
                 const checkboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
                 checkboxes.forEach(checkbox => {
                     const property = checkbox.id.replace('checkbox-', '');
                     checkbox.checked = student[property];
                 });
-                const participationSpan = floatingMenu.querySelector('.stepper span');
+                const participationSpan = floatingMenu.querySelector('.stepper:first-of-type span');
                 if (participationSpan) {
                     participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
                 }
-                const housePointsSpan = floatingMenu.querySelector('.stepper:last-child span:nth-child(3)');
+                const housePointsSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
                 if (housePointsSpan) {
-                    housePointsSpan.textContent = student.housePoints;
+                    housePointsSpan.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
                 }
             }
         }
@@ -732,37 +804,48 @@
         }
 
         function createBars() {
-            const container = document.getElementById('graph-container');
-            container.innerHTML = '';
-            students.forEach(student => {
-                const bar = document.createElement('div');
-                bar.className = 'bar';
-                const isBday = isBirthday(student.birthdate);
-                if (isBday) {
-                    bar.classList.add('bdaycolorful');
-                }
-                bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
-                bar.id = `bar-${student.name}`;
-                bar.dataset.studentName = student.name;
-                bar.innerHTML = `
-                    ${student.score !== 'EX' ? `<div class="value-label">${student.score}%</div>` : ''}
-                    <div class="bar-label">
-                        <div class="main-labels">
-                            <span ${isBday ? 'class="colorful"' : ''}>${student.name}</span>
-                            <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
-                        </div>
-                        <div class="secondary-labels">
-                            ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                            ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                        </div>
+        const container = document.getElementById('graph-container');
+        container.innerHTML = '';
+        students.forEach(student => {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            const isBday = isBirthday(student.birthdate);
+            if (isBday) {
+                bar.classList.add('bdaycolorful');
+            }
+            if (student.score === 'EX') {
+                bar.classList.add('ex-score');
+            }
+            bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
+            bar.id = `bar-${student.name}`;
+            bar.dataset.studentName = student.name;
+            bar.innerHTML = `
+                ${student.score !== 'EX' ? `<div class="value-label">${student.score}%</div>` : ''}
+                <div class="bar-label">
+                    <div class="main-labels">
+                        <span ${isBday ? 'class="colorful"' : ''}>${student.name}</span>
+                        <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
                     </div>
-                `;
-                bar.addEventListener('mouseover', () => highlightBar(student.name));
-                bar.addEventListener('mouseout', resetBarHighlights);
-                bar.addEventListener('click', (event) => showFloatingMenu(event, student.name));
-                container.appendChild(bar);
+                    <div class="secondary-labels">
+                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                        ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                    </div>
+                </div>
+            `;
+            bar.addEventListener('mouseover', () => highlightBar(student.name));
+            bar.addEventListener('mouseout', resetBarHighlights);
+            bar.addEventListener('click', (event) => {
+                if (event.target.closest('.main-labels span:first-child') || 
+                    event.target.closest('.main-labels span.score') || 
+                    event.target.closest('.secondary-labels')) {
+                    cycleAttendanceForStudent(student);
+                } else {
+                    showFloatingMenu(event, student.name);
+                }
             });
-        }
+            container.appendChild(bar);
+        });
+    }
 
         function isBirthday(birthdate) {
             if (!birthdate) return false;
@@ -816,11 +899,12 @@
                     const houseInfo = masterList.find(s => s.name === student.name);
                     const houseColor = getHouseColor(houseInfo.house);
                     newHousePointsElement.style.transition = 'background-color 1.0s ease, backdrop-filter 1.0s ease';
-                    newHousePointsElement.style.backgroundColor = `${houseColor}80`;
+                    newHousePointsElement.style.backgroundColor = `${houseColor}CC`;
                     setTimeout(() => {
-                        newHousePointsElement.style.backgroundColor = `${houseColor}26`;
+                        newHousePointsElement.style.backgroundColor = `${houseColor}66`;
                     }, 500);
                 }
+                updateFloatingMenu(student);
             }
         }
 
@@ -863,7 +947,7 @@
                 <div class="stepper">
                     <span>House Points</span>
                     <button onclick="updateHousePoints('${student.name}', -10)">-</button>
-                    <span>${student.housePoints}</span>
+                    <span>${student.housePoints > 0 ? '+' : ''}${student.housePoints}</span>
                     <button onclick="updateHousePoints('${student.name}', 10)">+</button>
                 </div>
                 <button onclick="closeFloatingMenu()">Close</button>
@@ -915,47 +999,160 @@
             });
         }
 
-        function createSearchBox() {
-            if (!document.getElementById('search-box')) {
-                searchBox = document.createElement('div');
-                searchBox.id = 'search-box';
-                searchBox.innerHTML = `
-                    <input type="text" id="search-input" placeholder="Type student name...">
-                    <div id="search-results"></div>
-                `;
-                document.body.appendChild(searchBox);
-                searchResults = document.getElementById('search-results');
-                document.getElementById('search-input').focus();
-                openMenu('search-box');
-                currentMode = MODES.SEARCH;
+        function addStudent(name) {
+            const masterStudent = masterList.find(s => s.name === name);
+            if (masterStudent && !students.some(s => s.name === name)) {
+                const newStudent = {
+                    name: masterStudent.name,
+                    birthdate: masterStudent.birthdate,
+                    house: masterStudent.house,
+                    attendance: 'Present',
+                    [currentCriteria[0]]: false,
+                    [currentCriteria[1]]: false,
+                    [currentCriteria[2]]: false,
+                    [currentCriteria[3]]: false,
+                    score: 'EX',
+                    housePoints: 0,
+                    manualAdjustment: 0,
+                    isAdditional: true
+                };
+                students.push(newStudent);
+                teacherModeOrder.push(name);
+                createBars();
+                if (document.getElementById('teacher-mode').style.display === 'block') {
+                    populateStudents();
+                }
+                closeSearchBox();
+            }
+        }
+
+    function createSearchBox() {
+        if (!document.getElementById('search-box')) {
+            searchBox = document.createElement('div');
+            searchBox.id = 'search-box';
+            searchBox.innerHTML = `
+                <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}">
+                <div id="search-results"></div>
+                ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
+            `;
+            document.body.appendChild(searchBox);
+            searchResults = document.getElementById('search-results');
+            const searchInput = document.getElementById('search-input');
+            searchInput.focus();
+            openMenu('search-box');
+            currentMode = MODES.SEARCH;
+
+            searchInput.addEventListener('input', () => {
+                updateSearchResults(searchInput.value);
+                if (!isAddingStudent && searchInput.value.trim() !== '') {
+                    const addStudentOption = document.getElementById('add-student-option');
+                    if (addStudentOption) {
+                        addStudentOption.style.display = 'none';
+                    }
+                }
+            });
+
+            // Add event listener for outside clicks
+            setTimeout(() => {
+                document.addEventListener('click', handleSearchOutsideClick);
+            }, 0);
+        }
+    }
+
+    function toggleAddStudentMode() {
+        closeSearchBox();
+        isAddingStudent = true;
+        createSearchBox();
+    }
+
+        function toggleSearchBox() {
+            const searchBox = document.getElementById('search-box');
+            if (searchBox) {
+                closeSearchBox();
+            } else {
+                isAddingStudent = false;
+                createSearchBox();
+            }
+        }
+
+        function handleSearchOutsideClick(event) {
+            const searchBox = document.getElementById('search-box');
+            if (searchBox && !searchBox.contains(event.target) && !event.target.closest('.search-button')) {
+                closeSearchBox();
+                document.removeEventListener('click', handleSearchOutsideClick);
             }
         }
 
         function updateSearchResults(query) {
-            const matchingStudents = students.filter(student => 
-                student.name.toLowerCase().includes(query.toLowerCase())
-            );
+            let matchingStudents;
+            if (isAddingStudent) {
+                const currentStudentNames = students.map(s => s.name);
+                matchingStudents = masterList
+                    .filter(student => !currentStudentNames.includes(student.name))
+                    .filter(student => student.name.toLowerCase().includes(query.toLowerCase()));
+            } else {
+                matchingStudents = students.filter(student => 
+                    student.name.toLowerCase().includes(query.toLowerCase())
+                );
+            }
             searchResults.innerHTML = '';
             selectedIndex = 0;
             matchingStudents.forEach((student, index) => {
                 const result = document.createElement('div');
                 result.textContent = student.name;
                 result.className = index === 0 ? 'selected' : '';
+                result.onclick = () => {
+                    if (isAddingStudent) {
+                        addStudent(student.name);
+                    } else {
+                        showFloatingMenu(null, student.name);
+                        closeSearchBox();
+                    }
+                };
                 searchResults.appendChild(result);
             });
         }
 
-        function updateSelectedResult() {
-            Array.from(searchResults.children).forEach((result, index) => {
-                result.className = index === selectedIndex ? 'selected' : '';
-            });
+        function handleSearchBoxKeys(event) {
+            const searchInput = document.getElementById('search-input');
+            const results = searchResults.children;
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                if (selectedIndex < results.length - 1) {
+                    results[selectedIndex].classList.remove('selected');
+                    selectedIndex++;
+                    results[selectedIndex].classList.add('selected');
+                }
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (selectedIndex > 0) {
+                    results[selectedIndex].classList.remove('selected');
+                    selectedIndex--;
+                    results[selectedIndex].classList.add('selected');
+                }
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                if (results[selectedIndex]) {
+                    const studentName = results[selectedIndex].textContent;
+                    if (isAddingStudent) {
+                        addStudent(studentName);
+                    } else {
+                        showFloatingMenu(null, studentName);
+                        closeSearchBox();
+                    }
+                }
+            } else if (event.key === 'Escape') {
+                closeSearchBox();
+            }
         }
 
         function closeSearchBox() {
             const searchBox = document.getElementById('search-box');
             if (searchBox) {
                 document.body.removeChild(searchBox);
-                currentMode = MODES.GLOBAL;
+                closeSpecificMenu('search-box');
+                document.removeEventListener('click', handleSearchOutsideClick);
+                isAddingStudent = false;
             }
         }
 
@@ -1051,6 +1248,14 @@
             }
         }
 
+        function preloadHouseImages() {
+            const houses = ['red', 'blue', 'green', 'yellow'];
+            houses.forEach(house => {
+                const img = new Image();
+                img.src = `https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${house}.png`;
+            });
+        }
+
         document.addEventListener('click', function(event) {
             const teacherMode = document.getElementById('teacher-mode');
             const floatingMenu = document.getElementById('floating-menu');
@@ -1063,10 +1268,7 @@
         });
 
         document.addEventListener('click', function(event) {
-            if (event.target.closest('.bar')) {
-                const studentName = event.target.closest('.bar').dataset.studentName;
-                showFloatingMenu(event, studentName);
-            } else if (event.target.closest('.spreadsheet-row .student-name')) {
+            if (event.target.closest('.spreadsheet-row .student-name')) {
                 const studentName = event.target.closest('.student-name').textContent;
                 const student = students.find(s => s.name === studentName);
                 if (student) {
@@ -1076,6 +1278,7 @@
         });
 
         window.onload = function() {
+            preloadHouseImages();
             currentClassIndex = getCurrentClass();
             updateClassDisplay();
             updateDateTime();
@@ -1086,7 +1289,7 @@
                     currentClassIndex = newIndex;
                     updateClassDisplay();
                 }
-            }, 1000); // Check every second to catch countdown starts
+            }, 1000);
             setInterval(updateCountdowns, 1000);
         };
     </script>

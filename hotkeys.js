@@ -6,8 +6,7 @@ const hotkeys = [
     { key: "↑", description: "Increase participation by 10." },
     { key: "↓", description: "Decrease participation by 10." },
     { key: "Cmd + →", description: "Cycle to next class." },
-    { key: "Cmd + ←", description: "Cycle to previous class." },
-    { key: "Click Title", description: "Cycle to next class." }
+    { key: "Cmd + ←", description: "Cycle to previous class." }
 ];
 
 function getMenuHotkeys() {

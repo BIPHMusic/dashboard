@@ -82,10 +82,11 @@
         const negativeEffect0 = 'sounds/villager-negative6.mp3';
 
         function playRandomSound(soundArray) {
-            const randomIndex = Math.floor(Math.random() * soundArray.length);
-            const audio = new Audio(soundArray[randomIndex]);
-            audio.play();
-        }
+        const randomIndex = Math.floor(Math.random() * soundArray.length);
+        const audio = new Audio(soundArray[randomIndex]);
+        audio.volume = 0.25; 
+        audio.play();
+    }
 
         const classes = [
             {
@@ -686,59 +687,61 @@
         }
 
         function updateScoreDisplay(student) {
-            const bar = document.getElementById(`bar-${student.name}`);
-            if (bar) {
-                const isStudentsBirthday = isBirthday(student.birthdate);
-                if (isStudentsBirthday) {
-                    bar.classList.add('bdaycolorful');
-                } else {
-                    bar.classList.remove('bdaycolorful');
-                }
-                bar.style.transition = 'height 0.3s ease-in-out';
-                if (student.score === 'EX') {
-                    bar.classList.add('ex-score');
-                    bar.style.height = '0%';
-                    bar.innerHTML = `
-                        <div class="bar-label">
-                            <div class="main-labels">
-                                <span>${student.name}</span>
-                                <span class="score">EX</span>
-                            </div>
-                            <div class="secondary-labels">
-                                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                                ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    bar.classList.remove('ex-score');
-                    bar.style.height = `${student.score}%`;
-                    bar.innerHTML = `
-                        <div class="value-label">${student.score}%</div>
-                        <div class="bar-label">
-                            <div class="main-labels">
-                                <span>${student.name}</span>
-                                <span class="score">${student.score}%</span>
-                            </div>
-                            <div class="secondary-labels">
-                                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                                ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                            </div>
-                        </div>
-                    `;
-                }
-                const scoreSpan = bar.querySelector('.score');
-                if (scoreSpan) {
-                    scoreSpan.removeAttribute('style');
-                }
-                updateTeacherMenu(student);
-                updateFloatingMenu(student);
-                const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
-                if (participationSpan) {
-                    participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
-                }
-            }
+    const bar = document.getElementById(`bar-${student.name}`);
+    if (bar) {
+        const isStudentsBirthday = isBirthday(student.birthdate);
+        if (isStudentsBirthday) {
+            bar.classList.add('bdaycolorful');
+        } else {
+            bar.classList.remove('bdaycolorful');
         }
+        bar.style.transition = 'height 0.3s ease-in-out';
+        const houseInfo = masterList.find(s => s.name === student.name); // Get house info
+        const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080'; // Fallback to gray if no house
+        if (student.score === 'EX') {
+            bar.classList.add('ex-score');
+            bar.style.height = '0%';
+            bar.innerHTML = `
+                <div class="bar-label">
+                    <div class="main-labels">
+                        <span>${student.name}</span>
+                        <span class="score">EX</span>
+                    </div>
+                    <div class="secondary-labels">
+                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        } else {
+            bar.classList.remove('ex-score');
+            bar.style.height = `${student.score}%`;
+            bar.innerHTML = `
+                <div class="value-label">${student.score}%</div>
+                <div class="bar-label">
+                    <div class="main-labels">
+                        <span>${student.name}</span>
+                        <span class="score">${student.score}%</span>
+                    </div>
+                    <div class="secondary-labels">
+                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        const scoreSpan = bar.querySelector('.score');
+        if (scoreSpan) {
+            scoreSpan.removeAttribute('style');
+        }
+        updateTeacherMenu(student);
+        updateFloatingMenu(student);
+        const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+        if (participationSpan) {
+            participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+        }
+    }
+}
 
         window.addEventListener('resize', () => {
             students.forEach(student => updateScoreDisplay(student));
@@ -1005,57 +1008,70 @@ function resetBarHighlights() {
         }
 
         function addStudent(name) {
-            const masterStudent = masterList.find(s => s.name === name);
-            if (masterStudent && !students.some(s => s.name === name)) {
-                const newStudent = {
-                    name: masterStudent.name,
-                    birthdate: masterStudent.birthdate,
-                    house: masterStudent.house,
-                    attendance: 'Present',
-                    [currentCriteria[0]]: false,
-                    [currentCriteria[1]]: false,
-                    [currentCriteria[2]]: false,
-                    [currentCriteria[3]]: false,
-                    score: 'EX',
-                    housePoints: 0,
-                    manualAdjustment: 0,
-                    isAdditional: true
-                };
-                students.push(newStudent);
-                teacherModeOrder.push(name);
-                createBars();
-                if (document.getElementById('teacher-mode').style.display === 'block') {
-                    populateStudents();
-                }
-                closeSearchBox();
-            }
-        }
-
-        function createSearchBox() {
-            if (!document.getElementById('search-box')) {
-                searchBox = document.createElement('div');
-                searchBox.id = 'search-box';
-                searchBox.innerHTML = `
-                    <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}">
-                    <div id="search-results"></div>
-                    ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
-                `;
-                document.body.appendChild(searchBox);
-                searchResults = document.getElementById('search-results');
-                const searchInput = document.getElementById('search-input');
-                searchInput.focus();
-                openMenu('search-box');
-                currentMode = MODES.SEARCH;
-
-                searchInput.addEventListener('input', () => {
-                    updateSearchResults(searchInput.value);
-                });
-
+        const masterStudent = masterList.find(s => s.name === name);
+        if (masterStudent && !students.some(s => s.name === name)) {
+            const newStudent = {
+                name: masterStudent.name,
+                birthdate: masterStudent.birthdate,
+                house: masterStudent.house,
+                attendance: 'Present',
+                [currentCriteria[0]]: true,
+                [currentCriteria[1]]: true,
+                [currentCriteria[2]]: true,
+                [currentCriteria[3]]: true,
+                score: 100,
+                housePoints: 0,
+                manualAdjustment: 0,
+                isAdditional: true
+            };
+            students.push(newStudent);
+            teacherModeOrder.push(name);
+            createBars();
+            // Animate the new student's bar
+            const newBar = document.getElementById(`bar-${newStudent.name}`);
+            if (newBar) {
+                newBar.style.height = '0%';
                 setTimeout(() => {
-                    document.addEventListener('click', handleSearchOutsideClick);
-                }, 0);
+                    newBar.style.transition = 'height 0.5s ease-in-out';
+                    newBar.style.height = `${newStudent.score}%`;
+                    newBar.style.setProperty('--flash-color', 'rgba(46, 204, 113, 0.6)');
+                    newBar.classList.remove('flash-animation');
+                    void newBar.offsetWidth;
+                    newBar.classList.add('flash-animation');
+                }, 10);
             }
+            if (document.getElementById('teacher-mode').style.display === 'block') {
+                populateStudents();
+            }
+            closeSearchBox();
         }
+    }
+
+    function createSearchBox() {
+    if (!document.getElementById('search-box')) {
+        searchBox = document.createElement('div');
+        searchBox.id = 'search-box';
+        searchBox.innerHTML = `
+            <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}" autocomplete="off">
+            <div id="search-results"></div>
+            ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
+        `;
+        document.body.appendChild(searchBox);
+        searchResults = document.getElementById('search-results');
+        const searchInput = document.getElementById('search-input');
+        searchInput.focus();
+        openMenu('search-box');
+        currentMode = MODES.SEARCH;
+
+        searchInput.addEventListener('input', () => {
+            updateSearchResults(searchInput.value);
+        });
+
+        setTimeout(() => {
+            document.addEventListener('click', handleSearchOutsideClick);
+        }, 0);
+    }
+}
 
         function toggleAddStudentMode() {
             closeSearchBox();
@@ -1119,39 +1135,6 @@ function resetBarHighlights() {
             const addStudentOption = document.getElementById('add-student-option');
             if (addStudentOption) {
                 addStudentOption.style.display = 'none';
-            }
-        }
-
-        function handleSearchBoxKeys(event) {
-            const searchInput = document.getElementById('search-input');
-            const results = searchResults.children;
-            if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                if (selectedIndex < results.length - 1) {
-                    results[selectedIndex].classList.remove('selected');
-                    selectedIndex++;
-                    results[selectedIndex].classList.add('selected');
-                }
-            } else if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                if (selectedIndex > 0) {
-                    results[selectedIndex].classList.remove('selected');
-                    selectedIndex--;
-                    results[selectedIndex].classList.add('selected');
-                }
-            } else if (event.key === 'Enter') {
-                event.preventDefault();
-                if (results[selectedIndex]) {
-                    const studentName = results[selectedIndex].textContent;
-                    if (isAddingStudent) {
-                        addStudent(studentName);
-                    } else {
-                        showFloatingMenu(null, studentName);
-                        closeSearchBox();
-                    }
-                }
-            } else if (event.key === 'Escape') {
-                closeSearchBox();
             }
         }
 

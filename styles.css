@@ -494,6 +494,14 @@ opacity: 1;
     .ex-score .bar-label .main-labels span:first-child {
         color: black;
     }
+
+    .house-points {
+        font-size: 1vw;
+        font-weight: bold;
+        transition: background-color 1.0s ease, backdrop-filter 1.0s ease;
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
     
     .value-label {
         font-size: clamp(12px, 1.4vw, 20px);

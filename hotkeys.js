@@ -80,8 +80,14 @@ function handleFloatingMenuHotkeys(event, studentName) {
 function handleSearchBoxKeys(event) {
     if (window.isObjectiveInputFocused) return;
 
-    const input = document.getElementById('search-input');
-    const results = Array.from(searchResults.children);
+    const searchInput = document.getElementById('search-input');
+    const results = searchResults.children;
+
+    if (event.shiftKey && (event.key === '=' || event.key === '+')) {
+        event.preventDefault(); // Prevent typing '+' in the input
+        toggleAddStudentMode();
+        return;
+    }
 
     switch (event.key) {
         case 'Escape':
@@ -89,23 +95,34 @@ function handleSearchBoxKeys(event) {
             break;
         case 'ArrowUp':
             event.preventDefault();
-            selectedIndex = Math.max(0, selectedIndex - 1);
-            updateSelectedResult();
+            if (selectedIndex > 0) {
+                results[selectedIndex].classList.remove('selected');
+                selectedIndex--;
+                results[selectedIndex].classList.add('selected');
+            }
             break;
         case 'ArrowDown':
             event.preventDefault();
-            selectedIndex = Math.min(results.length - 1, selectedIndex + 1);
-            updateSelectedResult();
+            if (selectedIndex < results.length - 1) {
+                results[selectedIndex].classList.remove('selected');
+                selectedIndex++;
+                results[selectedIndex].classList.add('selected');
+            }
             break;
         case 'Enter':
-            if (results.length > 0) {
-                const selectedStudent = results[selectedIndex].textContent;
-                closeSearchBox();
-                showFloatingMenu(null, selectedStudent);
+            event.preventDefault();
+            if (results[selectedIndex]) {
+                const studentName = results[selectedIndex].textContent;
+                if (isAddingStudent) {
+                    addStudent(studentName);
+                } else {
+                    showFloatingMenu(null, studentName);
+                    closeSearchBox();
+                }
             }
             break;
         default:
-            setTimeout(() => updateSearchResults(input.value), 0);
+            setTimeout(() => updateSearchResults(searchInput.value), 0);
     }
 }
 
@@ -162,23 +179,17 @@ function handleObjectiveInputKeys(event) {
 
 function handleGlobalHotkeys(event) {
     if (window.isObjectiveInputFocused) {
-        // Allow modifier keys
         if (['Control', 'Meta', 'Alt', 'Shift'].includes(event.key)) return;
-        // Allow standard text editing shortcuts
         if (event.metaKey || event.ctrlKey) {
-            const allowedShortcuts = ['a', 'c', 'v', 'x', 'z', 'y']; // Select all, copy, paste, cut, undo, redo
+            const allowedShortcuts = ['a', 'c', 'v', 'x', 'z', 'y', '='];
             if (allowedShortcuts.includes(event.key.toLowerCase())) return;
         }
-        // Allow navigation and input keys
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Backspace', 'Delete', 'Tab'].includes(event.key)) return;
-        // Allow character input
         if (event.key.length === 1) return;
-        // Handle Enter and Escape via handleObjectiveInputKeys
         if (['Enter', 'Escape'].includes(event.key)) {
             handleObjectiveInputKeys(event);
             return;
         }
-        // Block all other keys
         event.preventDefault();
         return;
     }
@@ -192,11 +203,17 @@ function handleGlobalHotkeys(event) {
     }
 
     const isProductionTech = classes[currentClassIndex].name === "Production Tech";
-    const validKeys = ['t', 'a', isProductionTech ? 'd' : 's', isProductionTech ? 'e' : 'i', 'r', isProductionTech ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'];
+    const validKeys = ['t', 'a', isProductionTech ? 'd' : 's', isProductionTech ? 'e' : 'i', 'r', isProductionTech ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'h', '=', '+'];
 
     if (validKeys.includes(event.key)) {
         if (event.key === 'r' && event.metaKey) return;
+        if ((event.key === '=' || event.key === '+') && (event.metaKey || event.ctrlKey)) return; // Allow Cmd+=/Ctrl+= for browser zoom
         event.preventDefault();
+    }
+
+    if ((event.key === '=' || event.key === '+') && event.shiftKey && !event.ctrlKey && !event.metaKey) {
+        toggleAddStudentMode();
+        return;
     }
 
     const floatingMenu = document.getElementById('floating-menu');

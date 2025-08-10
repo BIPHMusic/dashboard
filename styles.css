@@ -127,27 +127,28 @@ margin-top: -13px;
     overflow-x: auto;
     overflow-y: hidden;
 }
+
 .bar {
-width: 50px;
-background: linear-gradient(to top, #3378a6, #52a6df);
-box-shadow: 2px 0 15px rgba(0,0,0,0.2);
-transition: height 0.5s ease-in-out, opacity 0.8s ease;
-position: relative;
-margin: 0 10px;
-cursor: pointer;
-text-align: center;
+    width: 50px;
+    background: linear-gradient(to top, #3378a6, #52a6df);
+    box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+    transition: height 0.5s ease-in-out, opacity 0.8s ease;
+    position: relative;
+    margin: 0 10px;
+    cursor: pointer;
+    text-align: center;
 }
 
 .bar::after {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background-color: transparent;
-pointer-events: none;
-transition: background-color 0.5s;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    pointer-events: none;
+    transition: background-color 0.8s ease;
 }
 
 .bar.bdaycolorful {
@@ -726,4 +727,12 @@ transition: transform 0.3s ease;
 
 .hover-float:hover {
 transform: translateY(-5px);
+}
+
+#long-press-menu {
+    font-size: 14px;
+    cursor: pointer;
+}
+#long-press-menu div:hover {
+    text-decoration: underline;
 }

@@ -671,80 +671,78 @@
         }
 
         function calculateScore(student) {
-        if (student.attendance === 'Absent') {
-            student.score = 'EX';
-        } else {
-            let baseScore = 60;
-            if (student.attendance === 'Tardy') baseScore -= 20;
-            if (student[currentCriteria[0]]) baseScore += 10;
-            if (student[currentCriteria[1]]) baseScore += 10;
-            if (student[currentCriteria[2]]) baseScore += 10;
-            if (student[currentCriteria[3]]) baseScore += 10;
-            let manualAdjustment = student.manualAdjustment || 0;
-            student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
-        }
-    }
-
-    function updateScoreDisplay(student) {
-        const bar = document.getElementById(`bar-${student.name}`);
-        if (bar) {
-            const isStudentsBirthday = isBirthday(student.birthdate);
-            if (isStudentsBirthday) {
-                bar.classList.add('bdaycolorful');
+            if (student.attendance === 'Absent') {
+                student.score = 'EX';
             } else {
-                bar.classList.remove('bdaycolorful');
-            }
-            bar.style.transition = 'height 0.3s ease-in-out';
-            // Add or remove 'ex-score' class based on score
-            if (student.score === 'EX') {
-                bar.classList.add('ex-score');
-                bar.style.height = '0%';
-                bar.innerHTML = `
-                    <div class="bar-label">
-                        <div class="main-labels">
-                            <span>${student.name}</span>
-                            <span class="score">EX</span>
-                        </div>
-                        <div class="secondary-labels">
-                            ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                            ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                        </div>
-                    </div>
-                `;
-            } else {
-                bar.classList.remove('ex-score');
-                bar.style.height = `${student.score}%`;
-                bar.innerHTML = `
-                    <div class="value-label">${student.score}%</div>
-                    <div class="bar-label">
-                        <div class="main-labels">
-                            <span>${student.name}</span>
-                            <span class="score">${student.score}%</span>
-                        </div>
-                        <div class="secondary-labels">
-                            ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                            ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                        </div>
-                    </div>
-                `;
-            }
-            // Remove inline style from .score to let CSS @media rule control visibility
-            const scoreSpan = bar.querySelector('.score');
-            if (scoreSpan) {
-                scoreSpan.removeAttribute('style');
-            }
-            updateTeacherMenu(student);
-            updateFloatingMenu(student);
-            const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
-            if (participationSpan) {
-                participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+                let baseScore = 60;
+                if (student.attendance === 'Tardy') baseScore -= 20;
+                if (student[currentCriteria[0]]) baseScore += 10;
+                if (student[currentCriteria[1]]) baseScore += 10;
+                if (student[currentCriteria[2]]) baseScore += 10;
+                if (student[currentCriteria[3]]) baseScore += 10;
+                let manualAdjustment = student.manualAdjustment || 0;
+                student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
             }
         }
-    }
 
-window.addEventListener('resize', () => {
-    students.forEach(student => updateScoreDisplay(student));
-});
+        function updateScoreDisplay(student) {
+            const bar = document.getElementById(`bar-${student.name}`);
+            if (bar) {
+                const isStudentsBirthday = isBirthday(student.birthdate);
+                if (isStudentsBirthday) {
+                    bar.classList.add('bdaycolorful');
+                } else {
+                    bar.classList.remove('bdaycolorful');
+                }
+                bar.style.transition = 'height 0.3s ease-in-out';
+                if (student.score === 'EX') {
+                    bar.classList.add('ex-score');
+                    bar.style.height = '0%';
+                    bar.innerHTML = `
+                        <div class="bar-label">
+                            <div class="main-labels">
+                                <span>${student.name}</span>
+                                <span class="score">EX</span>
+                            </div>
+                            <div class="secondary-labels">
+                                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                                ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bar.classList.remove('ex-score');
+                    bar.style.height = `${student.score}%`;
+                    bar.innerHTML = `
+                        <div class="value-label">${student.score}%</div>
+                        <div class="bar-label">
+                            <div class="main-labels">
+                                <span>${student.name}</span>
+                                <span class="score">${student.score}%</span>
+                            </div>
+                            <div class="secondary-labels">
+                                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                                ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                const scoreSpan = bar.querySelector('.score');
+                if (scoreSpan) {
+                    scoreSpan.removeAttribute('style');
+                }
+                updateTeacherMenu(student);
+                updateFloatingMenu(student);
+                const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+                if (participationSpan) {
+                    participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+                }
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            students.forEach(student => updateScoreDisplay(student));
+        });
 
         function updateTeacherMenu(student) {
             const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
@@ -804,48 +802,48 @@ window.addEventListener('resize', () => {
         }
 
         function createBars() {
-        const container = document.getElementById('graph-container');
-        container.innerHTML = '';
-        students.forEach(student => {
-            const bar = document.createElement('div');
-            bar.className = 'bar';
-            const isBday = isBirthday(student.birthdate);
-            if (isBday) {
-                bar.classList.add('bdaycolorful');
-            }
-            if (student.score === 'EX') {
-                bar.classList.add('ex-score');
-            }
-            bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
-            bar.id = `bar-${student.name}`;
-            bar.dataset.studentName = student.name;
-            bar.innerHTML = `
-                ${student.score !== 'EX' ? `<div class="value-label">${student.score}%</div>` : ''}
-                <div class="bar-label">
-                    <div class="main-labels">
-                        <span ${isBday ? 'class="colorful"' : ''}>${student.name}</span>
-                        <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
-                    </div>
-                    <div class="secondary-labels">
-                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                        ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                    </div>
-                </div>
-            `;
-            bar.addEventListener('mouseover', () => highlightBar(student.name));
-            bar.addEventListener('mouseout', resetBarHighlights);
-            bar.addEventListener('click', (event) => {
-                if (event.target.closest('.main-labels span:first-child') || 
-                    event.target.closest('.main-labels span.score') || 
-                    event.target.closest('.secondary-labels')) {
-                    cycleAttendanceForStudent(student);
-                } else {
-                    showFloatingMenu(event, student.name);
+            const container = document.getElementById('graph-container');
+            container.innerHTML = '';
+            students.forEach(student => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                const isBday = isBirthday(student.birthdate);
+                if (isBday) {
+                    bar.classList.add('bdaycolorful');
                 }
+                if (student.score === 'EX') {
+                    bar.classList.add('ex-score');
+                }
+                bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
+                bar.id = `bar-${student.name}`;
+                bar.dataset.studentName = student.name;
+                bar.innerHTML = `
+                    ${student.score !== 'EX' ? `<div class="value-label">${student.score}%</div>` : ''}
+                    <div class="bar-label">
+                        <div class="main-labels">
+                            <span ${isBday ? 'class="colorful"' : ''}>${student.name}</span>
+                            <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
+                        </div>
+                        <div class="secondary-labels">
+                            ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                            ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                bar.addEventListener('mouseover', () => highlightBar(student.name));
+                bar.addEventListener('mouseout', resetBarHighlights);
+                bar.addEventListener('click', (event) => {
+                    if (event.target.closest('.main-labels span:first-child') || 
+                        event.target.closest('.main-labels span.score') || 
+                        event.target.closest('.secondary-labels')) {
+                        cycleAttendanceForStudent(student);
+                    } else {
+                        showFloatingMenu(event, student.name);
+                    }
+                });
+                container.appendChild(bar);
             });
-            container.appendChild(bar);
-        });
-    }
+        }
 
         function isBirthday(birthdate) {
             if (!birthdate) return false;
@@ -858,30 +856,37 @@ window.addEventListener('resize', () => {
         }
 
         function highlightBar(name) {
-            resetBarHighlights();
-            document.querySelectorAll('.bar, .bar-label').forEach(el => {
-                if (el.id === `bar-${name}` || el.parentElement.id === `bar-${name}`) {
-                    el.style.opacity = '1';
-                    const nameSpan = el.querySelector('.main-labels span:first-child');
-                    if (nameSpan) {
-                        nameSpan.style.fontWeight = 'bold';
-                    }
-                } else {
-                    el.style.opacity = '0.7';
-                }
-            });
+    document.querySelectorAll('.bar, .bar-label, .value-label').forEach(el => {
+        if (el.id === `bar-${name}` || el.parentElement.id === `bar-${name}`) {
+            el.style.opacity = '1';
+            const nameSpan = el.querySelector('.main-labels span:first-child');
+            if (nameSpan) {
+                nameSpan.style.fontWeight = 'bold'; // No transition for font-weight
+            }
+            const bar = el.classList.contains('bar') ? el : el.parentElement;
+            if (bar.classList.contains('bar')) {
+                bar.classList.add('highlighted');
+            }
+        } else {
+            el.style.opacity = '0.7';
         }
+    });
+}
 
-        function resetBarHighlights() {
-            document.querySelectorAll('.bar, .bar-label').forEach(el => {
-                el.style.opacity = '1';
-                const nameSpan = el.querySelector('.main-labels span:first-child');
-                if (nameSpan) {
-                    nameSpan.style.fontWeight = 'normal';
-                    nameSpan.style.textDecoration = 'none';
-                }
-            });
+function resetBarHighlights() {
+    document.querySelectorAll('.bar, .bar-label, .value-label').forEach(el => {
+        el.style.opacity = '1';
+        const nameSpan = el.querySelector('.main-labels span:first-child');
+        if (nameSpan) {
+            nameSpan.style.fontWeight = 'normal';
+            nameSpan.style.textDecoration = 'none';
         }
+        const bar = el.classList.contains('bar') ? el : el.parentElement;
+        if (bar.classList.contains('bar')) {
+            bar.classList.remove('highlighted');
+        }
+    });
+}
 
         function updateBarGraph(student) {
             const bar = document.getElementById(`bar-${student.name}`);
@@ -1026,44 +1031,37 @@ window.addEventListener('resize', () => {
             }
         }
 
-    function createSearchBox() {
-        if (!document.getElementById('search-box')) {
-            searchBox = document.createElement('div');
-            searchBox.id = 'search-box';
-            searchBox.innerHTML = `
-                <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}">
-                <div id="search-results"></div>
-                ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
-            `;
-            document.body.appendChild(searchBox);
-            searchResults = document.getElementById('search-results');
-            const searchInput = document.getElementById('search-input');
-            searchInput.focus();
-            openMenu('search-box');
-            currentMode = MODES.SEARCH;
+        function createSearchBox() {
+            if (!document.getElementById('search-box')) {
+                searchBox = document.createElement('div');
+                searchBox.id = 'search-box';
+                searchBox.innerHTML = `
+                    <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}">
+                    <div id="search-results"></div>
+                    ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
+                `;
+                document.body.appendChild(searchBox);
+                searchResults = document.getElementById('search-results');
+                const searchInput = document.getElementById('search-input');
+                searchInput.focus();
+                openMenu('search-box');
+                currentMode = MODES.SEARCH;
 
-            searchInput.addEventListener('input', () => {
-                updateSearchResults(searchInput.value);
-                if (!isAddingStudent && searchInput.value.trim() !== '') {
-                    const addStudentOption = document.getElementById('add-student-option');
-                    if (addStudentOption) {
-                        addStudentOption.style.display = 'none';
-                    }
-                }
-            });
+                searchInput.addEventListener('input', () => {
+                    updateSearchResults(searchInput.value);
+                });
 
-            // Add event listener for outside clicks
-            setTimeout(() => {
-                document.addEventListener('click', handleSearchOutsideClick);
-            }, 0);
+                setTimeout(() => {
+                    document.addEventListener('click', handleSearchOutsideClick);
+                }, 0);
+            }
         }
-    }
 
-    function toggleAddStudentMode() {
-        closeSearchBox();
-        isAddingStudent = true;
-        createSearchBox();
-    }
+        function toggleAddStudentMode() {
+            closeSearchBox();
+            isAddingStudent = true;
+            createSearchBox();
+        }
 
         function toggleSearchBox() {
             const searchBox = document.getElementById('search-box');
@@ -1085,6 +1083,15 @@ window.addEventListener('resize', () => {
 
         function updateSearchResults(query) {
             let matchingStudents;
+            searchResults.innerHTML = '';
+            selectedIndex = 0;
+            if (query.trim() === '') {
+                const addStudentOption = document.getElementById('add-student-option');
+                if (addStudentOption) {
+                    addStudentOption.style.display = !isAddingStudent ? 'block' : 'none';
+                }
+                return;
+            }
             if (isAddingStudent) {
                 const currentStudentNames = students.map(s => s.name);
                 matchingStudents = masterList
@@ -1095,8 +1102,6 @@ window.addEventListener('resize', () => {
                     student.name.toLowerCase().includes(query.toLowerCase())
                 );
             }
-            searchResults.innerHTML = '';
-            selectedIndex = 0;
             matchingStudents.forEach((student, index) => {
                 const result = document.createElement('div');
                 result.textContent = student.name;
@@ -1111,6 +1116,10 @@ window.addEventListener('resize', () => {
                 };
                 searchResults.appendChild(result);
             });
+            const addStudentOption = document.getElementById('add-student-option');
+            if (addStudentOption) {
+                addStudentOption.style.display = 'none';
+            }
         }
 
         function handleSearchBoxKeys(event) {
@@ -1173,7 +1182,7 @@ window.addEventListener('resize', () => {
             houseshield.style.zIndex = currentZIndex;
             if (currentStudentIndex === -1) {
                 const floatingMenu = document.getElementById('floating-menu');
-                if (floatingMenu.style.display === 'block') {
+                if ( floatingMenu.style.display === 'block') {
                     const currentStudentName = floatingMenu.querySelector('h3').textContent;
                     currentStudentIndex = students.findIndex(s => s.name === currentStudentName);
                 }
@@ -1255,6 +1264,91 @@ window.addEventListener('resize', () => {
                 img.src = `https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${house}.png`;
             });
         }
+
+        // Long press detection variables
+let longPressTimer = null;
+const LONG_PRESS_DURATION = 1000; // 1 second in milliseconds
+let isLongPressActive = false; // Flag to track long press completion
+
+// Function to toggle fullscreen mode
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+    closeLongPressMenu();
+}
+
+// Function to show the long press menu
+function showLongPressMenu(event) {
+    const longPressMenu = document.createElement('div');
+    longPressMenu.id = 'long-press-menu';
+    longPressMenu.style.position = 'fixed';
+    longPressMenu.style.left = `${event.clientX}px`;
+    longPressMenu.style.top = `${event.clientY}px`;
+    longPressMenu.style.backgroundColor = 'white';
+    longPressMenu.style.padding = '10px';
+    longPressMenu.style.borderRadius = '5px';
+    longPressMenu.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+    longPressMenu.style.zIndex = currentZIndex + 1;
+    longPressMenu.innerHTML = `
+        <div style="cursor: pointer;" onclick="toggleFullscreen()">Go Fullscreen</div>
+    `;
+    document.body.appendChild(longPressMenu);
+    openMenu('long-press-menu');
+    isLongPressActive = true; // Set flag to indicate menu is shown
+
+    // Add Escape key handler for long press menu
+    const handleLongPressEscape = (event) => {
+        if (event.key === 'Escape') {
+            closeLongPressMenu();
+            document.removeEventListener('keydown', handleLongPressEscape);
+        }
+    };
+    document.addEventListener('keydown', handleLongPressEscape);
+
+    // Add outside click handler after a delay to avoid capturing the mouseup event
+    setTimeout(() => {
+        document.addEventListener('click', handleLongPressOutsideClick);
+    }, 0);
+}
+
+// Function to close the long press menu
+function closeLongPressMenu() {
+    const longPressMenu = document.getElementById('long-press-menu');
+    if (longPressMenu) {
+        document.body.removeChild(longPressMenu);
+        closeSpecificMenu('long-press-menu');
+        document.removeEventListener('click', handleLongPressOutsideClick);
+    }
+    isLongPressActive = false; // Reset flag
+}
+
+// Function to handle outside clicks for long press menu
+function handleLongPressOutsideClick(event) {
+    const longPressMenu = document.getElementById('long-press-menu');
+    if (longPressMenu && !longPressMenu.contains(event.target) && !isLongPressActive) {
+        closeLongPressMenu();
+    }
+    isLongPressActive = false; // Reset flag after first click
+}
+
+// Long press event listeners
+document.addEventListener('mousedown', (event) => {
+    if (event.target.closest('.bar, .search-button, .menu-icon, .spreadsheet, .floating-menu, #search-box, #overlay, #teacher-mode')) {
+        return;
+    }
+    longPressTimer = setTimeout(() => {
+        showLongPressMenu(event);
+    }, LONG_PRESS_DURATION);
+});
+
+document.addEventListener('mouseup', () => {
+    clearTimeout(longPressTimer);
+});
 
         document.addEventListener('click', function(event) {
             const teacherMode = document.getElementById('teacher-mode');

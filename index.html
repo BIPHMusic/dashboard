@@ -477,11 +477,16 @@ document.addEventListener('keydown', globalKeydownHandler);
 
 function openMenu(menuId) {
     const menu = document.getElementById(menuId);
-    if (menu) {
+    if (menu && !menuStack.some(m => m.id === menuId)) {
         currentZIndex++;
         menu.style.zIndex = currentZIndex;
         menu.style.display = 'block';
         menuStack.push(menu);
+        console.log(`Menu opened: ${menuId}, menuStack: ${menuStack.map(m => m.id).join(',')}`);
+    } else if (menu) {
+        console.log(`Menu ${menuId} already in menuStack, skipping`);
+    } else {
+        console.error(`Menu ${menuId} not found`);
     }
 }
 

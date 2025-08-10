@@ -4,7 +4,7 @@ body, html {
     font-family: 'American Typewriter', serif;
     height: 100%;
     font-size: 18px;
-    overflow: auto;
+    overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;

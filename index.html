@@ -945,6 +945,7 @@ function navigateStudentMenu(direction) {
         currentStudentIndex = (currentStudentIndex + direction + students.length) % students.length;
     }
     const newStudent = students[currentStudentIndex];
+    resetBarHighlights(); // Reset all bars before highlighting the new one
     showFloatingMenu(null, newStudent.name);
 }
 
@@ -1311,7 +1312,6 @@ function preloadHouseImages() {
 
 let longPressTimer = null;
 const LONG_PRESS_DURATION = 1000;
-let isLongPressActive = false;
 
 function toggleFullscreen() {
     if (!document.fullscreenElement) {
@@ -1321,57 +1321,6 @@ function toggleFullscreen() {
     } else {
         document.exitFullscreen();
     }
-    closeLongPressMenu();
-}
-
-function showLongPressMenu(event) {
-    const longPressMenu = document.createElement('div');
-    longPressMenu.id = 'long-press-menu';
-    longPressMenu.style.position = 'fixed';
-    longPressMenu.style.left = `${event.clientX}px`;
-    longPressMenu.style.top = `${event.clientY}px`;
-    longPressMenu.style.backgroundColor = 'white';
-    longPressMenu.style.padding = '10px';
-    longPressMenu.style.borderRadius = '5px';
-    longPressMenu.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-    longPressMenu.style.zIndex = currentZIndex + 1;
-    const fullscreenText = document.fullscreenElement ? 'Exit Fullscreen' : 'Enter Fullscreen';
-    longPressMenu.innerHTML = `
-        <div style="cursor: pointer;" onclick="toggleFullscreen()">${fullscreenText}</div>
-    `;
-    document.body.appendChild(longPressMenu);
-    openMenu('long-press-menu');
-    isLongPressActive = true;
-
-    const handleLongPressEscape = (event) => {
-        if (event.key === 'Escape') {
-            closeLongPressMenu();
-            document.removeEventListener('keydown', handleLongPressEscape);
-        }
-    };
-    document.addEventListener('keydown', handleLongPressEscape);
-
-    setTimeout(() => {
-        document.addEventListener('click', handleLongPressOutsideClick);
-    }, 0);
-}
-
-function closeLongPressMenu() {
-    const longPressMenu = document.getElementById('long-press-menu');
-    if (longPressMenu) {
-        document.body.removeChild(longPressMenu);
-        closeSpecificMenu('long-press-menu');
-        document.removeEventListener('click', handleLongPressOutsideClick);
-    }
-    isLongPressActive = false;
-}
-
-function handleLongPressOutsideClick(event) {
-    const longPressMenu = document.getElementById('long-press-menu');
-    if (longPressMenu && !longPressMenu.contains(event.target) && !isLongPressActive) {
-        closeLongPressMenu();
-    }
-    isLongPressActive = false;
 }
 
 document.addEventListener('mousedown', (event) => {
@@ -1379,7 +1328,7 @@ document.addEventListener('mousedown', (event) => {
         return;
     }
     longPressTimer = setTimeout(() => {
-        showLongPressMenu(event);
+        toggleFullscreen();
     }, LONG_PRESS_DURATION);
 });
 
@@ -1399,7 +1348,6 @@ document.addEventListener('click', function(event) {
         'floating-menu': isClickOnBar || isClickOnMenuIcon,
         'houseshield': isClickOnMenuIcon,
         'search-box': isClickOnMenuIcon || event.target.closest('.search-button'),
-        'long-press-menu': isClickOnMenuIcon,
         'overlay': isClickOnMenuIcon
     };
 

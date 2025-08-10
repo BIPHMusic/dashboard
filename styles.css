@@ -4,7 +4,7 @@ body, html {
     font-family: 'American Typewriter', serif;
     height: 100%;
     font-size: 18px;
-    overflow: hidden;
+    overflow: auto;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -756,12 +756,4 @@ transition: transform 0.3s ease;
 
 .hover-float:hover {
 transform: translateY(-5px);
-}
-
-#long-press-menu {
-    font-size: 14px;
-    cursor: pointer;
-}
-#long-press-menu div:hover {
-    text-decoration: underline;
 }

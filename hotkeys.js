@@ -201,9 +201,11 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    if (event.key === '?' || (event.altKey && event.key === '/')) {
-        toggleOverlay();
-        event.preventDefault();
+    if (event.key === '/' && currentMode === MODES.GLOBAL) {
+        if (!document.getElementById('search-box')) {
+            createSearchBox();
+            event.preventDefault();
+        }
         return;
     }
 

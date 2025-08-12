@@ -280,7 +280,7 @@ function updateCountdowns() {
 
     if (!currentClass.days.includes(currentDay)) {
         hasCopiedScores = false;
-        hasResetReturned = false; // Reset flag when class day changes
+        hasResetReturned = false;
         return;
     }
 
@@ -313,7 +313,7 @@ function updateCountdowns() {
         conclusionDiv.className = 'conclusion-countdown';
         conclusionDiv.textContent = `Conclusion: ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(conclusionDiv);
-        hasResetReturned = false; // Reset flag when entering conclusion phase
+        hasResetReturned = false;
     } else if (endDiff <= 300 && endDiff > 0 && !hasResetReturned) {
         const minutes = Math.floor(endDiff / 60);
         const seconds = Math.floor(endDiff % 60);
@@ -322,12 +322,10 @@ function updateCountdowns() {
         packupDiv.textContent = `♫ Pack up: ${minutes}m ${seconds}s ♫`;
         countdownContainer.appendChild(packupDiv);
         if (currentClass.criteria.includes('returned')) {
-            console.log('Resetting returned checkboxes for class:', currentClass.name);
             const checkboxIndex = currentClass.criteria.indexOf('returned') + 3;
             const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${checkboxIndex}) input[type="checkbox"]`);
             checkboxes.forEach((checkbox, index) => {
                 if (checkbox.checked) {
-                    console.log('Unchecking returned for student:', teacherModeOrder[index]);
                     checkbox.checked = false;
                     const studentName = teacherModeOrder[index];
                     if (studentName) {
@@ -335,13 +333,13 @@ function updateCountdowns() {
                     }
                 }
             });
-            hasResetReturned = true; // Set flag to prevent further resets
+            hasResetReturned = true;
         }
         hasCopiedScores = false;
     } else if (endDiff <= 0 && endDiff > -2 && !hasCopiedScores) {
         exportScores();
         hasCopiedScores = true;
-        hasResetReturned = false; // Reset flag after class ends
+        hasResetReturned = false;
     }
 }
 
@@ -461,15 +459,11 @@ let isActive = false;
 let currentPoints = 0;
 
 function globalKeydownHandler(event) {
-    console.log('Keydown event:', event.key, 'currentMode:', currentMode, 'menuStack:', menuStack);
     if (event.key === 'Escape' && menuStack.length > 0) {
-        console.log('Closing top menu, currentMode before:', currentMode, 'menuStack:', menuStack);
         closeTopMenu();
-        console.log('After closing, currentMode:', currentMode, 'menuStack:', menuStack);
         return;
     }
     if (event.key === '/' && currentMode === MODES.GLOBAL) {
-        console.log('Attempting to open search box, currentMode:', currentMode, 'menuStack:', menuStack);
     }
     switch (currentMode) {
         case MODES.GLOBAL:
@@ -494,12 +488,8 @@ function openMenu(menuId) {
             menu.style.zIndex = currentZIndex;
             menu.style.display = 'block';
             menuStack.push(menu);
-            console.log(`Opened menu: ${menuId}, zIndex: ${menu.style.zIndex}, display: ${menu.style.display}, menuStack:`, menuStack);
-        } else {
-            console.warn(`Failed to open menu: ${menuId}, menu exists: ${!!menu}, already in stack: ${menuStack.some(m => m.id === menuId)}`);
         }
     } catch (error) {
-        console.error('Error in openMenu:', error);
     }
 }
 
@@ -522,9 +512,8 @@ function closeTopMenu() {
             resetBarHighlights();
         }
         if (menuStack.length === 0) {
-            currentMode = MODES.GLOBAL; // Explicitly reset mode
+            currentMode = MODES.GLOBAL;
         }
-        console.log('Top menu closed, id:', topMenu.id, 'currentMode:', currentMode, 'menuStack:', menuStack);
         document.activeElement.blur();
     }
 }
@@ -1096,9 +1085,7 @@ function addStudent(name) {
 
 function createSearchBox() {
     try {
-        console.log('Entering createSearchBox, checking for existing search-box...');
         if (!document.getElementById('search-box')) {
-            console.log('No existing search-box found, creating new one...');
             searchBox = document.createElement('div');
             searchBox.id = 'search-box';
             searchBox.style.position = 'fixed';
@@ -1116,13 +1103,10 @@ function createSearchBox() {
                 <div id="search-results"></div>
                 ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
             `;
-            console.log('Appending search-box to document.body...');
             document.body.appendChild(searchBox);
-            console.log('Search box appended to DOM:', searchBox);
             
-            // Force DOM repaint
             searchBox.style.display = 'none';
-            void searchBox.offsetWidth; // Trigger reflow
+            void searchBox.offsetWidth;
             searchBox.style.display = 'block';
             
             searchResults = document.getElementById('search-results');
@@ -1135,34 +1119,23 @@ function createSearchBox() {
                 throw new Error('Search input element not found');
             }
             
-            console.log('Focusing search input...');
             searchInput.focus();
             
-            console.log('Opening menu...');
             openMenu('search-box');
-            console.log('Setting currentMode to SEARCH...');
             currentMode = MODES.SEARCH;
 
-            console.log('Adding input event listener...');
             searchInput.addEventListener('input', () => {
                 try {
-                    console.log('Updating search results for query:', searchInput.value);
                     updateSearchResults(searchInput.value);
                 } catch (e) {
-                    console.error('Error in updateSearchResults:', e);
                 }
             });
 
-            console.log('Scheduling outside click handler...');
             setTimeout(() => {
                 document.addEventListener('click', handleSearchOutsideClick);
-                console.log('Outside click handler added');
             }, 0);
-        } else {
-            console.log('Search box already exists, skipping creation');
         }
     } catch (error) {
-        console.error('Error in createSearchBox:', error);
     }
 }
 
@@ -1235,23 +1208,16 @@ function closeSearchBox() {
     try {
         const searchBox = document.getElementById('search-box');
         if (searchBox) {
-            console.log('Removing search-box from DOM...');
             document.body.removeChild(searchBox);
-            console.log('Closing specific menu: search-box...');
             closeSpecificMenu('search-box');
-            console.log('Removing outside click handler...');
             document.removeEventListener('click', handleSearchOutsideClick);
             isAddingStudent = false;
             currentMode = MODES.GLOBAL;
             selectedIndex = 0;
             searchBox = null;
             searchResults = null;
-            console.log('Search box closed, currentMode:', currentMode, 'menuStack:', menuStack);
-        } else {
-            console.warn('Search box not found during closeSearchBox');
         }
     } catch (error) {
-        console.error('Error in closeSearchBox:', error);
     }
 }
 
@@ -1448,8 +1414,7 @@ document.addEventListener('click', function(event) {
 });
 
 document.addEventListener('keydown', (event) => {
-    console.log('Global keydown:', event.key, 'target:', event.target);
-}, true); // Use capture phase to catch events early
+}, true);
 
 window.onload = function() {
     preloadHouseImages();
@@ -1498,8 +1463,25 @@ function exportScores() {
         ? additionalStudents.map(s => `${s.name},Additional`)
         : [];
 
-    // Check if user is on macOS
     const isMacOS = /Macintosh|Mac OS X/i.test(navigator.userAgent);
+
+    // Construct the message for house points
+    const housePointsDisplay = housePointsItemized.length > 0 
+        ? housePointsItemized.map(item => `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`).join('\n')
+        : 'No house points';
+
+    // Construct the message for tardies
+    const tardiesDisplay = tardiesItemized.length > 0 
+        ? `Tardies:\n${tardiesItemized.join('\n')}`
+        : 'No tardies';
+
+    // Determine the separator based on whether both house points and tardies are empty
+    const separator = housePointsItemized.length === 0 && tardiesItemized.length === 0 ? '\n' : '\n\n';
+
+    // Construct the full message
+    const message = housePointsItemized.length > 0 
+        ? `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`
+        : `${housePointsDisplay}${separator}${tardiesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
 
     if (isMacOS) {
         const htmlTable = `
@@ -1516,14 +1498,12 @@ function exportScores() {
                 'text/plain': new Blob([scores.join('\t')], { type: 'text/plain' })
             })
         ]).then(() => {
-            const message = `House points for today:\n${housePointsItemized.map(item => `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`).join('\n')}\n\n${tardiesItemized.length > 0 ? `Tardies:\n${tardiesItemized.join('\n')}` : 'No tardies'}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
             showCustomAlert(message);
             showTemporaryMessage('Scores exported to clipboard');
+            closeSpecificMenu('teacher-mode');
         }).catch(err => {
-            console.error('Failed to export scores: ', err);
         });
     } else {
-        // For non-macOS, export as CSV
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
         const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_');
@@ -1533,9 +1513,7 @@ function exportScores() {
             ...regularStudents.map(student => 
                 `"${student.name}",${student.attendance},${student.score === 'EX' ? 'EX' : `${student.score}%`},${student.housePoints}`
             ),
-            ...housePointsItemized.map(item => 
-                `"${item.name}",House Points,,${item.points > 0 ? '+' : ''}${item.points}`
-            ),
+            ...housePointsMessage,
             ...tardiesMessage,
             ...additionalStudentsMessage
         ];
@@ -1551,9 +1529,9 @@ function exportScores() {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
 
-        const message = `House points for today:\n${housePointsItemized.map(item => `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`).join('\n')}\n\n${tardiesItemized.length > 0 ? `Tardies:\n${tardiesItemized.join('\n')}` : 'No tardies'}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
         showCustomAlert(message);
         showTemporaryMessage('Scores exported as CSV');
+        closeSpecificMenu('teacher-mode');
     }
 }
 
@@ -1640,7 +1618,7 @@ function showTemporaryMessage(message) {
     messageElement.style.color = 'white';
     messageElement.style.padding = '10px 20px';
     messageElement.style.borderRadius = '5px';
-    messageElement.style.zIndex = '1000';
+    messageElement.style.zIndex = '5000';
     messageElement.style.opacity = '1';
     messageElement.style.transition = 'opacity 1s ease-in-out';
     document.body.appendChild(messageElement);
@@ -1694,6 +1672,5 @@ createBars();
 updateDateTime();
 setInterval(updateDateTime, 1000);
     </script>
-    <!-- <script src="copyscores.js"></script> -->
 </body>
 </html>

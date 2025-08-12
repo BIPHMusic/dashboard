@@ -6,7 +6,8 @@ const hotkeys = [
     { key: "↑", description: "Increase participation by 10." },
     { key: "↓", description: "Decrease participation by 10." },
     { key: "Cmd + →", description: "Cycle to next class." },
-    { key: "Cmd + ←", description: "Cycle to previous class." }
+    { key: "Cmd + ←", description: "Cycle to previous class." },
+    { key: "?", description: "Show hotkeys menu." }
 ];
 
 function getMenuHotkeys() {
@@ -201,6 +202,12 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
+    if ((event.key === '?' || (event.altKey && event.key === '/')) && currentMode === MODES.GLOBAL) {
+        toggleOverlay();
+        event.preventDefault();
+        return;
+    }
+
     if (event.key === '/' && currentMode === MODES.GLOBAL) {
         if (!document.getElementById('search-box')) {
             createSearchBox();
@@ -213,7 +220,7 @@ function handleGlobalHotkeys(event) {
     const floatingMenu = document.getElementById('floating-menu');
     const teacherMode = document.getElementById('teacher-mode');
 
-    const validKeys = ['t', 'a', isProductionTech ? 'd' : 's', isProductionTech ? 'e' : 'i', 'r', isProductionTech ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'h', '=', '+'];
+    const validKeys = ['t', 'a', isProductionTech ? 'd' : 's', isProductionTech ? 'e' : 'i', 'r', isProductionTech ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'h', '=', '+', '?'];
 
     if (!validKeys.includes(event.key) && !(event.metaKey && ['ArrowLeft', 'ArrowRight'].includes(event.key))) {
         return;

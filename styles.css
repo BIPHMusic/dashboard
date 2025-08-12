@@ -86,7 +86,7 @@ margin-top: -13px;
         z-index: 2;
     }
     #hotkeys, #menuHotkeys {
-        line-height: 1.5; /* Increased line height for more spacing */
+        line-height: 1.2; /* Increased line height for more spacing */
     }
 #date {
     margin-top: -35px;

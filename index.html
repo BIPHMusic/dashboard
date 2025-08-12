@@ -29,7 +29,7 @@
     <div id="graph-container"></div>
     <div id="teacher-mode">
         <span class="close-button" onclick="closeTopMenu()">&times;</span>
-        <button class="copy-button" onclick="copyScores()">Copy Scores</button>
+        <button class="export-button" onclick="exportScores()">Export Scores</button>
         <button class="reset-button" onclick="resetAllStudents()">Reset All</button>
         <div class="spreadsheet">
             <div class="spreadsheet-header"><strong>Student</strong></div>
@@ -335,7 +335,7 @@ function updateCountdowns() {
         hasCopiedScores = false;
     }
     else if (endDiff <= 0 && endDiff > -2 && !hasCopiedScores) {
-        copyScores();
+        exportScores();
         hasCopiedScores = true;
     }
 }
@@ -455,12 +455,17 @@ let isActive = false;
 let currentPoints = 0;
 
 function globalKeydownHandler(event) {
+    console.log('Keydown event:', event.key, 'currentMode:', currentMode, 'menuStack:', menuStack);
     if (event.key === 'Escape' && menuStack.length > 0) {
+        console.log('Closing top menu, currentMode before:', currentMode, 'menuStack:', menuStack);
         closeTopMenu();
+        console.log('After closing, currentMode:', currentMode, 'menuStack:', menuStack);
         return;
     }
-
-    switch(currentMode) {
+    if (event.key === '/' && currentMode === MODES.GLOBAL) {
+        console.log('Attempting to open search box, currentMode:', currentMode, 'menuStack:', menuStack);
+    }
+    switch (currentMode) {
         case MODES.GLOBAL:
             handleGlobalHotkeys(event);
             break;
@@ -476,12 +481,19 @@ function globalKeydownHandler(event) {
 document.addEventListener('keydown', globalKeydownHandler);
 
 function openMenu(menuId) {
-    const menu = document.getElementById(menuId);
-    if (menu && !menuStack.some(m => m.id === menuId)) {
-        currentZIndex++;
-        menu.style.zIndex = currentZIndex;
-        menu.style.display = 'block';
-        menuStack.push(menu);
+    try {
+        const menu = document.getElementById(menuId);
+        if (menu && !menuStack.some(m => m.id === menuId)) {
+            currentZIndex++;
+            menu.style.zIndex = currentZIndex;
+            menu.style.display = 'block';
+            menuStack.push(menu);
+            console.log(`Opened menu: ${menuId}, zIndex: ${menu.style.zIndex}, display: ${menu.style.display}, menuStack:`, menuStack);
+        } else {
+            console.warn(`Failed to open menu: ${menuId}, menu exists: ${!!menu}, already in stack: ${menuStack.some(m => m.id === menuId)}`);
+        }
+    } catch (error) {
+        console.error('Error in openMenu:', error);
     }
 }
 
@@ -492,14 +504,19 @@ function closeTopMenu() {
         if (topMenu.id === 'search-box') {
             currentMode = MODES.GLOBAL;
             isAddingStudent = false;
+            document.removeEventListener('click', handleSearchOutsideClick);
         } else if (topMenu.id === 'houseshield') {
             deactivateHouseshield();
         } else if (topMenu.id === 'floating-menu') {
             resetBarHighlights();
+        } else if (topMenu.id === 'teacher-mode') {
+            // Ensure teacher mode cleanup
         }
         if (menuStack.length === 0) {
             currentMode = MODES.GLOBAL;
         }
+        console.log('Top menu closed, id:', topMenu.id, 'currentMode:', currentMode, 'menuStack:', menuStack);
+        document.activeElement.blur(); // Remove focus from any element
     }
 }
 
@@ -1069,28 +1086,74 @@ function addStudent(name) {
 }
 
 function createSearchBox() {
-    if (!document.getElementById('search-box')) {
-        searchBox = document.createElement('div');
-        searchBox.id = 'search-box';
-        searchBox.innerHTML = `
-            <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}" autocomplete="off">
-            <div id="search-results"></div>
-            ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
-        `;
-        document.body.appendChild(searchBox);
-        searchResults = document.getElementById('search-results');
-        const searchInput = document.getElementById('search-input');
-        searchInput.focus();
-        openMenu('search-box');
-        currentMode = MODES.SEARCH;
+    try {
+        console.log('Entering createSearchBox, checking for existing search-box...');
+        if (!document.getElementById('search-box')) {
+            console.log('No existing search-box found, creating new one...');
+            searchBox = document.createElement('div');
+            searchBox.id = 'search-box';
+            searchBox.style.position = 'fixed';
+            searchBox.style.top = '50%';
+            searchBox.style.left = '50%';
+            searchBox.style.transform = 'translate(-50%, -50%)';
+            searchBox.style.backgroundColor = 'white';
+            searchBox.style.padding = '20px';
+            searchBox.style.borderRadius = '5px';
+            searchBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+            searchBox.style.zIndex = '1000';
+            searchBox.style.display = 'block';
+            searchBox.innerHTML = `
+                <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}" autocomplete="off">
+                <div id="search-results"></div>
+                ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
+            `;
+            console.log('Appending search-box to document.body...');
+            document.body.appendChild(searchBox);
+            console.log('Search box appended to DOM:', searchBox);
+            
+            // Force DOM repaint
+            searchBox.style.display = 'none';
+            void searchBox.offsetWidth; // Trigger reflow
+            searchBox.style.display = 'block';
+            
+            searchResults = document.getElementById('search-results');
+            if (!searchResults) {
+                throw new Error('Search results element not found');
+            }
+            
+            const searchInput = document.getElementById('search-input');
+            if (!searchInput) {
+                throw new Error('Search input element not found');
+            }
+            
+            console.log('Focusing search input...');
+            searchInput.focus();
+            
+            console.log('Opening menu...');
+            openMenu('search-box');
+            console.log('Setting currentMode to SEARCH...');
+            currentMode = MODES.SEARCH;
 
-        searchInput.addEventListener('input', () => {
-            updateSearchResults(searchInput.value);
-        });
+            console.log('Adding input event listener...');
+            searchInput.addEventListener('input', () => {
+                try {
+                    console.log('Updating search results for query:', searchInput.value);
+                    updateSearchResults(searchInput.value);
+                } catch (e) {
+                    console.error('Error in updateSearchResults:', e);
+                }
+            });
 
-        setTimeout(() => {
-            document.addEventListener('click', handleSearchOutsideClick);
-        }, 0);
+            console.log('Scheduling outside click handler...');
+            setTimeout(() => {
+                document.addEventListener('click', handleSearchOutsideClick);
+                console.log('Outside click handler added');
+            }, 0);
+        } else {
+            console.log('Search box already exists, skipping creation');
+        }
+    } catch (error) {
+        console.error('Error in createSearchBox:', error);
     }
 }
 
@@ -1160,12 +1223,26 @@ function updateSearchResults(query) {
 }
 
 function closeSearchBox() {
-    const searchBox = document.getElementById('search-box');
-    if (searchBox) {
-        document.body.removeChild(searchBox);
-        closeSpecificMenu('search-box');
-        document.removeEventListener('click', handleSearchOutsideClick);
-        isAddingStudent = false;
+    try {
+        const searchBox = document.getElementById('search-box');
+        if (searchBox) {
+            console.log('Removing search-box from DOM...');
+            document.body.removeChild(searchBox);
+            console.log('Closing specific menu: search-box...');
+            closeSpecificMenu('search-box');
+            console.log('Removing outside click handler...');
+            document.removeEventListener('click', handleSearchOutsideClick);
+            isAddingStudent = false;
+            currentMode = MODES.GLOBAL;
+            selectedIndex = 0;
+            searchBox = null;
+            searchResults = null;
+            console.log('Search box closed, currentMode:', currentMode, 'menuStack:', menuStack);
+        } else {
+            console.warn('Search box not found during closeSearchBox');
+        }
+    } catch (error) {
+        console.error('Error in closeSearchBox:', error);
     }
 }
 
@@ -1362,10 +1439,8 @@ document.addEventListener('click', function(event) {
 });
 
 document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && document.fullscreenElement) {
-        event.preventDefault();
-    }
-});
+    console.log('Global keydown:', event.key, 'target:', event.target);
+}, true); // Use capture phase to catch events early
 
 window.onload = function() {
     preloadHouseImages();
@@ -1382,7 +1457,234 @@ window.onload = function() {
     }, 1000);
     setInterval(updateCountdowns, 1000);
 };
+
+function exportScores() {
+    const regularStudents = students.filter(s => !s.isAdditional);
+    const additionalStudents = students.filter(s => s.isAdditional);
+
+    const scores = regularStudents.map(student => 
+        student.score === 'EX' ? 'EX' : `${student.score}%`
+    );
+
+    const housePointsItemized = students
+        .filter(student => student.housePoints !== 0)
+        .map(student => ({
+            name: student.name,
+            points: student.housePoints
+        }));
+    
+    const tardiesItemized = students
+        .filter(student => student.attendance === 'Tardy')
+        .map(student => student.name);
+
+    const housePointsMessage = housePointsItemized.map(item => 
+        `${item.name},${item.points > 0 ? '+' : ''}${item.points}`
+    );
+
+    const tardiesMessage = tardiesItemized.length > 0 
+        ? tardiesItemized.map(name => `${name},Tardy`)
+        : [];
+
+    const additionalStudentsMessage = additionalStudents.length > 0
+        ? additionalStudents.map(s => `${s.name},Additional`)
+        : [];
+
+    // Check if user is on macOS
+    const isMacOS = /Macintosh|Mac OS X/i.test(navigator.userAgent);
+
+    if (isMacOS) {
+        const htmlTable = `
+            <table style="border-collapse: collapse; font-family: 'Arial Narrow'; font-size: 22pt;">
+                <tr>
+                    ${scores.map(score => `<td style="border: 2pt solid black;">${score}</td>`).join('')}
+                </tr>
+            </table>
+        `;
+
+        navigator.clipboard.write([
+            new ClipboardItem({
+                'text/html': new Blob([htmlTable], { type: 'text/html' }),
+                'text/plain': new Blob([scores.join('\t')], { type: 'text/plain' })
+            })
+        ]).then(() => {
+            const message = `House points for today:\n${housePointsItemized.map(item => `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`).join('\n')}\n\n${tardiesItemized.length > 0 ? `Tardies:\n${tardiesItemized.join('\n')}` : 'No tardies'}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
+            showCustomAlert(message);
+            showTemporaryMessage('Scores exported to clipboard');
+        }).catch(err => {
+            console.error('Failed to export scores: ', err);
+        });
+    } else {
+        // For non-macOS, export as CSV
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+        const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_');
+        const headers = ['Name', 'Status', 'Score', 'House Points'];
+        const csvRows = [
+            headers.join(','),
+            ...regularStudents.map(student => 
+                `"${student.name}",${student.attendance},${student.score === 'EX' ? 'EX' : `${student.score}%`},${student.housePoints}`
+            ),
+            ...housePointsItemized.map(item => 
+                `"${item.name}",House Points,,${item.points > 0 ? '+' : ''}${item.points}`
+            ),
+            ...tardiesMessage,
+            ...additionalStudentsMessage
+        ];
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${className}_Scores_${dateStr}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        const message = `House points for today:\n${housePointsItemized.map(item => `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`).join('\n')}\n\n${tardiesItemized.length > 0 ? `Tardies:\n${tardiesItemized.join('\n')}` : 'No tardies'}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
+        showCustomAlert(message);
+        showTemporaryMessage('Scores exported as CSV');
+    }
+}
+
+function showCustomAlert(message) {
+    const alertOverlay = document.createElement('div');
+    alertOverlay.id = 'alert-overlay';
+    alertOverlay.style.position = 'fixed';
+    alertOverlay.style.top = '0';
+    alertOverlay.style.left = '0';
+    alertOverlay.style.width = '100%';
+    alertOverlay.style.height = '100%';
+    alertOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    alertOverlay.style.display = 'flex';
+    alertOverlay.style.justifyContent = 'center';
+    alertOverlay.style.alignItems = 'center';
+    alertOverlay.style.zIndex = '9999';
+
+    const alertBox = document.createElement('div');
+    alertBox.style.backgroundColor = 'white';
+    alertBox.style.padding = '20px';
+    alertBox.style.borderRadius = '5px';
+    alertBox.style.maxWidth = '80%';
+    alertBox.style.maxHeight = '80%';
+    alertBox.style.overflow = 'auto';
+    alertBox.style.position = 'relative';
+    alertBox.style.transition = 'transform 0.3s ease-in-out';
+    alertBox.style.transform = 'scale(0.8)';
+    setTimeout(() => {
+        alertBox.style.transform = 'scale(1)';
+    }, 10);
+
+    const messageElement = document.createElement('pre');
+    messageElement.textContent = message;
+    messageElement.style.whiteSpace = 'pre-wrap';
+    messageElement.style.wordBreak = 'break-word';
+
+    const okButton = document.createElement('button');
+    okButton.textContent = 'OK';
+    okButton.style.marginTop = '10px';
+    okButton.style.marginRight = '10px';
+    okButton.onclick = () => {
+        resetAllStudents();
+        closeAlert();
+    };
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '×';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.background = 'none';
+    closeButton.style.border = 'none';
+    closeButton.style.fontSize = '20px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.onclick = closeAlert;
+
+    alertBox.appendChild(closeButton);
+    alertBox.appendChild(messageElement);
+    alertBox.appendChild(okButton);
+    alertOverlay.appendChild(alertBox);
+    document.body.appendChild(alertOverlay);
+}
+
+function closeAlert() {
+    const alertOverlay = document.getElementById('alert-overlay');
+    if (alertOverlay) {
+        const alertBox = alertOverlay.querySelector('div');
+        alertBox.style.transform = 'scale(0.8)';
+        alertBox.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(alertOverlay);
+        }, 300);
+    }
+}
+
+function showTemporaryMessage(message) {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    messageElement.style.position = 'fixed';
+    messageElement.style.bottom = '20px';
+    messageElement.style.left = '50%';
+    messageElement.style.transform = 'translateX(-50%)';
+    messageElement.style.backgroundColor = '#4CAF50';
+    messageElement.style.color = 'white';
+    messageElement.style.padding = '10px 20px';
+    messageElement.style.borderRadius = '5px';
+    messageElement.style.zIndex = '1000';
+    messageElement.style.opacity = '1';
+    messageElement.style.transition = 'opacity 1s ease-in-out';
+    document.body.appendChild(messageElement);
+
+    setTimeout(() => {
+        messageElement.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(messageElement);
+        }, 1000);
+    }, 1000);
+}
+
+function resetAllStudents() {
+    students.forEach(student => {
+        student.attendance = 'Absent';
+        student.stands = false;
+        student.ipads = false;
+        student.devices = false;
+        student.review = false;
+        student.returned = false;
+        student.progress = false;
+        student.engagement = false;
+        student.score = 'EX';
+        student.housePoints = 0;
+        updateScoreDisplay(student);
+    });
+
+    document.querySelectorAll('.attendance-dropdown select').forEach(select => {
+        select.value = 'Absent';
+    });
+
+    document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
+    document.querySelectorAll('.spreadsheet-row .stepper:last-child span').forEach(span => {
+        span.textContent = '0';
+    });
+
+    const bars = document.querySelectorAll('.bar');
+    bars.forEach(bar => {
+        bar.style.transition = 'height 0.5s ease-in-out, width 0.5s ease-in-out';
+        bar.style.height = '0px';
+    });
+    setTimeout(() => {
+        createBars();
+    }, 500);
+}
+
+createBars();
+updateDateTime();
+setInterval(updateDateTime, 1000);
     </script>
-    <script src="copyscores.js"></script>
+    <!-- <script src="copyscores.js"></script> -->
 </body>
 </html>

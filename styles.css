@@ -414,7 +414,7 @@ opacity: 1;
     align-items: center;
 }
 
-.copy-button {
+.export-button {
     position: absolute;
     top: 10px;
     left: 10px; 
@@ -430,14 +430,14 @@ opacity: 1;
     font-size: 14px; 
 }
 
-.copy-button:hover {
+.export-button:hover {
     opacity: 1;    
 }
 
 .reset-button {
     position: absolute;
     top: 10px;
-    left: 115px; 
+    left: 135px; 
     padding: 5px 10px;
     background-color: #3498db; 
     border: none;

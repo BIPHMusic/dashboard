@@ -1514,7 +1514,7 @@ function exportScores() {
             console.error('Failed to export scores: ', err);
         });
     } else {
-        // For non-macOS, export as CSV
+        // For non-macOS, export as CSV to E: drive
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
         const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_');
@@ -1531,20 +1531,19 @@ function exportScores() {
             ...additionalStudentsMessage
         ];
         const csvContent = csvRows.join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `${className}_Scores_${dateStr}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-        const message = `House points for today:\n${housePointsItemized.map(item => `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`).join('\n')}\n\n${tardiesItemized.length > 0 ? `Tardies:\n${tardiesItemized.join('\n')}` : 'No tardies'}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
-        showCustomAlert(message);
-        showTemporaryMessage('Scores exported as CSV');
+        const fs = window.require ? window.require('fs') : require('fs'); // For Electron or Node.js environment
+        const path = window.require ? window.require('path') : require('path');
+        const filePath = path.join('E:', `${className}_Scores_${dateStr}.csv`);
+        
+        try {
+            fs.writeFileSync(filePath, csvContent);
+            const message = `House points for today:\n${housePointsItemized.map(item => `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`).join('\n')}\n\n${tardiesItemized.length > 0 ? `Tardies:\n${tardiesItemized.join('\n')}` : 'No tardies'}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
+            showCustomAlert(message);
+            showTemporaryMessage(`Scores exported to ${filePath}`);
+        } catch (err) {
+            console.error('Failed to export scores to file: ', err);
+            showTemporaryMessage('Failed to export scores to E: drive');
+        }
     }
 }
 

@@ -272,12 +272,13 @@ function updateClassDisplay() {
 
 function updateCountdowns() {
     const countdownContainer = document.getElementById('countdowns');
-    countdownContainer.innerHTML = '';
+    countdownContainer.innerHTML = ''; // Clear previous countdowns
 
     const currentClass = classes[currentClassIndex];
     const now = new Date();
     const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
 
+    // Exit if the current day is not a class day
     if (!currentClass.days.includes(currentDay)) {
         hasCopiedScores = false;
         hasResetReturned = false;
@@ -293,9 +294,11 @@ function updateCountdowns() {
     let startDiff = (startTime - now) / 1000;
     let endDiff = (endTime - now) / 1000;
 
+    // Adjust for negative time differences (past midnight)
     if (startDiff < -86400) startDiff += 86400;
     if (endDiff < -86400) endDiff += 86400;
 
+    // Display start countdown (30 minutes before class starts)
     if (startDiff > 0 && startDiff <= 1800) {
         const minutes = Math.floor(startDiff / 60);
         const seconds = Math.floor(startDiff % 60);
@@ -304,8 +307,8 @@ function updateCountdowns() {
         startDiv.textContent = `Class begins in ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(startDiv);
     }
-
-    if (endDiff <= 600 && endDiff > 300) {
+    // Display conclusion countdown (10 to 5 minutes before class ends)
+    else if (endDiff <= 600 && endDiff > 300) {
         const conclusionDiff = endDiff - 300;
         const minutes = Math.floor(conclusionDiff / 60);
         const seconds = Math.floor(conclusionDiff % 60);
@@ -313,33 +316,39 @@ function updateCountdowns() {
         conclusionDiv.className = 'conclusion-countdown';
         conclusionDiv.textContent = `Conclusion: ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(conclusionDiv);
-        hasResetReturned = false;
-    } else if (endDiff <= 300 && endDiff > 0 && !hasResetReturned) {
+        hasResetReturned = false; // Reset flag when entering conclusion phase
+    }
+    // Display pack-up countdown (5 minutes or less until class ends)
+    else if (endDiff <= 300 && endDiff >= 0) {
         const minutes = Math.floor(endDiff / 60);
         const seconds = Math.floor(endDiff % 60);
         const packupDiv = document.createElement('div');
         packupDiv.className = 'packup-countdown';
         packupDiv.textContent = `♫ Pack up: ${minutes}m ${seconds}s ♫`;
         countdownContainer.appendChild(packupDiv);
-        if (currentClass.criteria.includes('returned')) {
+
+        // Reset 'returned' checkboxes only once during pack-up phase
+        if (currentClass.criteria.includes('returned') && !hasResetReturned) {
+            console.log('Resetting all returned checkboxes for class:', currentClass.name);
             const checkboxIndex = currentClass.criteria.indexOf('returned') + 3;
             const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${checkboxIndex}) input[type="checkbox"]`);
             checkboxes.forEach((checkbox, index) => {
-                if (checkbox.checked) {
-                    checkbox.checked = false;
-                    const studentName = teacherModeOrder[index];
-                    if (studentName) {
-                        syncCheckbox(studentName, checkbox, 'returned');
-                    }
+                checkbox.checked = false;
+                const studentName = teacherModeOrder[index];
+                if (studentName) {
+                    console.log('Unchecking returned for student:', studentName);
+                    syncCheckbox(studentName, checkbox, 'returned');
                 }
             });
-            hasResetReturned = true;
+            hasResetReturned = true; // Prevent further resets
         }
-        hasCopiedScores = false;
-    } else if (endDiff <= 0 && endDiff > -2 && !hasCopiedScores) {
+        hasCopiedScores = false; // Allow exporting scores when class ends
+    }
+    // Export scores when class ends
+    else if (endDiff < 0 && endDiff > -2 && !hasCopiedScores) {
         exportScores();
         hasCopiedScores = true;
-        hasResetReturned = false;
+        hasResetReturned = false; // Reset for next class
     }
 }
 

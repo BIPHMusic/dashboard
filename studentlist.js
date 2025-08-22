@@ -1,11 +1,13 @@
 const masterList = [
+    //Production Tech
     {"name": "Fiona", "house": "Red", "birthdate": ""},
+    {"name": "Jimmy", "house": "Yellow", "birthdate": ""},
     {"name": "Kevin", "house": "Red", "birthdate": "2007-06-29"},
     {"name": "Howard", "house": "Blue", "birthdate": "2008-05-09"},
     {"name": "Vlan", "house": "Green", "birthdate": ""},
     {"name": "Jennie", "house": "Red", "birthdate": ""},
     {"name": "Zoe", "house": "Green", "birthdate": ""},
-    {"name": "Genevieve", "house": "Green", "birthdate": ""},
+    {"name": "Voorhis", "house": "Yellow", "birthdate": ""},
     {"name": "Kiki", "house": "Red", "birthdate": ""},
     {"name": "Yolanda", "house": "Red", "birthdate": ""},
     {"name": "Stella", "house": "Green", "birthdate": ""},
@@ -19,17 +21,16 @@ const masterList = [
     {"name": "Angelina", "house": "Blue", "birthdate": "2009-01-15"},
     {"name": "Howen", "house": "Blue", "birthdate": ""},
     {"name": "Tommy", "house": "Green", "birthdate": ""},
-    {"name": "Harry", "house": "Yellow", "birthdate": ""},
     {"name": "Shawn", "house": "Blue", "birthdate": ""},
+    {"name": "Isaac", "house": "Blue", "birthdate": ""},
     {"name": "Hannah", "house": "Red", "birthdate": ""},
     {"name": "Thomas", "house": "Yellow", "birthdate": ""},
 
+    //MS Band
     {"name": "Jacky", "house": "Green", "birthdate": ""},
     {"name": "Oscar", "house": "Red", "birthdate": ""},
     {"name": "Matthew", "house": "Yellow", "birthdate": ""},
     {"name": "Nancy", "house": "Yellow", "birthdate": ""},
-    {"name": "Will", "house": "Blue", "birthdate": ""},
-    {"name": "Jagger", "house": "Red", "birthdate": ""},
     {"name": "Grace X", "house": "Red", "birthdate": ""},
     {"name": "Stella Y", "house": "Yellow", "birthdate": ""},
     {"name": "Grant", "house": "Green", "birthdate": ""},
@@ -53,24 +54,22 @@ const masterList = [
     {"name": "Celine", "house": "Blue", "birthdate": ""},
     {"name": "Rene", "house": "Red", "birthdate": "2013-03-28"},
     {"name": "Austen", "house": "Yellow", "birthdate": ""},
-    {"name": "Elon", "house": "Green", "birthdate": ""},
     {"name": "Zachary", "house": "Green", "birthdate": ""},
     {"name": "Aurora", "house": "Yellow", "birthdate": "2013-02-27"},
-    {"name": "Grace W", "house": "Yellow", "birthdate": ""},
 
-    {"name": "Henry", "house": "Red", "birthdate": "2009-09-10"},
-    {"name": "Emily", "house": "Yellow", "birthdate": ""},
-    {"name": "Ethan", "house": "Yellow", "birthdate": "2009-06-19"},
+    //HS Band
     {"name": "Tiger", "house": "Green", "birthdate": "2009-03-23"},
-    {"name": "Jim", "house": "Yellow", "birthdate": ""},
-    {"name": "Luna", "house": "Red", "birthdate": "2009-07-08"},
+    {"name": "Leo", "house": "Blue", "birthdate": "2011-07-06"},
     {"name": "Steven", "house": "Red", "birthdate": "2010-06-24"},
     {"name": "Jennifer", "house": "Yellow", "birthdate": ""},
+    {"name": "Henry", "house": "Red", "birthdate": "2009-09-10"},
+    {"name": "Ethan", "house": "Yellow", "birthdate": "2009-06-19"},
     {"name": "Calvin Y", "house": "Yellow", "birthdate": "2009-08-17"},
-    {"name": "Leo", "house": "Blue", "birthdate": "2011-07-06"},
+    {"name": "Luna", "house": "Red", "birthdate": "2009-07-08"},
     {"name": "Calvin Z", "house": "Blue", "birthdate": "2010-04-21"},
-    {"name": "Jack", "house": "Green", "birthdate": ""},
+    {"name": "Jim", "house": "Yellow", "birthdate": ""},
 
+    //all others
     {"name": "Chris", "house": "Green", "birthdate": "2007-03-24"},
     {"name": "Lucy", "house": "Blue", "birthdate": "2008-05-16"},
     {"name": "Johnny", "house": "Red", "birthdate": "2007-11-14"},
@@ -83,7 +82,7 @@ const masterList = [
 ];
 
 const productionTechStudents = [
-    'Fiona', 'Kevin', 'Howard', 'Vlan', 'Jennie', 'Zoe', 'Genevieve', 'Kiki', 'Yolanda', 'Stella', 'Angel', 'Vincent', 'Edward', 'Diego', 'Chloe', 'Jerry', 'Alfred', 'Angelina', 'Howen', 'Tommy', 'Harry', 'Shawn', 'Hannah', 'Thomas'
+    'Fiona', 'Jimmy', 'Kevin', 'Howard', 'Vlan', 'Jennie', 'Zoe', 'Voorhis', 'Kiki', 'Yolanda', 'Stella', 'Angel', 'Vincent', 'Edward', 'Diego', 'Chloe', 'Jerry', 'Alfred', 'Angelina', 'Howen', 'Tommy', 'Shawn', 'Isaac', 'Hannah', 'Thomas'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -99,10 +98,10 @@ const productionTechStudents = [
     };
 });
 
-const productionTechTeacherModeOrder = ['Fiona', 'Kevin', 'Howard', 'Vlan', 'Jennie', 'Zoe', 'Genevieve', 'Kiki', 'Yolanda', 'Stella', 'Angel', 'Vincent', 'Edward', 'Diego', 'Chloe', 'Jerry', 'Alfred', 'Angelina', 'Howen', 'Tommy', 'Harry', 'Shawn', 'Hannah', 'Thomas'];
+const productionTechTeacherModeOrder = ['Fiona', 'Jimmy', 'Kevin', 'Howard', 'Vlan', 'Jennie', 'Zoe', 'Voorhis', 'Kiki', 'Yolanda', 'Stella', 'Angel', 'Vincent', 'Edward', 'Diego', 'Chloe', 'Jerry', 'Alfred', 'Angelina', 'Howen', 'Tommy', 'Shawn', 'Isaac', 'Hannah', 'Thomas'];
 
 const msBandStudents = [
-    'Jacky', 'Matthew', 'Nancy', 'Will', 'Jagger', 'Grace X', 'Oscar', 'Stella Y', 'Grant', 'Catherine', 'Andy', 'June', 'Grace W', 'Anne', 'Katerina', 'Celine', 'Sophie', 'Tyler', 'Owen', 'Mianmian', 'Austen', 'Francis', 'Grace N', 'Stella S', 'Zachary', 'Kyla', 'Rene', 'Aurora', 'Hannah', 'Rebecca', 'Shine', 'Jacob', 'Elon'
+    'Jacky', 'Oscar', 'Matthew', 'Nancy', 'Grace X', 'Stella Y', 'Grant', 'Catherine', 'Anne', 'Hannah', 'Rebecca', 'Shine', 'Katerina', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Mianmian', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zachary', 'Aurora'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -118,10 +117,10 @@ const msBandStudents = [
     };
 });
 
-const msBandTeacherModeOrder = ['Shine', 'Celine', 'Rebecca', 'Grant', 'Andy', 'Grace X', 'Oscar', 'Matthew', 'Nancy', 'Grace W', 'Austen', 'Stella S', 'Katerina', 'Kyla', 'Mianmian', 'June', 'Stella Y', 'Grace N', 'Catherine', 'Hannah', 'Anne', 'Tyler', 'Francis', 'Elon', 'Owen', 'Zachary', 'Sophie', 'Jacob', 'Jacky', 'Rene', 'Jagger', 'Aurora', 'Will'];
+const msBandTeacherModeOrder = ['Shine', 'Celine', 'Rebecca', 'Grant', 'Andy', 'Grace X', 'Oscar', 'Matthew', 'Nancy', 'Austen', 'Stella S', 'Katerina', 'Kyla', 'Mianmian', 'June', 'Stella Y', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zachary', 'Sophie', 'Jacob', 'Jacky', 'Rene', 'Catherine', 'Hannah', 'Aurora'];
 
 const msBandThursdayStudents = [
-    'Andy', 'June', 'Grace W', 'Anne', 'Katerina', 'Celine', 'Sophie', 'Tyler', 'Owen', 'Mianmian', 'Austen', 'Francis', 'Grace N', 'Stella S', 'Zachary', 'Kyla', 'Rene', 'Aurora', 'Hannah', 'Rebecca', 'Shine', 'Jacob', 'Elon'
+    'Andy', 'June', 'Grace W', 'Anne', 'Katerina', 'Celine', 'Sophie', 'Tyler', 'Owen', 'Mianmian', 'Austen', 'Francis', 'Grace N', 'Stella S', 'Zachary', 'Kyla', 'Rene', 'Aurora', 'Hannah', 'Rebecca', 'Shine', 'Jacob'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -137,10 +136,10 @@ const msBandThursdayStudents = [
     };
 });
 
-const msBandThursdayTeacherModeOrder = ['Shine', 'Celine', 'Rebecca', 'Andy', 'Grace W', 'Austen', 'Stella S', 'Katerina', 'Kyla', 'Mianmian', 'June', 'Grace N', 'Hannah', 'Anne', 'Tyler', 'Francis', 'Elon', 'Owen', 'Zachary', 'Sophie', 'Jacob', 'Rene', 'Aurora'];
+const msBandThursdayTeacherModeOrder = ['Shine', 'Celine', 'Rebecca', 'Andy', 'Grace W', 'Austen', 'Stella S', 'Katerina', 'Kyla', 'Mianmian', 'June', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zachary', 'Sophie', 'Jacob', 'Rene', 'Hannah', 'Aurora'];
 
 const hsBandStudents = [
-    'Henry','Emily','Ethan','Tiger','Jim','Luna','Steven','Jennifer','Calvin Y','Leo','Calvin Z'
+    'Henry','Ethan','Tiger','Jim','Luna','Steven','Jennifer','Calvin Y','Leo','Calvin Z'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -156,4 +155,4 @@ const hsBandStudents = [
     };
 });
 
-const hsBandTeacherModeOrder = ['Henry','Emily','Ethan','Tiger','Jim','Luna','Steven','Jennifer','Calvin Y','Leo','Calvin Z'];
+const hsBandTeacherModeOrder = ['Henry','Ethan','Tiger','Jim','Luna','Steven','Jennifer','Calvin Y','Leo','Calvin Z'];

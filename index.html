@@ -1442,106 +1442,126 @@ window.onload = function() {
 };
 
 function exportScores() {
-    const regularStudents = students.filter(s => !s.isAdditional);
-    const additionalStudents = students.filter(s => s.isAdditional);
-
-    const scores = regularStudents.map(student => 
-        student.score === 'EX' ? 'EX' : `${student.score}%`
-    );
-
-    const housePointsItemized = students
-        .filter(student => student.housePoints !== 0)
-        .map(student => ({
-            name: student.name,
-            points: student.housePoints
-        }));
+    let studentsToExport = students;
+    const isMsBandThursday = classes[currentClassIndex].name === "MS Band ᵀᴴᵁᴿˢ";
     
-    const tardiesItemized = students
-        .filter(student => student.attendance === 'Tardy')
-        .map(student => student.name);
-
-    const housePointsMessage = housePointsItemized.map(item => 
-        `${item.name},${item.points > 0 ? '+' : ''}${item.points}`
-    );
-
-    const tardiesMessage = tardiesItemized.length > 0 
-        ? tardiesItemized.map(name => `${name},Tardy`)
-        : [];
-
-    const additionalStudentsMessage = additionalStudents.length > 0
-        ? additionalStudents.map(s => `${s.name},Additional`)
-        : [];
-
-    const isMacOS = /Macintosh|Mac OS X/i.test(navigator.userAgent);
-
-    // Construct the message for house points
-    const housePointsDisplay = housePointsItemized.length > 0 
-        ? housePointsItemized.map(item => `${item.name}: ${item.points > 0 ? '+' : ''}${item.points}`).join('\n')
-        : 'No house points';
-
-    // Construct the message for tardies
-    const tardiesDisplay = tardiesItemized.length > 0 
-        ? `Tardies:\n${tardiesItemized.join('\n')}`
-        : 'No tardies';
-
-    // Determine the separator based on whether both house points and tardies are empty
-    const separator = housePointsItemized.length === 0 && tardiesItemized.length === 0 ? '\n' : '\n\n';
-
-    // Construct the full message
-    const message = housePointsItemized.length > 0 
-        ? `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`
-        : `${housePointsDisplay}${separator}${tardiesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
-
-    if (isMacOS) {
-        const htmlTable = `
-            <table style="border-collapse: collapse; font-family: 'Arial Narrow'; font-size: 22pt;">
-                <tr>
-                    ${scores.map(score => `<td style="border: 2pt solid black;">${score}</td>`).join('')}
-                </tr>
-            </table>
-        `;
-
-        navigator.clipboard.write([
-            new ClipboardItem({
-                'text/html': new Blob([htmlTable], { type: 'text/html' }),
-                'text/plain': new Blob([scores.join('\t')], { type: 'text/plain' })
-            })
-        ]).then(() => {
-            showCustomAlert(message);
-            showTemporaryMessage('Scores exported to clipboard');
-            closeSpecificMenu('teacher-mode');
-        }).catch(err => {
+    // For MS Band Thursday, use msBandStudents order and mark non-present students
+    if (isMsBandThursday) {
+        studentsToExport = msBandStudents.map(student => {
+            const thursdayStudent = msBandThursdayStudents.find(s => s.name === student.name);
+            if (thursdayStudent) {
+                return students.find(s => s.name === student.name) || {
+                    ...student,
+                    attendance: 'Absent',
+                    score: 'EX',
+                    stands: false,
+                    ipads: false,
+                    returned: false,
+                    engagement: false,
+                    housePoints: 0,
+                    manualAdjustment: 0
+                };
+            } else {
+                return {
+                    ...student,
+                    attendance: 'Absent',
+                    score: 'EX',
+                    stands: false,
+                    ipads: false,
+                    returned: false,
+                    engagement: false,
+                    housePoints: 0,
+                    manualAdjustment: 0
+                };
+            }
         });
-    } else {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
-        const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_');
-        const headers = ['Name', 'Status', 'Score', 'House Points'];
-        const csvRows = [
-            headers.join(','),
-            ...regularStudents.map(student => 
-                `"${student.name}",${student.attendance},${student.score === 'EX' ? 'EX' : `${student.score}%`},${student.housePoints}`
-            ),
-            ...housePointsMessage,
-            ...tardiesMessage,
-            ...additionalStudentsMessage
-        ];
-        const csvContent = csvRows.join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `${className}_Scores_${dateStr}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-        showCustomAlert(message);
-        showTemporaryMessage('Scores exported as CSV');
-        closeSpecificMenu('teacher-mode');
     }
+
+    const regularStudents = studentsToExport.filter(s => !s.isAdditional);
+    const additionalStudents = studentsToExport.filter(s => s.isAdditional);
+
+    // Create headers and data rows
+    const headers = ['Name', ...regularStudents.map(student => `"${student.name}"`)];
+    const classworkRow = ['Classwork', ...regularStudents.map(student => `"${student.score === 'EX' ? 'EX' : `${student.score}%`}"`)];
+
+    // Format current date as "MM/DD/YYYY" for DATEVALUE
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
+
+    // Add house points section with liveschoolName and + for positive values
+    const housePointsItemized = studentsToExport
+        .filter(student => student.housePoints !== 0)
+        .map(student => {
+            const masterStudent = masterList.find(s => s.name === student.name);
+            const liveschoolName = masterStudent ? masterStudent.liveschoolName : student.name;
+            return `"${liveschoolName}",${student.housePoints > 0 ? '+' : ''}${student.housePoints}`;
+        });
+
+    // Add tardies section with DATEVALUE
+    const tardiesItemized = (isMsBandThursday ? students : studentsToExport)
+        .filter(student => student.attendance === 'Tardy')
+        .map(student => `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`);
+
+    // Add absences section with DATEVALUE
+    const absencesItemized = (isMsBandThursday ? students : studentsToExport)
+        .filter(student => student.attendance === 'Absent')
+        .map(student => `"${student.name}",Absent,=DATEVALUE("${dateStr}")`);
+
+    // Add additional students section
+    const additionalStudentsMessage = additionalStudents.length > 0
+        ? additionalStudents.map(s => `"${s.name}",Additional`)
+        : [];
+
+    // Combine all sections with empty rows before labels
+    const finalCsvRows = [
+        headers.join(','),
+        classworkRow.join(','),
+        ...(housePointsItemized.length > 0 ? ['', 'House Points', ...housePointsItemized] : []),
+        ...(tardiesItemized.length > 0 ? ['', 'Tardies', ...tardiesItemized] : []),
+        ...(absencesItemized.length > 0 ? ['', 'Absences', ...absencesItemized] : []),
+        ...(additionalStudentsMessage.length > 0 ? additionalStudentsMessage : [])
+    ];
+
+    // Generate and download CSV
+    const csvFileDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+    const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_');
+    const csvContent = finalCsvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${className}_Scores_${csvFileDateStr}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    // Prepare alert message
+    const housePointsDisplay = housePointsItemized.length > 0 
+        ? housePointsItemized.map(item => {
+            const [name, points] = item.split(',');
+            return `${name.replace(/"/g, '')}: ${points}`;
+        }).join('\n')
+        : 'No house points';
+    const tardiesDisplay = tardiesItemized.length > 0 
+        ? `Tardies:\n${tardiesItemized.map(item => {
+            const [name] = item.split(',');
+            return `${name.replace(/"/g, '')}`;
+        }).join('\n')}`
+        : 'No tardies';
+    const absencesDisplay = absencesItemized.length > 0 
+        ? `Absences:\n${absencesItemized.map(item => {
+            const [name] = item.split(',');
+            return `${name.replace(/"/g, '')}`;
+        }).join('\n')}`
+        : 'No absences';
+    const separator = housePointsItemized.length === 0 && tardiesItemized.length === 0 && absencesItemized.length === 0 ? '\n' : '\n\n';
+    const message = `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}\n\n${absencesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
+
+    showCustomAlert(message);
+    showTemporaryMessage('Scores exported as CSV');
+    closeSpecificMenu('teacher-mode');
 }
 
 function showCustomAlert(message) {

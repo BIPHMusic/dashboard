@@ -26,7 +26,6 @@ const masterList = [
     {"name": "Isaac", "liveschoolName": "Isaac Chuxuan Zheng", "house": "Blue", "birthdate": ""},
     {"name": "Hannah", "liveschoolName": "Alyssa Zihan Zhou", "house": "Red", "birthdate": ""},
     {"name": "Thomas", "liveschoolName": "Thomas Detong Zhu", "house": "Yellow", "birthdate": ""},
-    {"name": "Ray", "liveschoolName": "Ray Jingfei Xu", "house": "Yellow", "birthdate": ""},
     {"name": "Mia", "liveschoolName": "Mia Yuhan Chen", "house": "Yellow", "birthdate": ""},
 
     //MS Band
@@ -85,7 +84,7 @@ const masterList = [
 ];
 
 const productionTechStudents = [
-    'Jess', 'Howen', 'Shawn', 'Edward', 'Jerry', 'Diego', 'Isaac', 'Thomas', 'Kevin', 'Howard', 'Zoe', 'Kiki', 'Vincent', 'Vlan', 'Hannah', 'Chloe', 'Voorhis', 'Yolanda', 'Stella', 'Angel', 'Tommy', 'Fiona', 'Jimmy', 'Angelina', 'Jennie', 'Alfred', 'Mia', 'Ray'
+    'Jess', 'Howen', 'Shawn', 'Edward', 'Jerry', 'Diego', 'Isaac', 'Thomas', 'Kevin', 'Howard', 'Zoe', 'Kiki', 'Vincent', 'Vlan', 'Hannah', 'Chloe', 'Voorhis', 'Yolanda', 'Stella', 'Angel', 'Tommy', 'Fiona', 'Jimmy', 'Angelina', 'Jennie', 'Alfred', 'Mia'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -101,7 +100,7 @@ const productionTechStudents = [
     };
 });
 
-const productionTechTeacherModeOrder = ['Jess', 'Howen', 'Shawn', 'Edward', 'Jerry', 'Diego', 'Isaac', 'Thomas', 'Kevin', 'Howard', 'Zoe', 'Kiki', 'Vincent', 'Vlan', 'Hannah', 'Chloe', 'Voorhis', 'Yolanda', 'Stella', 'Angel', 'Tommy', 'Fiona', 'Jimmy', 'Angelina', 'Jennie', 'Alfred', 'Mia', 'Ray'];
+const productionTechTeacherModeOrder = ['Jess', 'Howen', 'Shawn', 'Edward', 'Jerry', 'Diego', 'Isaac', 'Thomas', 'Kevin', 'Howard', 'Zoe', 'Kiki', 'Vincent', 'Vlan', 'Hannah', 'Chloe', 'Voorhis', 'Yolanda', 'Stella', 'Angel', 'Tommy', 'Fiona', 'Jimmy', 'Angelina', 'Jennie', 'Alfred', 'Mia'];
 
 const msBandStudents = [
     'Jacky', 'Oscar', 'Matthew', 'Nancy', 'Grace X', 'Stella Y', 'Grant', 'Catherine', 'Anne', 'Hannah', 'Rebecca', 'Shine', 'Katerina', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Mianmian', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zachary', 'Aurora'

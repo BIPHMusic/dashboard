@@ -29,34 +29,33 @@ const masterList = [
     {"name": "Mia", "liveschoolName": "Mia Yuhan Chen", "house": "Yellow", "birthdate": ""},
 
     //MS Band
-    {"name": "Jacky", "liveschoolName": "Shine Yu Duan", "house": "Green", "birthdate": ""},
-    {"name": "Oscar", "liveschoolName": "Celine Yuting Shu", "house": "Red", "birthdate": ""},
-    {"name": "Matthew", "liveschoolName": "Rebecca Tsz Yin Cheung", "house": "Yellow", "birthdate": ""},
-    {"name": "Nancy", "liveschoolName": "Grant Zhang", "house": "Yellow", "birthdate": ""},
-    {"name": "Grace X", "liveschoolName": "Andy Xuanyu Feng", "house": "Red", "birthdate": ""},
-    {"name": "Stella Y", "liveschoolName": "Grace Leqi Xiong", "house": "Yellow", "birthdate": ""},
-    {"name": "Grant", "liveschoolName": "Oscar Xinchen Fang", "house": "Green", "birthdate": ""},
-    {"name": "Catherine", "liveschoolName": "Matthew Enhao Feng", "house": "Green", "birthdate": ""},
-    {"name": "Anne", "liveschoolName": "Nancy Han", "house": "Green", "birthdate": "2011-06-13"},
-    {"name": "Hannah", "liveschoolName": "Austen Lihan Xie", "house": "Yellow", "birthdate": ""},
-    {"name": "Rebecca", "liveschoolName": "Stella Yizhi Shang", "house": "Blue", "birthdate": ""},
-    {"name": "Shine", "liveschoolName": "Katerina Xinyu Fan", "house": "Blue", "birthdate": "2013-02-14"},
-    {"name": "Katerina", "liveschoolName": "Kyla Shi", "house": "Red", "birthdate": ""},
-    {"name": "Andy", "liveschoolName": "Mianmian Mingxuan Lyu", "house": "Green", "birthdate": ""},
-    {"name": "Sophie", "liveschoolName": "June Ziqiao Qin", "house": "Blue", "birthdate": "2012-05-14"},
-    {"name": "Jacob", "liveschoolName": "Stella Yuan", "house": "Red", "birthdate": ""},
-    {"name": "Owen", "liveschoolName": "Grace Ning", "house": "Green", "birthdate": "2012-11-30"},
-    {"name": "Tyler", "liveschoolName": "Anne Jiayue An", "house": "Red", "birthdate": ""},
-    {"name": "Francis", "liveschoolName": "Tyler Xiang Li", "house": "Blue", "birthdate": "2013-01-31"},
-    {"name": "Mianmian", "liveschoolName": "Francis Liu", "house": "Red", "birthdate": "2013-03-01"},
-    {"name": "Grace N", "liveschoolName": "Owen Qizhiyaun He", "house": "Yellow", "birthdate": "2013-03-09"},
-    {"name": "June", "liveschoolName": "Zachary Yang", "house": "Blue", "birthdate": "2011-06-18"},
-    {"name": "Stella S", "liveschoolName": "Sophie Geng", "house": "Green", "birthdate": ""},
-    {"name": "Kyla", "liveschoolName": "Jacob I Chon He", "house": "Red", "birthdate": ""},
-    {"name": "Celine", "liveschoolName": "Jacky Tsz Hin Cheung", "house": "Blue", "birthdate": ""},
+    {"name": "Jacky", "liveschoolName": "Jacky Tsz Hin Cheung", "house": "Green", "birthdate": ""},
+    {"name": "Oscar", "liveschoolName": "Oscar Xinchen Fang", "house": "Red", "birthdate": ""},
+    {"name": "Matthew", "liveschoolName": "Matthew Enhao Feng", "house": "Yellow", "birthdate": ""},
+    {"name": "Nancy", "liveschoolName": "Nancy Han", "house": "Yellow", "birthdate": ""},
+    {"name": "Grace X", "liveschoolName": "Grace Leqi Xiong", "house": "Red", "birthdate": ""},
+    {"name": "Stella Y", "liveschoolName": "Stella Yuan", "house": "Yellow", "birthdate": ""},
+    {"name": "Grant", "liveschoolName": "Grant Zhang", "house": "Green", "birthdate": ""},
+    {"name": "Catherine", "liveschoolName": "Catherine Qiannuo Zhu", "house": "Green", "birthdate": ""},
+    {"name": "Anne", "liveschoolName": "Anne Jiayue An", "house": "Green", "birthdate": "2011-06-13"},
+    {"name": "Hannah", "liveschoolName": "Hannah Ruihan Chen", "house": "Yellow", "birthdate": ""},
+    {"name": "Rebecca", "liveschoolName": "Rebecca Tsz Yin Cheung", "house": "Blue", "birthdate": ""},
+    {"name": "Shine", "liveschoolName": "Shine Yu Duan", "house": "Blue", "birthdate": "2013-02-14"},
+    {"name": "Andy", "liveschoolName": "Andy Xuanyu Feng", "house": "Green", "birthdate": ""},
+    {"name": "Sophie", "liveschoolName": "Sophie Geng", "house": "Blue", "birthdate": "2012-05-14"},
+    {"name": "Jacob", "liveschoolName": "Jacob I Chon He", "house": "Red", "birthdate": ""},
+    {"name": "Owen", "liveschoolName": "Owen Qizhiyaun He", "house": "Green", "birthdate": "2012-11-30"},
+    {"name": "Tyler", "liveschoolName": "Tyler Xiang Li", "house": "Red", "birthdate": ""},
+    {"name": "Francis", "liveschoolName": "Francis Liu", "house": "Blue", "birthdate": "2013-01-31"},
+    {"name": "Mianmian", "liveschoolName": "Mianmian Mingxuan Lyu", "house": "Red", "birthdate": "2013-03-01"},
+    {"name": "Grace N", "liveschoolName": "Grace Ning", "house": "Yellow", "birthdate": "2013-03-09"},
+    {"name": "June", "liveschoolName": "June Ziqiao Qin", "house": "Blue", "birthdate": "2011-06-18"},
+    {"name": "Stella S", "liveschoolName": "Stella Yizhi Shang", "house": "Green", "birthdate": ""},
+    {"name": "Kyla", "liveschoolName": "Kyla Shi", "house": "Red", "birthdate": ""},
+    {"name": "Celine", "liveschoolName": "Celine Yuting Shu", "house": "Blue", "birthdate": ""},
     {"name": "Rene", "liveschoolName": "Rene King Hei Tang", "house": "Red", "birthdate": "2013-03-28"},
-    {"name": "Austen", "liveschoolName": "Catherine Qiannuo Zhu", "house": "Yellow", "birthdate": ""},
-    {"name": "Zachary", "liveschoolName": "Hannah Ruihan Chen", "house": "Green", "birthdate": ""},
+    {"name": "Austen", "liveschoolName": "Austen Lihan Xie", "house": "Yellow", "birthdate": ""},
+    {"name": "Zachary", "liveschoolName": "Zachary Yang", "house": "Green", "birthdate": ""},
     {"name": "Aurora", "liveschoolName": "Aurora Yingxi Zhong", "house": "Yellow", "birthdate": "2013-02-27"},
 
     //HS Band
@@ -102,8 +101,12 @@ const productionTechStudents = [
 
 const productionTechTeacherModeOrder = ['Jess', 'Howen', 'Shawn', 'Edward', 'Jerry', 'Diego', 'Isaac', 'Thomas', 'Kevin', 'Howard', 'Zoe', 'Kiki', 'Vincent', 'Vlan', 'Hannah', 'Chloe', 'Voorhis', 'Yolanda', 'Stella', 'Angel', 'Tommy', 'Fiona', 'Jimmy', 'Angelina', 'Jennie', 'Alfred', 'Mia'];
 
+
+
+
+
 const msBandStudents = [
-    'Jacky', 'Oscar', 'Matthew', 'Nancy', 'Grace X', 'Stella Y', 'Grant', 'Catherine', 'Anne', 'Hannah', 'Rebecca', 'Shine', 'Katerina', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Mianmian', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zachary', 'Aurora'
+   'Jacky', 'Oscar', 'Matthew', 'Nancy', 'Grace X', 'Stella Y', 'Grant', 'Catherine', 'Anne', 'Hannah', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Mianmian', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zachary', 'Aurora'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -119,10 +122,13 @@ const msBandStudents = [
     };
 });
 
-const msBandTeacherModeOrder = ['Shine', 'Celine', 'Rebecca', 'Grant', 'Andy', 'Grace X', 'Oscar', 'Matthew', 'Nancy', 'Austen', 'Stella S', 'Katerina', 'Kyla', 'Mianmian', 'June', 'Stella Y', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zachary', 'Sophie', 'Jacob', 'Jacky', 'Rene', 'Catherine', 'Hannah', 'Aurora'];
+const msBandTeacherModeOrder = ['Shine', 'Oscar', 'Rebecca', 'Andy', 'Grant', 'Matthew', 'Nancy', 'Grace X', 'Celine', 'Austen', 'Stella S', 'Kyla', 'Mianmian', 'June', 'Stella Y', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zachary', 'Sophie', 'Jacob', 'Jacky', 'Rene', 'Catherine', 'Hannah', 'Aurora'];
+
+
+
 
 const msBandThursdayStudents = [
-    'Andy', 'June', 'Grace W', 'Anne', 'Katerina', 'Celine', 'Sophie', 'Tyler', 'Owen', 'Mianmian', 'Austen', 'Francis', 'Grace N', 'Stella S', 'Zachary', 'Kyla', 'Rene', 'Aurora', 'Hannah', 'Rebecca', 'Shine', 'Jacob'
+    'Anne', 'Hannah', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Mianmian', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zachary', 'Aurora'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -138,7 +144,11 @@ const msBandThursdayStudents = [
     };
 });
 
-const msBandThursdayTeacherModeOrder = ['Shine', 'Celine', 'Rebecca', 'Andy', 'Grace W', 'Austen', 'Stella S', 'Katerina', 'Kyla', 'Mianmian', 'June', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zachary', 'Sophie', 'Jacob', 'Rene', 'Hannah', 'Aurora'];
+const msBandThursdayTeacherModeOrder = ['Shine', 'Rebecca', 'Andy', 'Celine', 'Austen', 'Stella S', 'Kyla', 'Mianmian', 'June', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zachary', 'Sophie', 'Jacob', 'Rene', 'Hannah', 'Aurora'];
+
+
+
+
 
 const hsBandStudents = [
     'Henry','Ethan','Tiger','Jim','Luna','Steven','Jennifer','Calvin Y','Leo','Calvin Z'

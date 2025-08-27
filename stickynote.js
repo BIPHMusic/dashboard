@@ -3,7 +3,7 @@ const STICKY_NOTE_CONFIG = {
     position: { x: window.innerWidth - 300, y: 300 }, // Position from left and top
     dimensions: { width: 150, height: 150 },       // Width and height in pixels
     content: 'Type your note here...',             // Default content
-    qrCodeSrc: '/qr-code.png'                       // QR code image source
+    qrCodeSrc: 'qr-code.png'                       // QR code image source
 };
 
 // Function to check if sticky notes are allowed for the current class

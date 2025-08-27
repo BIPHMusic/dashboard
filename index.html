@@ -58,6 +58,7 @@
 
     <script src="studentlist.js"></script>
     <script src="hotkeys.js"></script>
+    <script src="stickynote.js"></script>
     <script>
 const positiveEffects = [
     'sounds/villager-positive1.mp3',
@@ -268,6 +269,7 @@ function updateClassDisplay() {
     }
     updateHotkeysDisplay();
     updateCountdowns();
+    loadStickyNotes(); // Add this to load sticky notes for the new class
 }
 
 function updateCountdowns() {
@@ -455,7 +457,8 @@ let currentZIndex = 1000;
 const MODES = {
     GLOBAL: 'global',
     SEARCH: 'search',
-    HOUSESHIELD: 'houseshield'
+    HOUSESHIELD: 'houseshield',
+    STICKY_NOTE: 'sticky_note' 
 };
 let currentMode = MODES.GLOBAL;
 let currentStudentIndex = -1;
@@ -473,10 +476,16 @@ function globalKeydownHandler(event) {
         return;
     }
     if (event.key === '/' && currentMode === MODES.GLOBAL) {
+        toggleSearchBox();
+        return;
     }
     switch (currentMode) {
         case MODES.GLOBAL:
             handleGlobalHotkeys(event);
+            if (event.ctrlKey && event.key === 'n' && isStickyNoteAllowed()) {
+                event.preventDefault();
+                createStickyNote();
+            }
             break;
         case MODES.SEARCH:
             handleSearchBoxKeys(event);
@@ -484,7 +493,16 @@ function globalKeydownHandler(event) {
         case MODES.HOUSESHIELD:
             handleActiveHouseshield(event);
             break;
+        case MODES.STICKY_NOTE:
+            // When in sticky note mode, don't handle other hotkeys
+            break;
     }
+}
+
+// Add isStickyNoteAllowed function if not included in stickynote.js
+function isStickyNoteAllowed() {
+    const currentClass = classes[currentClassIndex].name;
+    return ["MS Band", "HS Band", "MS Band ᵀᴴᵁᴿˢ"].includes(currentClass);
 }
 
 document.addEventListener('keydown', globalKeydownHandler);
@@ -1430,6 +1448,7 @@ window.onload = function() {
     currentClassIndex = getCurrentClass();
     updateClassDisplay();
     updateDateTime();
+    loadStickyNotes(); // Add this to load sticky notes on page load
     setInterval(updateDateTime, 60000);
     setInterval(() => {
         const newIndex = getCurrentClass();
@@ -1488,14 +1507,16 @@ function exportScores() {
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
 
-    // Add house points section with liveschoolName and + for positive values
+    // Add house points section with liveschoolName and + for positive values, sorted alphabetically
     const housePointsItemized = studentsToExport
         .filter(student => student.housePoints !== 0)
         .map(student => {
             const masterStudent = masterList.find(s => s.name === student.name);
             const liveschoolName = masterStudent ? masterStudent.liveschoolName : student.name;
-            return `"${liveschoolName}",${student.housePoints > 0 ? '+' : ''}${student.housePoints}`;
-        });
+            return { name: liveschoolName, points: student.housePoints };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(item => `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`);
 
     // Add tardies section with DATEVALUE
     const tardiesItemized = (isMsBandThursday ? students : studentsToExport)

@@ -652,10 +652,10 @@ background-color: #f0f0f0;
         word-break: break-word;
     }
 
-    /* .sticky-note {
+    .sticky-note {
         position: absolute;
-        min-height: 200px;
-        min-width: 200px;
+        min-height: 100px;
+        min-width: 100px;
         background-color: #ffd75e;
         padding: 20px;
         box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
@@ -666,7 +666,7 @@ background-color: #f0f0f0;
         resize: both;
         overflow: auto;
     }
-
+    
     .sticky-note:before {
         content: '';
         position: absolute;
@@ -677,10 +677,10 @@ background-color: #f0f0f0;
         background-color: rgba(255,255,255,0.5);
         transform: translateX(-50%);
     }
-
+    
     .sticky-note-content {
         width: 100%;
-        height: calc(100% - 20px);
+        height: calc(100% - 60px); /* Adjusted for header with image */
         border: none;
         background: transparent;
         resize: none;
@@ -689,23 +689,33 @@ background-color: #f0f0f0;
         line-height: 1.5;
         outline: none;
     }
-
+    
     .sticky-note-header {
         height: 20px;
         margin-bottom: 10px;
         cursor: move;
+        position: relative;
     }
-
+    
     .sticky-close {
-        float: right;
+        position: absolute;
+        top: 2px; /* Adjusted from 5px to move closer to top */
+        right: 2px; /* Adjusted from 5px to move closer to right */
         cursor: pointer;
         font-size: 18px;
         color: #666666;
     }
-
+    
     .sticky-close:hover {
         color: #000000;
-    } */
+    }
+    
+    .sticky-note img {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+    }
 
     .search-button {
         position: absolute;

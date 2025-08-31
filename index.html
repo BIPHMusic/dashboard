@@ -82,6 +82,14 @@ const negativeEffects10to50 = [
 
 const negativeEffect0 = 'sounds/villager-negative6.mp3';
 
+const style = document.createElement('style');
+style.textContent = `
+    input[type="checkbox"]:disabled {
+        opacity: 0.5;
+    }
+`;
+document.head.appendChild(style);
+
 function playRandomSound(soundArray) {
     const randomIndex = Math.floor(Math.random() * soundArray.length);
     const audio = new Audio(soundArray[randomIndex]);
@@ -471,12 +479,13 @@ let isActive = false;
 let currentPoints = 0;
 
 function globalKeydownHandler(event) {
-    if (event.key === 'Escape' && menuStack.length > 0) {
-        closeTopMenu();
+    if (event.key === '/' && currentMode === MODES.GLOBAL) {
+        event.preventDefault(); // Prevent '/' from propagating
+        toggleSearchBox();
         return;
     }
-    if (event.key === '/' && currentMode === MODES.GLOBAL) {
-        toggleSearchBox();
+    if (event.key === 'Escape' && menuStack.length > 0) {
+        closeTopMenu();
         return;
     }
     switch (currentMode) {
@@ -494,15 +503,8 @@ function globalKeydownHandler(event) {
             handleActiveHouseshield(event);
             break;
         case MODES.STICKY_NOTE:
-            // When in sticky note mode, don't handle other hotkeys
             break;
     }
-}
-
-// Add isStickyNoteAllowed function if not included in stickynote.js
-function isStickyNoteAllowed() {
-    const currentClass = classes[currentClassIndex].name;
-    return ["MS Band", "HS Band", "MS Band ᵀᴴᵁᴿˢ"].includes(currentClass);
 }
 
 document.addEventListener('keydown', globalKeydownHandler);
@@ -579,6 +581,7 @@ function populateStudents() {
     `;
     teacherModeOrder.forEach(name => {
         const student = students.find(s => s.name === name);
+        const isAbsent = student.attendance === 'Absent';
         const row = document.createElement('div');
         row.className = 'spreadsheet-row';
         row.dataset.studentName = student.name;
@@ -592,20 +595,20 @@ function populateStudents() {
                 </select>
             </div>
             <div class="checkbox-container">
-                <input type="checkbox" ${student[currentCriteria[0]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
+                <input type="checkbox" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
             </div>
             <div class="checkbox-container">
-                <input type="checkbox" ${student[currentCriteria[1]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
+                <input type="checkbox" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
             </div>
             <div class="checkbox-container">
-                <input type="checkbox" ${student[currentCriteria[2]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
+                <input type="checkbox" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
             </div>
             <div class="checkbox-container">
-                <input type="checkbox" ${student[currentCriteria[3]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
+                <input type="checkbox" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
             </div>
             <div class="stepper">
                 <button onclick="updateScore('${student.name}', -10)">-</button>
-                <span class="score">${student.score === 'EX' ? student.score : student.score + '%'}</span>
+                <span class="score">${student.score === 'EX' ? 'EX' : student.score + '%'}</span>
                 <button onclick="updateScore('${student.name}', 10)">+</button>
             </div>
             <div class="stepper">
@@ -685,6 +688,19 @@ function syncAttendance(name, select) {
             if (attendanceSelect) {
                 attendanceSelect.value = student.attendance;
             }
+            // Update checkbox disabled state in teacher mode
+            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
+        }
+        // Update checkbox disabled state in floating menu
+        const floatingMenu = document.getElementById('floating-menu');
+        if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
+            const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+            floatingCheckboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
         }
         updateFloatingMenu(student);
     }
@@ -999,6 +1015,7 @@ function showFloatingMenu(event, studentName) {
     if (currentStudentIndex === -1) {
         return;
     }
+    const isAbsent = student.attendance === 'Absent';
     floatingMenu.innerHTML = `
         <span class="close-button" onclick="closeTopMenu()">&times;</span>
         <h3 onclick="cycleAttendanceForStudent(students[${currentStudentIndex}])">${student.name}</h3>
@@ -1007,10 +1024,10 @@ function showFloatingMenu(event, studentName) {
             <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
             <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
         </select>
-        <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${isProductionTech ? 'Devices' : 'Stands'}</label>
-        <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${isProductionTech ? 'Engagement' : 'iPads'}</label>
-        <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${isProductionTech ? 'Review' : 'Returned'}</label>
-        <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${isProductionTech ? 'Progress' : 'Engagement'}</label>
+        <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${isProductionTech ? 'Devices' : 'Stands'}</label>
+        <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${isProductionTech ? 'Engagement' : 'iPads'}</label>
+        <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${isProductionTech ? 'Review' : 'Returned'}</label>
+        <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${isProductionTech ? 'Progress' : 'Engagement'}</label>
         <div class="stepper">
             <button onclick="updateScore('${student.name}', -10)">-</button>
             <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
@@ -1053,6 +1070,28 @@ function cycleAttendance() {
         calculateScore(student);
         updateScoreDisplay(student);
         updateTardyLabel(student);
+        updateBarGraph(student);
+        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
+        if (teacherRow) {
+            const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+            if (attendanceSelect) {
+                attendanceSelect.value = student.attendance;
+            }
+            // Update checkbox disabled state in teacher mode
+            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
+        }
+        // Update floating menu if open for this student
+        const floatingMenu = document.getElementById('floating-menu');
+        if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
+            const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+            floatingCheckboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
+            updateFloatingMenu(student);
+        }
     });
     document.querySelectorAll('.attendance-dropdown select').forEach(select => {
         select.value = nextAttendance;
@@ -1146,6 +1185,7 @@ function createSearchBox() {
                 throw new Error('Search input element not found');
             }
             
+            searchInput.value = ''; // Clear any existing input
             searchInput.focus();
             
             openMenu('search-box');
@@ -1380,29 +1420,6 @@ function preloadHouseImages() {
     });
 }
 
-let longPressTimer = null;
-const LONG_PRESS_DURATION = 1000;
-
-function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-    } else {
-        document.exitFullscreen();
-    }
-}
-
-document.addEventListener('mousedown', (event) => {
-    if (event.target.closest('.bar, .search-button, .menu-icon, .spreadsheet, .floating-menu, #search-box, #overlay, #teacher-mode')) {
-        return;
-    }
-    longPressTimer = setTimeout(() => {
-        toggleFullscreen();
-    }, LONG_PRESS_DURATION);
-});
-
-document.addEventListener('mouseup', () => {
-    clearTimeout(longPressTimer);
-});
 
 document.addEventListener('click', function(event) {
     if (menuStack.length === 0) return;

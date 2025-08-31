@@ -181,21 +181,23 @@ function handleObjectiveInputKeys(event) {
 
 function handleGlobalHotkeys(event) {
     if (window.isObjectiveInputFocused) {
+        // Allow standard text editing keys
         if (['Control', 'Meta', 'Alt', 'Shift'].includes(event.key)) return;
         if (event.metaKey || event.ctrlKey) {
             const allowedShortcuts = ['a', 'c', 'v', 'x', 'z', 'y', '='];
             if (allowedShortcuts.includes(event.key.toLowerCase())) return;
         }
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Backspace', 'Delete', 'Tab'].includes(event.key)) return;
-        if (event.key.length === 1) return;
+        if (event.key.length === 1) return; // Allow single character input
         if (['Enter', 'Escape'].includes(event.key)) {
             handleObjectiveInputKeys(event);
             return;
         }
-        event.preventDefault();
+        event.preventDefault(); // Prevent all other hotkeys
         return;
     }
 
+    // Rest of the function remains unchanged
     if (event.key === 'Escape' && menuStack.length > 0) {
         closeTopMenu();
         event.preventDefault();
@@ -254,8 +256,8 @@ function handleGlobalHotkeys(event) {
             break;
         case '/':
             if (!document.getElementById('search-box')) {
+                event.preventDefault(); // Prevent '/' from being typed
                 createSearchBox();
-                event.preventDefault();
             }
             break;
         case 'ArrowRight':

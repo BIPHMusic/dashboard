@@ -382,6 +382,13 @@ function editObjective(item) {
     const cls = classes[currentClassIndex];
     const currentItem = item.textContent;
     const index = Array.from(item.parentElement.children).indexOf(item);
+    
+    // Remove any existing objective editing dialog
+    const existingDialog = document.querySelector('div[style*="position: fixed"][style*="z-index: 1000"]');
+    if (existingDialog) {
+        existingDialog.remove();
+    }
+
     const dialog = document.createElement('div');
     dialog.style.position = 'fixed';
     dialog.style.top = '50%';
@@ -431,15 +438,34 @@ function editObjective(item) {
 
     document.body.appendChild(dialog);
     const input = document.getElementById('objectiveInput');
-    input.focus();
-    input.select();
-    window.isObjectiveInputFocused = true;
 
-    input.addEventListener('focus', () => { window.isObjectiveInputFocused = true; });
-    input.addEventListener('blur', () => { window.isObjectiveInputFocused = false; });
+    // Ensure focus and selection after rendering
+    setTimeout(() => {
+        input.focus();
+        input.select();
+        window.isObjectiveInputFocused = true;
+    }, 0);
+
+    // Re-attach event listeners
+    input.addEventListener('focus', () => {
+        window.isObjectiveInputFocused = true;
+    });
+    input.addEventListener('blur', () => {
+        window.isObjectiveInputFocused = false;
+    });
 
     const handleKeydown = (event) => {
-        if (event.key === 'Escape') {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (input.value.trim() !== '') {
+                document.querySelector(`#objectiveList li:nth-child(${index + 1})`).textContent = input.value.trim();
+                saveObjectives(cls.objectivesKey);
+            }
+            dialog.remove();
+            window.isObjectiveInputFocused = false;
+            document.removeEventListener('keydown', handleKeydown);
+        } else if (event.key === 'Escape') {
+            event.preventDefault();
             dialog.remove();
             window.isObjectiveInputFocused = false;
             document.removeEventListener('keydown', handleKeydown);
@@ -452,6 +478,7 @@ function editObjective(item) {
             dialog.remove();
             window.isObjectiveInputFocused = false;
             document.removeEventListener('click', handleOutsideClick);
+            document.removeEventListener('keydown', handleKeydown);
         }
     };
 

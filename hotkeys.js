@@ -7,7 +7,8 @@ const hotkeys = [
     { key: "↓", description: "Decrease participation by 10." },
     { key: "Cmd + →", description: "Cycle to next class." },
     { key: "Cmd + ←", description: "Cycle to previous class." },
-    { key: "?", description: "Show hotkeys menu." }
+    { key: "?", description: "Show hotkeys menu." },
+    { key: "r", description: "Speak a random student name." }
 ];
 
 function getMenuHotkeys() {
@@ -193,11 +194,10 @@ function handleGlobalHotkeys(event) {
             handleObjectiveInputKeys(event);
             return;
         }
-        event.preventDefault(); // Prevent all other hotkeys
+        event.preventDefault(); // Block all other hotkeys
         return;
     }
 
-    // Rest of the function remains unchanged
     if (event.key === 'Escape' && menuStack.length > 0) {
         closeTopMenu();
         event.preventDefault();
@@ -228,14 +228,20 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    if (event.metaKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+    if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0) {
+        // Speak a random student name
+        const randomIndex = Math.floor(Math.random() * students.length);
+        const randomStudent = students[randomIndex];
+        if (randomStudent && randomStudent.name) {
+            const masterStudent = masterList.find(s => s.name === randomStudent.name);
+            const speechText = masterStudent && masterStudent.altName ? masterStudent.altName : randomStudent.name;
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.volume = 1.0;
+            utterance.rate = 1.25;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
         event.preventDefault();
-        currentClassIndex = event.key === 'ArrowRight' ? 
-            (currentClassIndex + 1) % classes.length : 
-            (currentClassIndex - 1 + classes.length) % classes.length;
-        updateClassDisplay();
-        updateHotkeysDisplay();
-        updateCountdowns();
         return;
     }
 
@@ -256,7 +262,7 @@ function handleGlobalHotkeys(event) {
             break;
         case '/':
             if (!document.getElementById('search-box')) {
-                event.preventDefault(); // Prevent '/' from being typed
+                event.preventDefault();
                 createSearchBox();
             }
             break;

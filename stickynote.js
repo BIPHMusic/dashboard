@@ -15,7 +15,7 @@ const STICKY_NOTES_CONFIG = [
         forWhichClasses: ["MS Band", "MS Band ᵀᴴᵁᴿˢ"],
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 60 },
-        textContent: 'Reminder: HS Band sessions - starting this week',
+        textContent: 'Last week, as there were many who forgot to attend the HS sessions, instead of deducting points, I will instead award 20 house points for everyone who DID attend at least once. Be aware that this week, we will actually start applying the 10% loss.',
         imageSrc: '',
         backgroundColor: '#7BDAC3',
     },

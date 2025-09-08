@@ -7,9 +7,12 @@ const hotkeys = [
     { key: "↓", description: "Decrease participation by 10." },
     { key: "Cmd + →", description: "Cycle to next class." },
     { key: "Cmd + ←", description: "Cycle to previous class." },
-    { key: "?", description: "Show hotkeys menu." },
-    { key: "r", description: "Speak a random student name." }
+    { key: "r", description: "Call a random student." },
+    { key: "?", description: "Show hotkeys menu." }
 ];
+
+// Track called students for the current class
+let calledStudents = [];
 
 function getMenuHotkeys() {
     const isProductionTech = classes[currentClassIndex].name === "Production Tech";
@@ -180,6 +183,56 @@ function handleObjectiveInputKeys(event) {
     }
 }
 
+function displayStudentName(name) {
+    let container = document.querySelector('.student-name-display');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'student-name-display';
+        container.style.position = 'fixed';
+        container.style.top = '50%';
+        container.style.left = '50%';
+        container.style.transform = 'translate(-50%, -50%)';
+        container.style.backgroundColor = 'white';
+        container.style.borderRadius = '5px';
+        container.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+        container.style.padding = '20px';
+        container.style.zIndex = '1000';
+        container.style.opacity = '1';
+        container.style.transition = 'opacity 0.5s ease-in-out';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.alignItems = 'center';
+        container.style.gap = '10px';
+        document.body.appendChild(container);
+    }
+
+    const text = document.createElement('h2');
+    text.textContent = name;
+    text.style.margin = '0';
+    text.style.textAlign = 'center';
+    text.style.fontWeight = 'normal';
+    container.appendChild(text);
+
+    // Clear any existing timeout to extend display time
+    if (container.timeoutId) {
+        clearTimeout(container.timeoutId);
+    }
+
+    // Set new timeout for fade-out
+    container.timeoutId = setTimeout(() => {
+        container.style.opacity = '0';
+        setTimeout(() => {
+            container.remove();
+        }, 500);
+    }, 3000);
+}
+
+function cycleClass(direction) {
+    currentClassIndex = (currentClassIndex + direction + classes.length) % classes.length;
+    calledStudents = []; // Reset called students when class changes
+    updateClassDisplay();
+}
+
 function handleGlobalHotkeys(event) {
     if (window.isObjectiveInputFocused) {
         // Allow standard text editing keys
@@ -187,6 +240,7 @@ function handleGlobalHotkeys(event) {
         if (event.metaKey || event.ctrlKey) {
             const allowedShortcuts = ['a', 'c', 'v', 'x', 'z', 'y', '='];
             if (allowedShortcuts.includes(event.key.toLowerCase())) return;
+            if (event.key.toLowerCase() === 'r') return; // Allow Cmd+R or Ctrl+R for page refresh
         }
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Backspace', 'Delete', 'Tab'].includes(event.key)) return;
         if (event.key.length === 1) return; // Allow single character input
@@ -228,22 +282,43 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0) {
-        // Speak a random student name
-        const randomIndex = Math.floor(Math.random() * students.length);
-        const randomStudent = students[randomIndex];
-        if (randomStudent && randomStudent.name) {
-            const masterStudent = masterList.find(s => s.name === randomStudent.name);
-            const speechText = masterStudent && masterStudent.altName ? masterStudent.altName : randomStudent.name;
-            const utterance = new SpeechSynthesisUtterance(speechText);
-            utterance.volume = 1.0;
-            utterance.rate = 1.25;
-            utterance.pitch = 1.0;
-            window.speechSynthesis.speak(utterance);
+    if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 && !event.metaKey && !event.ctrlKey) {
+        // Filter students who are not marked as "EX" or "Absent" and not yet called
+        let eligibleStudents = students.filter(student => 
+            student.attendance !== "EX" && student.attendance !== "Absent" && !calledStudents.includes(student.name)
+        );
+
+        // If no eligible students are left, reset the called students list
+        if (eligibleStudents.length === 0) {
+            calledStudents = [];
+            // Repopulate with all students who are not "EX" or "Absent"
+            eligibleStudents = students.filter(student => 
+                student.attendance !== "EX" && student.attendance !== "Absent"
+            );
+        }
+
+        // Select a random student from eligible students
+        if (eligibleStudents.length > 0) {
+            const randomIndex = Math.floor(Math.random() * eligibleStudents.length);
+            const randomStudent = eligibleStudents[randomIndex];
+            if (randomStudent && randomStudent.name) {
+                // Add student to calledStudents *before* displaying to prevent re-selection
+                calledStudents.push(randomStudent.name);
+                const masterStudent = masterList.find(s => s.name === randomStudent.name);
+                const displayText = randomStudent.name; // Display the name field
+                const speechText = masterStudent && masterStudent.altName ? masterStudent.altName : randomStudent.name; // Speak the altName
+                displayStudentName(displayText);
+                const utterance = new SpeechSynthesisUtterance(speechText);
+                utterance.volume = 1.0;
+                utterance.rate = 1.25;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
         }
         event.preventDefault();
         return;
     }
+
 
     switch (event.key) {
         case 'h':
@@ -267,12 +342,22 @@ function handleGlobalHotkeys(event) {
             }
             break;
         case 'ArrowRight':
-            navigateStudentMenu(1);
-            event.preventDefault();
+            if (event.metaKey) {
+                cycleClass(1); // Cmd + Right Arrow cycles to next class
+                event.preventDefault();
+            } else {
+                navigateStudentMenu(1); // Right Arrow navigates to next student
+                event.preventDefault();
+            }
             break;
         case 'ArrowLeft':
-            navigateStudentMenu(-1);
-            event.preventDefault();
+            if (event.metaKey) {
+                cycleClass(-1); // Cmd + Left Arrow cycles to previous class
+                event.preventDefault();
+            } else {
+                navigateStudentMenu(-1); // Left Arrow navigates to previous student
+                event.preventDefault();
+            }
             break;
         case 'ArrowUp':
             if (floatingMenu.style.display === 'block') {

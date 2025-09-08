@@ -1,39 +1,40 @@
 const STICKY_NOTES_CONFIG = [
     {
-        id: 'The Nutcracker QR Code',
+        id: 'ALL BAND - The Nutcracker QR',
         forWhichClasses: ["MS Band", "HS Band", "MS Band ᵀᴴᵁᴿˢ"],
         position: { x: window.innerWidth - 300, y: 300 },
         dimensions: { width: 150, height: 150 },
         textContent: '',
         imageSrc: 'qr-code.png',
-        backgroundColor: '#ffd75e',
+        backgroundColor: '#ffd75e', //yellow
     },
 
 
     {
-        id: 'Note for Middle Schoolers',
+        id: 'MIDDLE SCHOOL',
         forWhichClasses: ["MS Band", "MS Band ᵀᴴᵁᴿˢ"],
         position: { x: 100, y: 300 },
-        dimensions: { width: 250, height: 60 },
-        textContent: 'Last week, as there were many who forgot to attend the HS sessions, instead of deducting points, I will instead award 20 house points for everyone who DID attend at least once. Be aware that this week, we will actually start applying the 10% loss.',
+        dimensions: { width: 250, height: 200 },
+        textContent: 'Last week, there were many who forgot to attend the HS sessions. Instead of deducting points, I will instead award 20 house points for everyone who DID attend at least once. Be aware that this week, we will actually start applying the 10%.',
         imageSrc: '',
-        backgroundColor: '#7BDAC3',
+        //backgroundColor: '#7BDAC3', //teal
+        backgroundColor: '#ff9999', //red
     },
 
 
     // {
-    //     id: 'Note for High Schoolers',
+    //     id: 'HIGH SCHOOL',
     //     forWhichClasses: ["HS Band"],
     //     position: { x: 100, y: 300 },
     //     dimensions: { width: 250, height: 60 },
     //     textContent: 'Reminder: ',
     //     imageSrc: '',
-    //     backgroundColor: '#ff9999',
+    //     backgroundColor: '#ff9999', //red
     // },
 
 
     // {
-    //     id: 'Note for Production Tech', 
+    //     id: 'PRODUCTION TECH', 
     //     forWhichClasses: ["Production Tech"], 
     //     position: { x: 200, y: 200 }, 
     //     dimensions: { width: 230, height: 150 }, 

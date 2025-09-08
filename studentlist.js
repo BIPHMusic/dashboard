@@ -71,15 +71,16 @@ const masterList = [
     {"name": "Jim", "liveschoolName": "Jim Zi Jing Zheng", "house": "Yellow", "birthdate": "2009-02-16", "altName": "Jimm"},
 
     //all others
-    {"name": "Chris", "liveschoolName": "Chris", "house": "Green", "birthdate": "2007-03-24", "altName": "Chris"},
-    {"name": "Lucy", "liveschoolName": "Lucy", "house": "Blue", "birthdate": "2008-05-16", "altName": "Lucy"},
-    {"name": "Johnny", "liveschoolName": "Johnny", "house": "Red", "birthdate": "2007-11-14", "altName": "Johnny"},
-    {"name": "Daniel", "liveschoolName": "Daniel", "house": "Blue", "birthdate": "2009-09-04", "altName": "Daniel"},
-    {"name": "Agu", "liveschoolName": "Agu", "house": "Yellow", "birthdate": "2008-11-01", "altName": "Aagoo"},
-    {"name": "Michael", "liveschoolName": "Michael", "house": "Blue", "birthdate": "2008-12-25", "altName": "Michael"},
-    {"name": "Steve", "liveschoolName": "Steve", "house": "Green", "birthdate": "2012-09-09", "altName": "Steve"},
-    {"name": "Ben", "liveschoolName": "Ben", "house": "Yellow", "birthdate": "2007-12-17", "altName": "Ben"},
-    {"name": "Stuart", "liveschoolName": "Stuart", "house": "Yellow", "birthdate": "2007-12-17", "altName": "Stuart"},
+    {"name": "Chris", "liveschoolName": "Chris Zirui Peng", "house": "Green", "birthdate": "2007-03-24", "altName": "Chris"},
+    {"name": "Lucy", "liveschoolName": "Lucy Ruxin Sheng", "house": "Blue", "birthdate": "2008-05-16", "altName": "Lucy"},
+    {"name": "Johnny", "liveschoolName": "Johnny Zhongjie Yi", "house": "Red", "birthdate": "2007-11-14", "altName": "Johnny"},
+    {"name": "Daniel", "liveschoolName": "Daniel Tianyu He", "house": "Blue", "birthdate": "2009-09-04", "altName": "Daniel"},
+    {"name": "Agu", "liveschoolName": "Agu Zi-Zhen Huang", "house": "Yellow", "birthdate": "2008-11-01", "altName": "Aagoo"},
+    {"name": "Michael", "liveschoolName": "Michael Bao Shen Chen", "house": "Blue", "birthdate": "2008-12-25", "altName": "Michael"},
+    {"name": "Steve", "liveschoolName": "Steve Haoxuan Wang", "house": "Green", "birthdate": "2012-09-09", "altName": "Steve"},
+    {"name": "Ben", "liveschoolName": "Ben Luyue Chen", "house": "Yellow", "birthdate": "2007-12-17", "altName": "Ben"},
+    {"name": "Stuart", "liveschoolName": "Stuart Beichen Yang", "house": "Blue", "birthdate": "", "altName": "Stuart"},
+    {"name": "Kevin J", "liveschoolName": "Kevin Jincheng Jiao", "house": "Blue", "birthdate": "", "altName": "Kevin J"},
 ];
 
 const productionTechStudents = [

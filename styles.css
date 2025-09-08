@@ -15,7 +15,7 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 60px 50px 0px;
+    padding: 60px 50px 30px;
     background-color: #f0f0f0;
 }
 #title {
@@ -344,16 +344,17 @@ cursor: default;
     border-radius: 10px;
     z-index: 1002;
 }
+
 @media (min-width: 800px) {
     #teacher-mode {
-        width: 700px;
+        width: 800px;
         max-width: 1000px;
     }
 }
 
 .spreadsheet {
     display: grid;
-    grid-template-columns: auto auto auto auto auto auto auto auto;
+    grid-template-columns: 110px repeat(7, auto); 
     gap: 10px;
     margin-top: 20px;
     font-size: 14px;
@@ -400,13 +401,35 @@ opacity: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: white; /* Initial background color */
-    transition: background-color 0.3s; /* Transition effect */
+    background-color: transparent;
+    transition: background-color 0.3s;
 }
 
 .attendance-dropdown:hover {
-    background-color: rgb(235, 235, 235); /* Background color on hover */
+    background-color: rgb(235, 235, 235);
 }
+
+input[type="checkbox"]:disabled {
+    opacity: 0.5;
+}
+
+select.attendance-dropdown-select {
+    transition: background-color 0.3s;
+    padding: 2px;
+}
+
+select.attendance-dropdown-select.present {
+    background-color: #d4edda; 
+}
+
+select.attendance-dropdown-select.tardy {
+    background-color: #fff3cd; 
+}
+
+select.attendance-dropdown-select.absent {
+    background-color: #ffffff; 
+}
+
 
 .checkbox-container {
     display: flex;
@@ -465,6 +488,25 @@ opacity: 1;
     transform: translate(-50%, -50%); 
 }
 
+#floating-menu select.attendance-dropdown-select {
+    width: auto;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#floating-menu .checkbox-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+#floating-menu label {
+    display: inline-flex;
+    align-items: center;
+    margin: 5px 0;
+}
+
 @media (max-width: 1200px) {
     .bar {
         margin: 0 2px; 
@@ -512,8 +554,8 @@ opacity: 1;
         border-radius: 4px;
         padding: 2px 6px;
         position: fixed;
-        top: -65px;
-        transform: translateX(50%) rotate(90deg);
+        top: -69px;
+        transform: translateX(52%) rotate(90deg);
         z-index: 10;
     }
     
@@ -559,7 +601,7 @@ opacity: 1;
 }
 
 #search-input {
-    width: 85%;
+    width: 78%;
     padding: 10px;
     margin-bottom: 10px;
 }
@@ -702,3 +744,4 @@ transition: transform 0.3s ease;
 .hover-float:hover {
 transform: translateY(-5px);
 }
+

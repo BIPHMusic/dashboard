@@ -331,14 +331,12 @@ function updateCountdowns() {
 
         // Reset 'returned' checkboxes only once during pack-up phase
         if (currentClass.criteria.includes('returned') && !hasResetReturned) {
-            console.log('Resetting all returned checkboxes for class:', currentClass.name);
             const checkboxIndex = currentClass.criteria.indexOf('returned') + 3;
             const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${checkboxIndex}) input[type="checkbox"]`);
             checkboxes.forEach((checkbox, index) => {
                 checkbox.checked = false;
                 const studentName = teacherModeOrder[index];
                 if (studentName) {
-                    console.log('Unchecking returned for student:', studentName);
                     syncCheckbox(studentName, checkbox, 'returned');
                 }
             });
@@ -557,7 +555,6 @@ function openMenu(menuId) {
                     }
                 }
             } catch (error) {
-                console.error('Error opening menu:', error);
             }
         }
 
@@ -886,7 +883,14 @@ function updateTeacherMenu(student) {
 
 function updateFloatingMenu(student) {
     const floatingMenu = document.getElementById('floating-menu');
-    if (floatingMenu && floatingMenu.style.display === 'block') {
+    if (!floatingMenu || floatingMenu.style.display !== 'block') {
+        return;
+    }
+    if (floatingMenu.querySelector('h3').textContent !== student.name) {
+        return;
+    }
+
+    setTimeout(() => {
         const isProductionTech = classes[currentClassIndex].name === "Production Tech";
         const attendanceSelect = floatingMenu.querySelector('select');
         if (attendanceSelect) {
@@ -897,15 +901,28 @@ function updateFloatingMenu(student) {
             const property = checkbox.id.replace('checkbox-', '');
             checkbox.checked = student[property];
         });
-        const participationSpan = floatingMenu.querySelector('.stepper:first-of-type span');
-        if (participationSpan) {
-            participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+        
+        let participationSpan = floatingMenu.querySelector('.stepper:nth-child(7) .score');
+        if (!participationSpan) {
+            participationSpan = floatingMenu.querySelector('.stepper .score');
         }
-        const housePointsSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
+        if (participationSpan) {
+            const displayText = student.score === 'EX' ? 'EX' : `${student.score}%`;
+            participationSpan.textContent = displayText;
+        } else {
+            const childCount = floatingMenu.children.length;
+        }
+        
+        let housePointsSpan = floatingMenu.querySelector('.stepper:nth-child(8) span:nth-child(3)');
+        if (!housePointsSpan) {
+            housePointsSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
+        }
         if (housePointsSpan) {
             housePointsSpan.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
+        } else {
         }
-    }
+        
+    }, 100);
 }
 
 function updateTardyLabel(student) {
@@ -1257,7 +1274,6 @@ function addStudent(name) {
                     try {
                         updateSearchResults(searchInput.value);
                     } catch (e) {
-                        console.error('Error updating search results:', e);
                     }
                 });
 
@@ -1265,7 +1281,6 @@ function addStudent(name) {
                     document.addEventListener('click', handleSearchOutsideClick);
                 }, 0);
             } catch (error) {
-                console.error('Error creating search box:', error);
             }
         }
 
@@ -1542,7 +1557,7 @@ window.onload = function() {
 
 function exportScores() {
     let studentsToExport = students;
-    const isMsBandThursday = classes[currentClassIndex].name === "MS Band ᵀᴴᵁᴿˢ";
+    const isMsBandThursday = classes[currentClassIndex].name === "MS Band ᵀᴴᴿˢ";
     
     // For MS Band Thursday, use msBandStudents order and mark non-present students
     if (isMsBandThursday) {
@@ -1574,6 +1589,20 @@ function exportScores() {
                 };
             }
         });
+    }
+
+    // Now check (after potential override)
+    let allAbsent = true;
+    for (const student of studentsToExport) {
+        if (student.attendance !== 'Absent' || student.score !== 'EX') {
+            allAbsent = false;
+            break;
+        }
+    }
+    
+    if (allAbsent) {
+        showTemporaryMessage('No changes detected—all students absent/EX. CSV not exported.');
+        return;
     }
 
     const regularStudents = studentsToExport.filter(s => !s.isAdditional);

@@ -40,7 +40,7 @@ const STICKY_NOTES_CONFIG = [
         dimensions: { width: 230, height: 150 }, 
         textContent: 'If you need to make an event request to reserve a space, let me know.', 
         imageSrc: '',
-        backgroundColor: '#ff9999', //red
+        backgroundColor: '#ff9999', 
     },
 ];
 
@@ -124,7 +124,7 @@ function createStickyNote(config, id) {
     contentDiv.className = 'sticky-note-content';
     contentDiv.textContent = config.textContent;
     contentDiv.style.width = '100%';
-    contentDiv.style.height = config.imageSrc ? 'calc(100% - 60px)' : 'calc(100% - 40px)'; // Adjust height based on header
+    contentDiv.style.height = config.imageSrc ? 'calc(100% - 60px)' : 'calc(100% - 40px)';
     contentDiv.style.border = 'none';
     contentDiv.style.background = 'transparent';
     contentDiv.style.resize = 'none';
@@ -138,6 +138,17 @@ function createStickyNote(config, id) {
     contentDiv.addEventListener('input', () => {
         config.textContent = contentDiv.textContent;
         saveStickyNote(id, config);
+    });
+
+    // Set mode to STICKY_NOTE when focused
+    contentDiv.addEventListener('focus', () => {
+        currentMode = MODES.STICKY_NOTE;
+    });
+
+    // Reset mode to GLOBAL when blurred
+    contentDiv.addEventListener('blur', () => {
+        currentMode = MODES.GLOBAL;
+        saveStickyNote(id, config); // Save on blur to ensure latest content is saved
     });
 
     note.appendChild(tape);

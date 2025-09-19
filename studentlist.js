@@ -83,6 +83,7 @@ const masterList = [
     {"name": "Vivi", "liveschoolName": "Vivi Xinran Xia", "house": "Red", "birthdate": "", "altName": "Vivi"},
     {"name": "Jason", "liveschoolName": "Jason Junxing Zhu", "house": "Red", "birthdate": "", "altName": "Jason"},
     {"name": "Karen", "liveschoolName": "Karen Hou", "house": "Red", "birthdate": "", "altName": "Karen"},
+    {"name": "LiPai", "liveschoolName": "Pai Li", "house": "Yellow", "birthdate": "", "altName": "LiPai"},
 ];
 
 const productionTechStudents = [

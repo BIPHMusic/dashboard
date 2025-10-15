@@ -12,7 +12,7 @@ const STICKY_NOTES_CONFIG = [
 
     {
         id: 'MIDDLE SCHOOL',
-        forWhichClasses: ["MS Band", "MS Band ᵀᴴᵁᴿˢ"],
+        forWhichClasses: ["MS Band"],
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
         textContent: 'Don\'t forget to join a HS session this week 💡',
@@ -21,6 +21,16 @@ const STICKY_NOTES_CONFIG = [
         backgroundColor: '#ff9999', //red
     },
 
+        {
+        id: 'MIDDLE SCHOOL (THURSDAY)',
+        forWhichClasses: ["MS Band ᵀᴴᵁᴿˢ"],
+        position: { x: 100, y: 300 },
+        dimensions: { width: 250, height: 200 },
+        textContent: 'Last day to join HS! Don\'t forget! 💡',
+        imageSrc: '',
+        //backgroundColor: '#7BDAC3', //teal
+        backgroundColor: '#ff9999', //red
+    },
 
     // {
     //     id: 'HIGH SCHOOL',

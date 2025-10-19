@@ -85,6 +85,20 @@ const masterList = [
     {"name": "Karen", "liveschoolName": "Karen Hou", "house": "Red", "birthdate": "", "altName": "Karen"},
     {"name": "LiPai", "liveschoolName": "Pai Li", "house": "Yellow", "birthdate": "", "altName": "LiPai"},
     {"name": "James", "liveschoolName": "James Tianyou Dai", "house": "Blue", "birthdate": "", "altName": "James"},
+    {"name": "Alyssa", "liveschoolName": "Alyssa Peng", "house": "Blue", "birthdate": "", "altName": "Alyssa"},
+    {"name": "Ben", "liveschoolName": "Ben Luyue Chen", "house": "Yellow", "birthdate": "", "altName": "Ben"},
+    {"name": "Alan Wen", "liveschoolName": "Alan Tianlin Wen", "house": "Yellow", "birthdate": "", "altName": "Alan"},
+    {"name": "Ivan", "liveschoolName": "Ivan Yan Zhi Lin", "house": "Green", "birthdate": "", "altName": "Ivan"},
+    {"name": "Allen Yu", "liveschoolName": "Allen Kwun Ting Yu", "house": "Yellow", "birthdate": "", "altName": "Allen"},
+    {"name": "Kitty", "liveschoolName": "Kitty Yuzi Zhang", "house": "Yellow", "birthdate": "", "altName": "Kitty"},
+    {"name": "Alex", "liveschoolName": "Alex Tsz To Huang", "house": "Blue", "birthdate": "", "altName": "Alex"},
+    {"name": "Emily", "liveschoolName": "Emily Xuan Tong Ke", "house": "Yellow", "birthdate": "", "altName": "Emily"},
+    {"name": "Fiona", "liveschoolName": "Fiona Fang", "house": "Blue", "birthdate": "", "altName": "Fiona"},
+    {"name": "Mandy", "liveschoolName": "Mandy Ming Luo", "house": "Green", "birthdate": "", "altName": "Mandy"},
+    {"name": "Hubert", "liveschoolName": "Hubert Hongyi Chen", "house": "Yellow", "birthdate": "", "altName": "Hubert"},
+    {"name": "Tison", "liveschoolName": "Tison Zekai Wu", "house": "Yellow", "birthdate": "", "altName": "Tison"},
+    {"name": "Christi", "liveschoolName": "Christi Yawen Zhu", "house": "Yellow", "birthdate": "", "altName": "Christi"},
+    {"name": "Yaffa", "liveschoolName": "Yaffa Hei Wun Luo", "house": "Green", "birthdate": "", "altName": "Yaffa"},
 ];
 
 const productionTechStudents = [

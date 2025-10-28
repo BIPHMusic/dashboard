@@ -326,8 +326,26 @@ function updateCountdowns() {
         const seconds = Math.floor(endDiff % 60);
         const packupDiv = document.createElement('div');
         packupDiv.className = 'packup-countdown';
-        packupDiv.textContent = `♫ Pack up: ${minutes}m ${seconds}s ♫`;
+        packupDiv.textContent = `Pack up: ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(packupDiv);
+
+        // ------------------------------------------------------------
+        //  NEW: ONLY MS Band classes drop 10 % during pack-up
+        // ------------------------------------------------------------
+        const isMsBand = currentClass.name.includes('MS Band');
+        if (isMsBand && !hasResetReturned) {
+            students.forEach(student => {
+                if (student.attendance !== 'Absent' && student.score !== 'EX') {
+                    // deduct 10 % (but never below 0)
+                    const newScore = Math.max(0, (student.score || 0) - 10);
+                    student.manualAdjustment = (student.manualAdjustment || 0) + (newScore - (student.score || 0));
+                    student.score = newScore;
+                    updateScoreDisplay(student);
+                }
+            });
+            hasResetReturned = true;   // run only once per pack-up
+        }
+        // ------------------------------------------------------------
 
         // Reset 'returned' checkboxes only once during pack-up phase
         if (currentClass.criteria.includes('returned') && !hasResetReturned) {

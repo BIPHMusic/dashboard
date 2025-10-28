@@ -24,7 +24,7 @@ const masterList = [
     {"name": "Tommy", "liveschoolName": "Tommy Haolin Zhan", "house": "Green", "birthdate": "2008-03-27", "altName": "Tommy"},
     {"name": "Shawn", "liveschoolName": "Shawn Suyang Zhao", "house": "Blue", "birthdate": "2008-08-18", "altName": "Shawn"},
     {"name": "Isaac", "liveschoolName": "Isaac Chuxuan Zheng", "house": "Blue", "birthdate": "2007-12-05", "altName": "Isaac"},
-    {"name": "Hannah", "liveschoolName": "Hannah Ruihan Chen", "house": "Yellow", "birthdate": "2008-10-28", "altName": "Hannah"},
+    {"name": "Hannah", "liveschoolName": "Hannah Ruihan Chen", "house": "Yellow", "birthdate": "2013-01-19", "altName": "Hannah"},
     {"name": "Thomas", "liveschoolName": "Thomas Detong Zhu", "house": "Yellow", "birthdate": "2008-05-08", "altName": "Thomas"},
 
     //MS Band

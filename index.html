@@ -140,7 +140,7 @@ const classes = [
             'Announcements',
             'Housekeeping'
         ],
-        criteria: ['stands', 'ipads', 'returned', 'engagement']
+        criteria: ['stands', 'intonation', 'returned', 'engagement']  // ← changed
     },
     {
         name: "MS Band ᵀᴴᵁᴿˢ",
@@ -166,7 +166,7 @@ const classes = [
             'Announcements',
             'Housekeeping'
         ],
-        criteria: ['stands', 'ipads', 'returned', 'engagement']
+        criteria: ['stands', 'intonation', 'returned', 'engagement']  // ← changed
     },
     {
         name: "HS Band",
@@ -192,7 +192,7 @@ const classes = [
             'Announcements',
             'Housekeeping'
         ],
-        criteria: ['stands', 'ipads', 'returned', 'engagement']
+        criteria: ['stands', 'intonation', 'returned', 'engagement']  // ← changed
     }
 ];
 
@@ -269,18 +269,17 @@ function updateClassDisplay() {
     }
     updateHotkeysDisplay();
     updateCountdowns();
-    loadStickyNotes(); // Add this to load sticky notes for the new class
+    loadStickyNotes();
 }
 
 function updateCountdowns() {
     const countdownContainer = document.getElementById('countdowns');
-    countdownContainer.innerHTML = ''; // Clear previous countdowns
+    countdownContainer.innerHTML = '';
 
     const currentClass = classes[currentClassIndex];
     const now = new Date();
     const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
 
-    // Exit if the current day is not a class day
     if (!currentClass.days.includes(currentDay)) {
         hasCopiedScores = false;
         hasResetReturned = false;
@@ -296,11 +295,9 @@ function updateCountdowns() {
     let startDiff = (startTime - now) / 1000;
     let endDiff = (endTime - now) / 1000;
 
-    // Adjust for negative time differences (past midnight)
     if (startDiff < -86400) startDiff += 86400;
     if (endDiff < -86400) endDiff += 86400;
 
-    // Display start countdown (30 minutes before class starts)
     if (startDiff > 0 && startDiff <= 1800) {
         const minutes = Math.floor(startDiff / 60);
         const seconds = Math.floor(startDiff % 60);
@@ -309,7 +306,6 @@ function updateCountdowns() {
         startDiv.textContent = `Class begins in ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(startDiv);
     }
-    // Display conclusion countdown (10 to 5 minutes before class ends)
     else if (endDiff <= 600 && endDiff > 300) {
         const conclusionDiff = endDiff - 300;
         const minutes = Math.floor(conclusionDiff / 60);
@@ -318,9 +314,8 @@ function updateCountdowns() {
         conclusionDiv.className = 'conclusion-countdown';
         conclusionDiv.textContent = `Conclusion: ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(conclusionDiv);
-        hasResetReturned = false; // Reset flag when entering conclusion phase
+        hasResetReturned = false;
     }
-    // Display pack-up countdown (5 minutes or less until class ends)
     else if (endDiff <= 300 && endDiff >= 0) {
         const minutes = Math.floor(endDiff / 60);
         const seconds = Math.floor(endDiff % 60);
@@ -329,25 +324,20 @@ function updateCountdowns() {
         packupDiv.textContent = `Pack up: ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(packupDiv);
 
-        // ------------------------------------------------------------
-        //  NEW: ONLY MS Band classes drop 10 % during pack-up
-        // ------------------------------------------------------------
+        // === MS BAND ONLY: Uncheck "Returned" to deduct 10% ===
         const isMsBand = currentClass.name.includes('MS Band');
         if (isMsBand && !hasResetReturned) {
             students.forEach(student => {
-                if (student.attendance !== 'Absent' && student.score !== 'EX') {
-                    // deduct 10 % (but never below 0)
-                    const newScore = Math.max(0, (student.score || 0) - 10);
-                    student.manualAdjustment = (student.manualAdjustment || 0) + (newScore - (student.score || 0));
-                    student.score = newScore;
-                    updateScoreDisplay(student);
+                if (student.attendance !== 'Absent' && student.returned === true) {
+                    student.returned = false;
+                    const fakeCheckbox = { checked: false };
+                    syncCheckbox(student.name, fakeCheckbox, 'returned');
                 }
             });
-            hasResetReturned = true;   // run only once per pack-up
+            hasResetReturned = true;
         }
-        // ------------------------------------------------------------
 
-        // Reset 'returned' checkboxes only once during pack-up phase
+        // Reset 'returned' checkboxes in teacher mode
         if (currentClass.criteria.includes('returned') && !hasResetReturned) {
             const checkboxIndex = currentClass.criteria.indexOf('returned') + 3;
             const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${checkboxIndex}) input[type="checkbox"]`);
@@ -358,15 +348,14 @@ function updateCountdowns() {
                     syncCheckbox(studentName, checkbox, 'returned');
                 }
             });
-            hasResetReturned = true; // Prevent further resets
+            hasResetReturned = true;
         }
-        hasCopiedScores = false; // Allow exporting scores when class ends
+        hasCopiedScores = false;
     }
-    // Export scores when class ends
     else if (endDiff < 0 && endDiff > -2 && !hasCopiedScores) {
         exportScores();
         hasCopiedScores = true;
-        hasResetReturned = false; // Reset for next class
+        hasResetReturned = false;
     }
 }
 
@@ -391,7 +380,6 @@ function editObjective(item) {
     const currentItem = item.textContent;
     const index = Array.from(item.parentElement.children).indexOf(item);
     
-    // Remove any existing objective editing dialog
     const existingDialog = document.querySelector('div[style*="position: fixed"][style*="z-index: 1000"]');
     if (existingDialog) {
         existingDialog.remove();
@@ -447,14 +435,12 @@ function editObjective(item) {
     document.body.appendChild(dialog);
     const input = document.getElementById('objectiveInput');
 
-    // Ensure focus and selection after rendering
     setTimeout(() => {
         input.focus();
         input.select();
         window.isObjectiveInputFocused = true;
     }, 0);
 
-    // Re-attach event listeners
     input.addEventListener('focus', () => {
         window.isObjectiveInputFocused = true;
     });
@@ -515,7 +501,7 @@ let currentPoints = 0;
 
 function globalKeydownHandler(event) {
     if (event.key === '/' && currentMode === MODES.GLOBAL) {
-        event.preventDefault(); // Prevent '/' from propagating
+        event.preventDefault();
         toggleSearchBox();
         return;
     }
@@ -545,36 +531,34 @@ function globalKeydownHandler(event) {
 document.addEventListener('keydown', globalKeydownHandler);
 
 function openMenu(menuId) {
-            try {
-                // Close all modals except floating-menu when opening houseshield
-                if (menuId === 'houseshield') {
-                    const floatingMenu = document.getElementById('floating-menu');
-                    menuStack = floatingMenu && floatingMenu.style.display === 'block' ? [floatingMenu] : [];
-                } else {
-                    // Close all modals for other cases
-                    while (menuStack.length > 0) {
-                        closeTopMenu();
-                    }
-                }
-                const menu = document.getElementById(menuId);
-                if (menu) {
-                    currentZIndex++;
-                    menu.style.zIndex = currentZIndex;
-                    menu.style.display = 'block';
-                    menuStack.push(menu);
-                    if (menuId === 'search-box') {
-                        currentMode = MODES.SEARCH;
-                    } else if (menuId === 'houseshield') {
-                        currentMode = MODES.HOUSESHIELD;
-                    } else if (menuId === 'floating-menu') {
-                        currentMode = MODES.GLOBAL;
-                    } else {
-                        currentMode = MODES.GLOBAL;
-                    }
-                }
-            } catch (error) {
+    try {
+        if (menuId === 'houseshield') {
+            const floatingMenu = document.getElementById('floating-menu');
+            menuStack = floatingMenu && floatingMenu.style.display === 'block' ? [floatingMenu] : [];
+        } else {
+            while (menuStack.length > 0) {
+                closeTopMenu();
             }
         }
+        const menu = document.getElementById(menuId);
+        if (menu) {
+            currentZIndex++;
+            menu.style.zIndex = currentZIndex;
+            menu.style.display = 'block';
+            menuStack.push(menu);
+            if (menuId === 'search-box') {
+                currentMode = MODES.SEARCH;
+            } else if (menuId === 'houseshield') {
+                currentMode = MODES.HOUSESHIELD;
+            } else if (menuId === 'floating-menu') {
+                currentMode = MODES.GLOBAL;
+            } else {
+                currentMode = MODES.GLOBAL;
+            }
+        }
+    } catch (error) {
+    }
+}
 
 function closeTopMenu() {
     if (menuStack.length > 0) {
@@ -621,59 +605,59 @@ function closeSpecificMenu(menuId) {
 }
 
 function populateStudents() {
-            const spreadsheet = document.querySelector('.spreadsheet');
-            const isProductionTech = classes[currentClassIndex].name === "Production Tech";
-            spreadsheet.innerHTML = `
-                <div class="spreadsheet-header"><strong>Student</strong></div>
-                <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
-                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[0]}')">${isProductionTech ? 'Devices' : 'Stands'}</strong></div>
-                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[1]}')">${isProductionTech ? 'Engagement' : 'iPads'}</strong></div>
-                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[2]}')">${isProductionTech ? 'Review' : 'Returned'}</strong></div>
-                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[3]}')">${isProductionTech ? 'Progress' : 'Engagement'}</strong></div>
-                <div class="spreadsheet-header"><strong>Participation</strong></div>
-                <div class="spreadsheet-header"><strong>House Points</strong></div>
-            `;
-            teacherModeOrder.forEach(name => {
-                const student = students.find(s => s.name === name);
-                const isAbsent = student.attendance === 'Absent';
-                const row = document.createElement('div');
-                row.className = 'spreadsheet-row';
-                row.dataset.studentName = student.name;
-                row.innerHTML = `
-                    <div class="student-name">${student.name}</div>
-                    <div class="attendance-dropdown">
-                        <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}" onchange="syncAttendance('${student.name}', this)">
-                            <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
-                            <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
-                            <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
-                        </select>
-                    </div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
-                    </div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
-                    </div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
-                    </div>
-                    <div class="checkbox-container">
-                        <input type="checkbox" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
-                    </div>
-                    <div class="stepper">
-                        <button onclick="updateScore('${student.name}', -10)">-</button>
-                        <span class="score">${student.score === 'EX' ? 'EX' : student.score + '%'}</span>
-                        <button onclick="updateScore('${student.name}', 10)">+</button>
-                    </div>
-                    <div class="stepper">
-                        <button onclick="updateHousePoints('${student.name}', -10)">-</button>
-                        <span>${student.housePoints}</span>
-                        <button onclick="updateHousePoints('${student.name}', 10)">+</button>
-                    </div>
-                `;
-                spreadsheet.appendChild(row);
-            });
-        }
+    const spreadsheet = document.querySelector('.spreadsheet');
+    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    spreadsheet.innerHTML = `
+        <div class="spreadsheet-header"><strong>Student</strong></div>
+        <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[0]}')">${isProductionTech ? 'Devices' : 'Stands'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[1]}')">${isProductionTech ? 'Engagement' : 'Intonation'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[2]}')">${isProductionTech ? 'Review' : 'Returned'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[3]}')">${isProductionTech ? 'Progress' : 'Engagement'}</strong></div>
+        <div class="spreadsheet-header"><strong>Participation</strong></div>
+        <div class="spreadsheet-header"><strong>House Points</strong></div>
+    `;
+    teacherModeOrder.forEach(name => {
+        const student = students.find(s => s.name === name);
+        const isAbsent = student.attendance === 'Absent';
+        const row = document.createElement('div');
+        row.className = 'spreadsheet-row';
+        row.dataset.studentName = student.name;
+        row.innerHTML = `
+            <div class="student-name">${student.name}</div>
+            <div class="attendance-dropdown">
+                <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}" onchange="syncAttendance('${student.name}', this)">
+                    <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
+                    <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
+                    <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+                </select>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
+            </div>
+            <div class="stepper">
+                <button onclick="updateScore('${student.name}', -10)">-</button>
+                <span class="score">${student.score === 'EX' ? 'EX' : student.score + '%'}</span>
+                <button onclick="updateScore('${student.name}', 10)">+</button>
+            </div>
+            <div class="stepper">
+                <button onclick="updateHousePoints('${student.name}', -10)">-</button>
+                <span>${student.housePoints}</span>
+                <button onclick="updateHousePoints('${student.name}', 10)">+</button>
+            </div>
+        `;
+        spreadsheet.appendChild(row);
+    });
+}
 
 function updateHousePoints(name, change) {
     const student = students.find(s => s.name === name);
@@ -729,44 +713,42 @@ function exitTeacherMode() {
 }
 
 function syncAttendance(name, select) {
-            const student = students.find(s => s.name === name);
-            if (student) {
-                student.attendance = select.value;
-                calculateScore(student);
-                updateScoreDisplay(student);
-                updateTardyLabel(student);
-                updateBarGraph(student);
-                const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
-                if (teacherRow) {
-                    const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
-                    if (attendanceSelect) {
-                        attendanceSelect.value = student.attendance;
-                        attendanceSelect.classList.remove('present', 'tardy', 'absent');
-                        attendanceSelect.classList.add(student.attendance.toLowerCase());
-                    }
-                    // Update checkbox disabled state in teacher mode
-                    const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
-                    checkboxes.forEach(checkbox => {
-                        checkbox.disabled = student.attendance === 'Absent';
-                    });
-                }
-                // Update floating menu if open for this student
-                const floatingMenu = document.getElementById('floating-menu');
-                if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
-                    const floatingSelect = floatingMenu.querySelector('select');
-                    if (floatingSelect) {
-                        floatingSelect.value = student.attendance;
-                        floatingSelect.classList.remove('present', 'tardy', 'absent');
-                        floatingSelect.classList.add(student.attendance.toLowerCase());
-                    }
-                    const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
-                    floatingCheckboxes.forEach(checkbox => {
-                        checkbox.disabled = student.attendance === 'Absent';
-                    });
-                    updateFloatingMenu(student);
-                }
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student.attendance = select.value;
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+        updateBarGraph(student);
+        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
+        if (teacherRow) {
+            const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+            if (attendanceSelect) {
+                attendanceSelect.value = student.attendance;
+                attendanceSelect.classList.remove('present', 'tardy', 'absent');
+                attendanceSelect.classList.add(student.attendance.toLowerCase());
             }
+            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
         }
+        const floatingMenu = document.getElementById('floating-menu');
+        if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
+            const floatingSelect = floatingMenu.querySelector('select');
+            if (floatingSelect) {
+                floatingSelect.value = student.attendance;
+                floatingSelect.classList.remove('present', 'tardy', 'absent');
+                floatingSelect.classList.add(student.attendance.toLowerCase());
+            }
+            const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+            floatingCheckboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
+            updateFloatingMenu(student);
+        }
+    }
+}
 
 function syncCheckbox(name, checkbox, type) {
     const student = students.find(s => s.name === name);
@@ -927,8 +909,6 @@ function updateFloatingMenu(student) {
         if (participationSpan) {
             const displayText = student.score === 'EX' ? 'EX' : `${student.score}%`;
             participationSpan.textContent = displayText;
-        } else {
-            const childCount = floatingMenu.children.length;
         }
         
         let housePointsSpan = floatingMenu.querySelector('.stepper:nth-child(8) span:nth-child(3)');
@@ -937,9 +917,7 @@ function updateFloatingMenu(student) {
         }
         if (housePointsSpan) {
             housePointsSpan.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
-        } else {
         }
-        
     }, 100);
 }
 
@@ -1090,48 +1068,48 @@ function navigateStudentMenu(direction) {
 }
 
 function showFloatingMenu(event, studentName) {
-            const floatingMenu = document.getElementById('floating-menu');
-            const student = students.find(s => s.name === studentName);
-            const isProductionTech = classes[currentClassIndex].name === "Production Tech";
-            currentStudentIndex = students.findIndex(s => s.name === studentName);
-            if (currentStudentIndex === -1) {
-                return;
-            }
-            const isAbsent = student.attendance === 'Absent';
-            floatingMenu.innerHTML = `
-                <span class="close-button" onclick="closeTopMenu()">&times;</span>
-                <h3 onclick="cycleAttendanceForStudent(students[${currentStudentIndex}])">${student.name}</h3>
-                <div class="checkbox-row">
-                    <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}" onchange="syncAttendance('${student.name}', this)">
-                        <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
-                        <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
-                        <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
-                    </select>
-                    <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${isProductionTech ? 'Devices' : 'Stands'}</label>
-                    <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${isProductionTech ? 'Engagement' : 'iPads'}</label>
-                    <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${isProductionTech ? 'Review' : 'Returned'}</label>
-                    <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${isProductionTech ? 'Progress' : 'Engagement'}</label>
-                </div>
-                <div class="stepper">
-                    <button onclick="updateScore('${student.name}', -10)">-</button>
-                    <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
-                    <button onclick="updateScore('${student.name}', 10)">+</button>
-                </div>
-                <div class="stepper">
-                    <span>House Points</span>
-                    <button onclick="updateHousePoints('${student.name}', -10)">-</button>
-                    <span>${student.housePoints > 0 ? '+' : ''}${student.housePoints}</span>
-                    <button onclick="updateHousePoints('${student.name}', 10)">+</button>
-                </div>
-                <button onclick="closeFloatingMenu()">Close</button>
-            `;
-            const menuWidth = floatingMenu.offsetWidth;
-            const menuHeight = floatingMenu.offsetHeight;
-            floatingMenu.style.left = `50%`;
-            floatingMenu.style.top = `50%`;
-            openMenu('floating-menu');
-            highlightBar(student.name);
-        }
+    const floatingMenu = document.getElementById('floating-menu');
+    const student = students.find(s => s.name === studentName);
+    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    currentStudentIndex = students.findIndex(s => s.name === studentName);
+    if (currentStudentIndex === -1) {
+        return;
+    }
+    const isAbsent = student.attendance === 'Absent';
+    floatingMenu.innerHTML = `
+        <span class="close-button" onclick="closeTopMenu()">&times;</span>
+        <h3 onclick="cycleAttendanceForStudent(students[${currentStudentIndex}])">${student.name}</h3>
+        <div class="checkbox-row">
+            <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}" onchange="syncAttendance('${student.name}', this)">
+                <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
+                <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
+                <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+            </select>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${isProductionTech ? 'Devices' : 'Stands'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${isProductionTech ? 'Engagement' : 'Intonation'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${isProductionTech ? 'Review' : 'Returned'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${isProductionTech ? 'Progress' : 'Engagement'}</label>
+        </div>
+        <div class="stepper">
+            <button onclick="updateScore('${student.name}', -10)">-</button>
+            <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
+            <button onclick="updateScore('${student.name}', 10)">+</button>
+        </div>
+        <div class="stepper">
+            <span>House Points</span>
+            <button onclick="updateHousePoints('${student.name}', -10)">-</button>
+            <span>${student.housePoints > 0 ? '+' : ''}${student.housePoints}</span>
+            <button onclick="updateHousePoints('${student.name}', 10)">+</button>
+        </div>
+        <button onclick="closeFloatingMenu()">Close</button>
+    `;
+    const menuWidth = floatingMenu.offsetWidth;
+    const menuHeight = floatingMenu.offsetHeight;
+    floatingMenu.style.left = `50%`;
+    floatingMenu.style.top = `50%`;
+    openMenu('floating-menu');
+    highlightBar(student.name);
+}
 
 function closeFloatingMenu() {
     closeSpecificMenu('floating-menu');
@@ -1145,47 +1123,45 @@ function updateDateTime() {
 }
 
 function cycleAttendance() {
-            const attendanceOptions = ['Absent', 'Present', 'Tardy'];
-            const currentIndex = attendanceOptions.indexOf(students[0].attendance);
-            const nextIndex = (currentIndex + 1) % attendanceOptions.length;
-            const nextAttendance = attendanceOptions[nextIndex];
-            students.forEach(student => {
-                student.attendance = nextAttendance;
-                calculateScore(student);
-                updateScoreDisplay(student);
-                updateTardyLabel(student);
-                updateBarGraph(student);
-                const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
-                if (teacherRow) {
-                    const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
-                    if (attendanceSelect) {
-                        attendanceSelect.value = student.attendance;
-                        attendanceSelect.classList.remove('present', 'tardy', 'absent');
-                        attendanceSelect.classList.add(student.attendance.toLowerCase());
-                    }
-                    // Update checkbox disabled state in teacher mode
-                    const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
-                    checkboxes.forEach(checkbox => {
-                        checkbox.disabled = student.attendance === 'Absent';
-                    });
-                }
-                // Update floating menu if open for this student
-                const floatingMenu = document.getElementById('floating-menu');
-                if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
-                    const floatingSelect = floatingMenu.querySelector('select');
-                    if (floatingSelect) {
-                        floatingSelect.value = student.attendance;
-                        floatingSelect.classList.remove('present', 'tardy', 'absent');
-                        floatingSelect.classList.add(student.attendance.toLowerCase());
-                    }
-                    const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
-                    floatingCheckboxes.forEach(checkbox => {
-                        checkbox.disabled = student.attendance === 'Absent';
-                    });
-                    updateFloatingMenu(student);
-                }
+    const attendanceOptions = ['Absent', 'Present', 'Tardy'];
+    const currentIndex = attendanceOptions.indexOf(students[0].attendance);
+    const nextIndex = (currentIndex + 1) % attendanceOptions.length;
+    const nextAttendance = attendanceOptions[nextIndex];
+    students.forEach(student => {
+        student.attendance = nextAttendance;
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+        updateBarGraph(student);
+        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
+        if (teacherRow) {
+            const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+            if (attendanceSelect) {
+                attendanceSelect.value = student.attendance;
+                attendanceSelect.classList.remove('present', 'tardy', 'absent');
+                attendanceSelect.classList.add(student.attendance.toLowerCase());
+            }
+            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
             });
         }
+        const floatingMenu = document.getElementById('floating-menu');
+        if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
+            const floatingSelect = floatingMenu.querySelector('select');
+            if (floatingSelect) {
+                floatingSelect.value = student.attendance;
+                floatingSelect.classList.remove('present', 'tardy', 'absent');
+                floatingSelect.classList.add(student.attendance.toLowerCase());
+            }
+            const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+            floatingCheckboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
+            updateFloatingMenu(student);
+        }
+    });
+}
 
 function toggleAllCheckboxes(type) {
     const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${currentCriteria.indexOf(type) + 3}) input[type="checkbox"]`);
@@ -1200,107 +1176,105 @@ function toggleAllCheckboxes(type) {
 }
 
 function addStudent(name) {
-            const masterStudent = masterList.find(s => s.name === name);
-            if (masterStudent && !students.some(s => s.name === name)) {
-                const newStudent = {
-                    name: masterStudent.name,
-                    birthdate: masterStudent.birthdate,
-                    house: masterStudent.house,
-                    attendance: 'Present',
-                    [currentCriteria[0]]: true,
-                    [currentCriteria[1]]: true,
-                    [currentCriteria[2]]: true,
-                    [currentCriteria[3]]: true,
-                    score: 100,
-                    housePoints: 10, // Award 10 house points by default
-                    manualAdjustment: 0,
-                    isAdditional: true
-                };
-                students.push(newStudent);
-                teacherModeOrder.push(name);
-                createBars();
-                const newBar = document.getElementById(`bar-${newStudent.name}`);
-                if (newBar) {
-                    newBar.style.height = '0%';
-                    setTimeout(() => {
-                        newBar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
-                        newBar.style.height = `${newStudent.score}%`;
-                        newBar.style.setProperty('--flash-color', 'rgba(46, 204, 113, 0.6)');
-                        newBar.classList.remove('flash-animation');
-                        void newBar.offsetWidth;
-                        newBar.classList.add('flash-animation');
-                    }, 10);
-                }
-                if (document.getElementById('teacher-mode').style.display === 'block') {
-                    populateStudents();
-                }
-                closeSearchBox();
-            }
+    const masterStudent = masterList.find(s => s.name === name);
+    if (masterStudent && !students.some(s => s.name === name)) {
+        const newStudent = {
+            name: masterStudent.name,
+            birthdate: masterStudent.birthdate,
+            house: masterStudent.house,
+            attendance: 'Present',
+            [currentCriteria[0]]: true,
+            [currentCriteria[1]]: true,
+            [currentCriteria[2]]: true,
+            [currentCriteria[3]]: true,
+            score: 100,
+            housePoints: 10,
+            manualAdjustment: 0,
+            isAdditional: true
+        };
+        students.push(newStudent);
+        teacherModeOrder.push(name);
+        createBars();
+        const newBar = document.getElementById(`bar-${newStudent.name}`);
+        if (newBar) {
+            newBar.style.height = '0%';
+            setTimeout(() => {
+                newBar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
+                newBar.style.height = `${newStudent.score}%`;
+                newBar.style.setProperty('--flash-color', 'rgba(46, 204, 113, 0.6)');
+                newBar.classList.remove('flash-animation');
+                void newBar.offsetWidth;
+                newBar.classList.add('flash-animation');
+            }, 10);
         }
+        if (document.getElementById('teacher-mode').style.display === 'block') {
+            populateStudents();
+        }
+        closeSearchBox();
+    }
+}
 
-        function createSearchBox() {
+function createSearchBox() {
+    try {
+        while (menuStack.length > 0) {
+            closeTopMenu();
+        }
+        searchBox = document.createElement('div');
+        searchBox.id = 'search-box';
+        searchBox.style.position = 'fixed';
+        searchBox.style.top = '50%';
+        searchBox.style.left = '50%';
+        searchBox.style.transform = 'translate(-50%, -50%)';
+        searchBox.style.backgroundColor = 'white';
+        searchBox.style.padding = '20px';
+        searchBox.style.borderRadius = '5px';
+        searchBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+        searchBox.style.zIndex = '1000';
+        searchBox.style.display = 'block';
+        searchBox.innerHTML = `
+            <span class="close-button" onclick="closeSearchBox()">&times;</span>
+            <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}" autocomplete="off">
+            <div id="search-results"></div>
+            ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
+        `;
+        document.body.appendChild(searchBox);
+        
+        searchBox.style.display = 'none';
+        void searchBox.offsetWidth;
+        searchBox.style.display = 'block';
+        
+        searchResults = document.getElementById('search-results');
+        if (!searchResults) {
+            throw new Error('Search results element not found');
+        }
+        
+        const searchInput = document.getElementById('search-input');
+        if (!searchInput) {
+            throw new Error('Search input element not found');
+        }
+        
+        searchInput.value = '';
+        setTimeout(() => {
+            searchInput.focus();
+            searchInput.select();
+        }, 0);
+        
+        openMenu('search-box');
+        currentMode = MODES.SEARCH;
+
+        searchInput.addEventListener('input', () => {
             try {
-                // Close all existing modals
-                while (menuStack.length > 0) {
-                    closeTopMenu();
-                }
-                searchBox = document.createElement('div');
-                searchBox.id = 'search-box';
-                searchBox.style.position = 'fixed';
-                searchBox.style.top = '50%';
-                searchBox.style.left = '50%';
-                searchBox.style.transform = 'translate(-50%, -50%)';
-                searchBox.style.backgroundColor = 'white';
-                searchBox.style.padding = '20px';
-                searchBox.style.borderRadius = '5px';
-                searchBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
-                searchBox.style.zIndex = '1000';
-                searchBox.style.display = 'block';
-                searchBox.innerHTML = `
-                    <span class="close-button" onclick="closeSearchBox()">&times;</span>
-                    <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}" autocomplete="off">
-                    <div id="search-results"></div>
-                    ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
-                `;
-                document.body.appendChild(searchBox);
-                
-                searchBox.style.display = 'none';
-                void searchBox.offsetWidth;
-                searchBox.style.display = 'block';
-                
-                searchResults = document.getElementById('search-results');
-                if (!searchResults) {
-                    throw new Error('Search results element not found');
-                }
-                
-                const searchInput = document.getElementById('search-input');
-                if (!searchInput) {
-                    throw new Error('Search input element not found');
-                }
-                
-                searchInput.value = '';
-                // Ensure input is focused and selected
-                setTimeout(() => {
-                    searchInput.focus();
-                    searchInput.select();
-                }, 0);
-                
-                openMenu('search-box');
-                currentMode = MODES.SEARCH;
-
-                searchInput.addEventListener('input', () => {
-                    try {
-                        updateSearchResults(searchInput.value);
-                    } catch (e) {
-                    }
-                });
-
-                setTimeout(() => {
-                    document.addEventListener('click', handleSearchOutsideClick);
-                }, 0);
-            } catch (error) {
+                updateSearchResults(searchInput.value);
+            } catch (e) {
             }
-        }
+        });
+
+        setTimeout(() => {
+            document.addEventListener('click', handleSearchOutsideClick);
+        }, 0);
+    } catch (error) {
+    }
+}
 
 function toggleAddStudentMode() {
     closeSearchBox();
@@ -1516,7 +1490,6 @@ function preloadHouseImages() {
     });
 }
 
-
 document.addEventListener('click', function(event) {
     if (menuStack.length === 0) return;
 
@@ -1561,7 +1534,7 @@ window.onload = function() {
     currentClassIndex = getCurrentClass();
     updateClassDisplay();
     updateDateTime();
-    loadStickyNotes(); // Add this to load sticky notes on page load
+    loadStickyNotes();
     setInterval(updateDateTime, 60000);
     setInterval(() => {
         const newIndex = getCurrentClass();
@@ -1575,9 +1548,8 @@ window.onload = function() {
 
 function exportScores() {
     let studentsToExport = students;
-    const isMsBandThursday = classes[currentClassIndex].name === "MS Band ᵀᴴᴿˢ";
+    const isMsBandThursday = classes[currentClassIndex].name === "MS Band ᵀᴴᵁᴿˢ";
     
-    // For MS Band Thursday, use msBandStudents order and mark non-present students
     if (isMsBandThursday) {
         studentsToExport = msBandStudents.map(student => {
             const thursdayStudent = msBandThursdayStudents.find(s => s.name === student.name);
@@ -1587,7 +1559,7 @@ function exportScores() {
                     attendance: 'Absent',
                     score: 'EX',
                     stands: false,
-                    ipads: false,
+                    intonation: false,
                     returned: false,
                     engagement: false,
                     housePoints: 0,
@@ -1599,7 +1571,7 @@ function exportScores() {
                     attendance: 'Absent',
                     score: 'EX',
                     stands: false,
-                    ipads: false,
+                    intonation: false,
                     returned: false,
                     engagement: false,
                     housePoints: 0,
@@ -1609,7 +1581,6 @@ function exportScores() {
         });
     }
 
-    // Now check (after potential override)
     let allAbsent = true;
     for (const student of studentsToExport) {
         if (student.attendance !== 'Absent' || student.score !== 'EX') {
@@ -1626,15 +1597,12 @@ function exportScores() {
     const regularStudents = studentsToExport.filter(s => !s.isAdditional);
     const additionalStudents = studentsToExport.filter(s => s.isAdditional);
 
-    // Create headers and data rows
     const headers = ['Name', ...regularStudents.map(student => `"${student.name}"`)];
     const classworkRow = ['Classwork', ...regularStudents.map(student => `"${student.score === 'EX' ? 'EX' : `${student.score}%`}"`)];
 
-    // Format current date as "MM/DD/YYYY" for DATEVALUE
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
 
-    // Add house points section with liveschoolName and + for positive values, sorted alphabetically
     const housePointsItemized = studentsToExport
         .filter(student => student.housePoints !== 0)
         .map(student => {
@@ -1645,22 +1613,18 @@ function exportScores() {
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(item => `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`);
 
-    // Add tardies section with DATEVALUE
     const tardiesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Tardy')
         .map(student => `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`);
 
-    // Add absences section with DATEVALUE
     const absencesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Absent')
         .map(student => `"${student.name}",Absent,=DATEVALUE("${dateStr}")`);
 
-    // Add additional students section
     const additionalStudentsMessage = additionalStudents.length > 0
         ? additionalStudents.map(s => `"${s.name}",Additional`)
         : [];
 
-    // Combine all sections with empty rows before labels
     const finalCsvRows = [
         headers.join(','),
         classworkRow.join(','),
@@ -1670,7 +1634,6 @@ function exportScores() {
         ...(additionalStudentsMessage.length > 0 ? additionalStudentsMessage : [])
     ];
 
-    // Generate and download CSV
     const csvFileDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
     const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_');
     const csvContent = finalCsvRows.join('\n');
@@ -1685,7 +1648,6 @@ function exportScores() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    // Prepare alert message
     const housePointsDisplay = housePointsItemized.length > 0 
         ? housePointsItemized.map(item => {
             const [name, points] = item.split(',');
@@ -1812,7 +1774,7 @@ function resetAllStudents() {
     students.forEach(student => {
         student.attendance = 'Absent';
         student.stands = false;
-        student.ipads = false;
+        student.intonation = false;   // ← changed
         student.devices = false;
         student.review = false;
         student.returned = false;

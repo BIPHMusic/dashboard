@@ -101,6 +101,7 @@ const masterList = [
     {"name": "Yaffa", "liveschoolName": "Yaffa Hei Wun Luo", "house": "Green", "birthdate": "", "altName": "Yaffa"},
     {"name": "Odelia", "liveschoolName": "Odelia Yunhan Xie", "house": "Green", "birthdate": "", "altName": "Odelia"},
     {"name": "Alyssa", "liveschoolName": "Alyssa Peng", "house": "Blue", "birthdate": "2012-03-26", "altName": "Alyssa"},
+    {"name": "Tim", "liveschoolName": "Tim Yaheng Wang", "house": "Green", "birthdate": "", "altName": "Tim"},
 ];
 
 const productionTechStudents = [

@@ -19,7 +19,7 @@ function getMenuHotkeys() {
     return [
         { key: "a", description: "Toggle Attendance." },
         { key: isProductionTech ? "d" : "s", description: `Toggle ${isProductionTech ? 'Devices' : 'Stands'} checkbox(es).` },
-        { key: isProductionTech ? "e" : "i", description: `Toggle ${isProductionTech ? 'Engagement' : 'iPads'} checkbox(es).` },
+        { key: isProductionTech ? "e" : "i", description: `Toggle ${isProductionTech ? 'Engagement' : 'intonation'} checkbox(es).` },
         { key: isProductionTech ? "r" : "r", description: `Toggle ${isProductionTech ? 'Review' : 'Returned'} checkbox(es).` },
         { key: isProductionTech ? "p" : "e", description: `Toggle ${isProductionTech ? 'Progress' : 'Engagement'} checkbox(es).` },
         { key: "h", description: "Toggle House Shield." },
@@ -72,7 +72,7 @@ function handleFloatingMenuHotkeys(event, studentName) {
             toggleCheckboxForStudent(student, isProductionTech ? 'devices' : 'stands');
             break;
         case isProductionTech ? 'e' : 'i':
-            toggleCheckboxForStudent(student, isProductionTech ? 'engagement' : 'ipads');
+            toggleCheckboxForStudent(student, isProductionTech ? 'engagement' : 'intonation');
             break;
         case 'r':
             toggleCheckboxForStudent(student, isProductionTech ? 'review' : 'returned');
@@ -401,7 +401,7 @@ function handleGlobalHotkeys(event) {
                         toggleAllCheckboxes(isProductionTech ? 'devices' : 'stands');
                         break;
                     case isProductionTech ? 'e' : 'i':
-                        toggleAllCheckboxes(isProductionTech ? 'engagement' : 'ipads');
+                        toggleAllCheckboxes(isProductionTech ? 'engagement' : 'intonation');
                         break;
                     case 'r':
                         toggleAllCheckboxes(isProductionTech ? 'review' : 'returned');

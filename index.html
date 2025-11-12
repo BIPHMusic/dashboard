@@ -275,29 +275,22 @@ function updateClassDisplay() {
 function updateCountdowns() {
     const countdownContainer = document.getElementById('countdowns');
     countdownContainer.innerHTML = '';
-
     const currentClass = classes[currentClassIndex];
     const now = new Date();
     const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
-
     if (!currentClass.days.includes(currentDay)) {
         hasCopiedScores = false;
         hasResetReturned = false;
         return;
     }
-
     const startTime = new Date(now);
     startTime.setHours(currentClass.startTime.hours, currentClass.startTime.minutes, 0, 0);
-
     const endTime = new Date(now);
     endTime.setHours(currentClass.endTime.hours, currentClass.endTime.minutes, 0, 0);
-
     let startDiff = (startTime - now) / 1000;
     let endDiff = (endTime - now) / 1000;
-
     if (startDiff < -86400) startDiff += 86400;
     if (endDiff < -86400) endDiff += 86400;
-
     if (startDiff > 0 && startDiff <= 1800) {
         const minutes = Math.floor(startDiff / 60);
         const seconds = Math.floor(startDiff % 60);
@@ -324,32 +317,6 @@ function updateCountdowns() {
         packupDiv.textContent = `Pack up: ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(packupDiv);
 
-        // === MS BAND ONLY: Uncheck "Returned" to deduct 10% ===
-        const isMsBand = currentClass.name.includes('MS Band');
-        if (isMsBand && !hasResetReturned) {
-            students.forEach(student => {
-                if (student.attendance !== 'Absent' && student.returned === true) {
-                    student.returned = false;
-                    const fakeCheckbox = { checked: false };
-                    syncCheckbox(student.name, fakeCheckbox, 'returned');
-                }
-            });
-            hasResetReturned = true;
-        }
-
-        // Reset 'returned' checkboxes in teacher mode
-        if (currentClass.criteria.includes('returned') && !hasResetReturned) {
-            const checkboxIndex = currentClass.criteria.indexOf('returned') + 3;
-            const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${checkboxIndex}) input[type="checkbox"]`);
-            checkboxes.forEach((checkbox, index) => {
-                checkbox.checked = false;
-                const studentName = teacherModeOrder[index];
-                if (studentName) {
-                    syncCheckbox(studentName, checkbox, 'returned');
-                }
-            });
-            hasResetReturned = true;
-        }
         hasCopiedScores = false;
     }
     else if (endDiff < 0 && endDiff > -2 && !hasCopiedScores) {

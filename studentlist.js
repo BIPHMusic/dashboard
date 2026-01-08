@@ -59,11 +59,9 @@ const masterList = [
     //HS Band
     {"name": "Tiger", "liveschoolName": "Tiger Si Cheng Hou", "house": "Green", "birthdate": "2009-03-23", "altName": "Tiger"},
     {"name": "Leo", "liveschoolName": "Leo Ruikun Li", "house": "Blue", "birthdate": "2011-07-06", "altName": "Leo"},
-    {"name": "David", "liveschoolName": "David Peiyu Liang", "house": "Red", "birthdate": "2008-02-03", "altName": "David"},
     {"name": "Steven", "liveschoolName": "Steven Siyuan Meng", "house": "Red", "birthdate": "2010-06-24", "altName": "Steven"},
     {"name": "Jennifer", "liveschoolName": "Jennifer Yan Yi Mou", "house": "Yellow", "birthdate": "2010-06-08", "altName": "Jennifer"},
     {"name": "Henry", "liveschoolName": "Henry Shi", "house": "Red", "birthdate": "2009-09-10", "altName": "Henry"},
-    {"name": "Calvin Y", "liveschoolName": "Calvin Kuang Yan", "house": "Yellow", "birthdate": "2009-08-17", "altName": "Calvin Yen"},
     {"name": "Luna", "liveschoolName": "Luna Mingxi Zhan", "house": "Red", "birthdate": "2009-07-08", "altName": "Luna"},
     {"name": "Calvin Z", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "2010-04-21", "altName": "Calvin Jong"},
     {"name": "Jim", "liveschoolName": "Jim Zi Jing Zheng", "house": "Yellow", "birthdate": "2009-02-16", "altName": "Jimm"},
@@ -174,7 +172,7 @@ const msBandThursdayTeacherModeOrder = ['Shine', 'Rebecca', 'Andy', 'Celine', 'A
 
 
 const hsBandStudents = [
-    'Tiger', 'Leo', 'David', 'Steven', 'Jennifer', 'Henry', 'Calvin Y', 'Luna', 'Calvin Z', 'Jim'
+    'Tiger', 'Leo', 'Steven', 'Jennifer', 'Henry', 'Luna', 'Calvin Z', 'Jim'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -190,4 +188,4 @@ const hsBandStudents = [
     };
 });
 
-const hsBandTeacherModeOrder = ['Tiger', 'Leo', 'David', 'Steven', 'Jennifer', 'Henry', 'Calvin Y', 'Luna', 'Calvin Z', 'Jim'];
+const hsBandTeacherModeOrder = ['Tiger', 'Leo', 'Steven', 'Jennifer', 'Henry', 'Luna', 'Calvin Z', 'Jim'];

@@ -143,7 +143,7 @@ const msBandStudents = [
     };
 });
 
-const msBandTeacherModeOrder = ['Shine', 'Oscar', 'Rebecca', 'Andy', 'Matthew', 'Grant', 'Jacky', 'Nancy', 'Grace X', 'Celine', 'Austen', 'Stella S', 'Kyla', 'Mianmian', 'June', 'Stella Y', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zach', 'Sophie', 'Jacob', 'Rene', 'Hannah', 'Aurora'];
+const msBandTeacherModeOrder = ['Shine', 'Oscar', 'Rebecca', 'Andy', 'Matthew', 'Grant', 'Jacky', 'Nancy', 'Grace X', 'Celine', 'Austen', 'Stella S', 'Kyla', 'Stella Y', 'Mianmian', 'Grace N', 'June', 'Tyler', 'Hannah', 'Francis', 'Zach', 'Owen', 'Anne', 'Sophie', 'Jacob', 'Rene', 'Aurora'];
 
 
 

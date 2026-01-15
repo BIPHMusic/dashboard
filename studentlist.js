@@ -1,7 +1,7 @@
 const masterList = [
     //Production Tech
     {"name": "Fiona", "liveschoolName": "Fiona Fangyuan Bi", "house": "Red", "birthdate": "2009-04-21", "altName": "Fiona"},
-    {"name": "Jimmy", "liveschoolName": "Jimmy Jun Ming Chen", "house": "Yellow", "birthdate": "2009-01-15", "altName": "Jimmy"},
+    {"name": "Jimmy", "liveschoolName": "Jimmy Jun Ming Chen", "house": "Yellow", "birthdate": "2008-03-02", "altName": "Jimmy"},
     {"name": "Kevin", "liveschoolName": "Kevin Ka Ming Chen", "house": "Red", "birthdate": "2007-06-29", "altName": "Kevin"},
     {"name": "Mia", "liveschoolName": "Mia Yuhan Chen", "house": "Yellow", "birthdate": "2007-09-19", "altName": "Mia"},
     {"name": "Howard", "liveschoolName": "Howard Haochuan Ding", "house": "Blue", "birthdate": "2008-05-09", "altName": "Howard"},

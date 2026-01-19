@@ -24,7 +24,7 @@ const masterList = [
     {"name": "Tommy", "liveschoolName": "Tommy Haolin Zhan", "house": "Green", "birthdate": "2008-03-27", "altName": "Tommy"},
     {"name": "Shawn", "liveschoolName": "Shawn Suyang Zhao", "house": "Blue", "birthdate": "2008-08-18", "altName": "Shawn"},
     {"name": "Isaac", "liveschoolName": "Isaac Chuxuan Zheng", "house": "Blue", "birthdate": "2007-12-05", "altName": "Isaac"},
-    {"name": "Hannah", "liveschoolName": "Hannah Ruihan Chen", "house": "Yellow", "birthdate": "2013-01-19", "altName": "Hannah"},
+    {"name": "Hannah", "liveschoolName": "Hannah Zihan Zhou", "house": "Red", "birthdate": "10-28-2008", "altName": "Hannah"},
     {"name": "Thomas", "liveschoolName": "Thomas Detong Zhu", "house": "Yellow", "birthdate": "2008-05-08", "altName": "Thomas"},
 
     //MS Band
@@ -35,7 +35,7 @@ const masterList = [
     {"name": "Grant", "liveschoolName": "Grant Zhang", "house": "Green", "birthdate": "2014-02-11", "altName": "Grant"},
     {"name": "Matthew", "liveschoolName": "Matthew Enhao Feng", "house": "Yellow", "birthdate": "2013-12-16", "altName": "Matthew"},
     {"name": "Nancy", "liveschoolName": "Nancy Han", "house": "Yellow", "birthdate": "2013-07-16", "altName": "Nancy"},
-    {"name": "Grace X", "liveschoolName": "Grace Leqi Xiong", "house": "Red", "birthdate": "2013-01-19", "altName": "Grace--x"},
+    {"name": "Grace X", "liveschoolName": "Grace Leqi Xiong", "house": "Red", "birthdate": "2014-02-04", "altName": "Grace--x"},
     {"name": "Celine", "liveschoolName": "Celine Yuting Shu", "house": "Blue", "birthdate": "2012-01-18", "altName": "Celine"},
     {"name": "Austen", "liveschoolName": "Austen Lihan Xie", "house": "Yellow", "birthdate": "2013-01-02", "altName": "Austen"},
     {"name": "Stella S", "liveschoolName": "Stella Yizhi Shang", "house": "Green", "birthdate": "2012-02-29", "altName": "Stella Shaong"},

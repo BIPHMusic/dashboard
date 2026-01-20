@@ -40,7 +40,6 @@ const masterList = [
     {"name": "Austen", "liveschoolName": "Austen Lihan Xie", "house": "Yellow", "birthdate": "2013-01-02", "altName": "Austen"},
     {"name": "Stella S", "liveschoolName": "Stella Yizhi Shang", "house": "Green", "birthdate": "2012-02-29", "altName": "Stella Shaong"},
     {"name": "Kyla", "liveschoolName": "Kyla Shi", "house": "Red", "birthdate": "2013-03-25", "altName": "Kyla"},
-    {"name": "Mianmian", "liveschoolName": "Mianmian Mingxuan Lyu", "house": "Red", "birthdate": "2013-03-01", "altName": "Mienn Mienn"},
     {"name": "June", "liveschoolName": "June Ziqiao Qin", "house": "Blue", "birthdate": "2011-06-18", "altName": "June"},
     {"name": "Stella Y", "liveschoolName": "Stella Yuan", "house": "Yellow", "birthdate": "2012-01-28", "altName": "Stella Yunn"},
     {"name": "Grace N", "liveschoolName": "Grace Ning", "house": "Yellow", "birthdate": "2013-03-09", "altName": "Grace Ning"},
@@ -77,6 +76,7 @@ const masterList = [
     {"name": "Ben", "liveschoolName": "Ben Luyue Chen", "house": "Yellow", "birthdate": "2007-12-17", "altName": "Ben"},
     {"name": "Stuart", "liveschoolName": "Stuart Beichen Yang", "house": "Yellow", "birthdate": "", "altName": "Stuart"},
     {"name": "Kevin J", "liveschoolName": "Kevin Jincheng Jiao", "house": "Blue", "birthdate": "", "altName": "Kevin J"},
+    {"name": "Mianmian", "liveschoolName": "Mianmian Mingxuan Lyu", "house": "Red", "birthdate": "2013-03-01", "altName": "Mienn Mienn"},
     {"name": "Vivi", "liveschoolName": "Vivi Xinran Xia", "house": "Red", "birthdate": "", "altName": "Vivi"},
     {"name": "Jason", "liveschoolName": "Jason Junxing Zhu", "house": "Red", "birthdate": "", "altName": "Jason"},
     {"name": "Karen", "liveschoolName": "Karen Hou", "house": "Red", "birthdate": "", "altName": "Karen"},
@@ -127,7 +127,7 @@ const productionTechTeacherModeOrder = ['Fiona', 'Jimmy', 'Kevin', 'Mia', 'Howar
 
 
 const msBandStudents = [
-   'Jacky', 'Oscar', 'Matthew', 'Nancy', 'Grace X', 'Stella Y', 'Grant', 'Anne', 'Hannah', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Mianmian', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zach', 'Aurora'
+   'Jacky', 'Oscar', 'Matthew', 'Nancy', 'Grace X', 'Stella Y', 'Grant', 'Anne', 'Hannah', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zach', 'Aurora'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -143,13 +143,13 @@ const msBandStudents = [
     };
 });
 
-const msBandTeacherModeOrder = ['Shine', 'Oscar', 'Rebecca', 'Andy', 'Matthew', 'Grant', 'Jacky', 'Nancy', 'Grace X', 'Celine', 'Austen', 'Stella S', 'Kyla', 'Stella Y', 'Mianmian', 'Grace N', 'June', 'Tyler', 'Hannah', 'Francis', 'Zach', 'Owen', 'Anne', 'Sophie', 'Jacob', 'Rene', 'Aurora'];
+const msBandTeacherModeOrder = ['Shine', 'Oscar', 'Rebecca', 'Andy', 'Matthew', 'Grant', 'Jacky', 'Nancy', 'Grace X', 'Celine', 'Austen', 'Stella S', 'Kyla', 'Stella Y', 'Grace N', 'June', 'Tyler', 'Hannah', 'Francis', 'Zach', 'Owen', 'Anne', 'Sophie', 'Jacob', 'Rene', 'Aurora'];
 
 
 
 
 const msBandThursdayStudents = [
-    'Anne', 'Hannah', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Mianmian', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zach', 'Aurora'
+    'Anne', 'Hannah', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zach', 'Aurora'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -165,7 +165,7 @@ const msBandThursdayStudents = [
     };
 });
 
-const msBandThursdayTeacherModeOrder = ['Shine', 'Rebecca', 'Andy', 'Celine', 'Austen', 'Stella S', 'Kyla', 'Mianmian', 'June', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zach', 'Sophie', 'Jacob', 'Rene', 'Hannah', 'Aurora'];
+const msBandThursdayTeacherModeOrder = ['Shine', 'Rebecca', 'Andy', 'Celine', 'Austen', 'Stella S', 'Kyla', 'June', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zach', 'Sophie', 'Jacob', 'Rene', 'Hannah', 'Aurora'];
 
 
 

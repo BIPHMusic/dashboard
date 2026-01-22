@@ -24,7 +24,7 @@ const masterList = [
     {"name": "Tommy", "liveschoolName": "Tommy Haolin Zhan", "house": "Green", "birthdate": "2008-03-27", "altName": "Tommy"},
     {"name": "Shawn", "liveschoolName": "Shawn Suyang Zhao", "house": "Blue", "birthdate": "2008-08-18", "altName": "Shawn"},
     {"name": "Isaac", "liveschoolName": "Isaac Chuxuan Zheng", "house": "Blue", "birthdate": "2007-12-05", "altName": "Isaac"},
-    {"name": "Hannah", "liveschoolName": "Hannah Zihan Zhou", "house": "Red", "birthdate": "10-28-2008", "altName": "Hannah"},
+    {"name": "Hannah", "liveschoolName": "Alyssa Zihan Zhou", "house": "Red", "birthdate": "10-28-2008", "altName": "Hannah"},
     {"name": "Thomas", "liveschoolName": "Thomas Detong Zhu", "house": "Yellow", "birthdate": "2008-05-08", "altName": "Thomas"},
 
     //MS Band
@@ -52,7 +52,7 @@ const masterList = [
     {"name": "Jacob", "liveschoolName": "Jacob I Chon He", "house": "Red", "birthdate": "2012-05-30", "altName": "Jacob"},
     {"name": "Jacky", "liveschoolName": "Jacky Tsz Hin Cheung", "house": "Green", "birthdate": "2014-08-30", "altName": "Jacky"},
     {"name": "Rene", "liveschoolName": "Rene King Hei Tang", "house": "Red", "birthdate": "2013-03-28", "altName": "Renee"},
-    {"name": "Hannah", "liveschoolName": "Hannah Ruihan Chen", "house": "Yellow", "birthdate": "2013-01-19", "altName": "Hannah"},
+    {"name": "Hannah ", "liveschoolName": "Hannah Ruihan Chen", "house": "Yellow", "birthdate": "2013-01-19", "altName": "Hannah "},
     {"name": "Aurora", "liveschoolName": "Aurora Yingxi Zhong", "house": "Yellow", "birthdate": "2013-02-27", "altName": "Aurora"},
 
     //HS Band
@@ -127,7 +127,7 @@ const productionTechTeacherModeOrder = ['Fiona', 'Jimmy', 'Kevin', 'Mia', 'Howar
 
 
 const msBandStudents = [
-   'Jacky', 'Oscar', 'Matthew', 'Nancy', 'Grace X', 'Stella Y', 'Grant', 'Anne', 'Hannah', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zach', 'Aurora'
+   'Jacky', 'Oscar', 'Matthew', 'Nancy', 'Grace X', 'Stella Y', 'Grant', 'Anne', 'Hannah ', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zach', 'Aurora'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -143,13 +143,13 @@ const msBandStudents = [
     };
 });
 
-const msBandTeacherModeOrder = ['Shine', 'Oscar', 'Rebecca', 'Andy', 'Matthew', 'Grant', 'Jacky', 'Nancy', 'Grace X', 'Celine', 'Austen', 'Stella S', 'Kyla', 'Stella Y', 'Grace N', 'June', 'Tyler', 'Hannah', 'Francis', 'Zach', 'Owen', 'Anne', 'Sophie', 'Jacob', 'Rene', 'Aurora'];
+const msBandTeacherModeOrder = ['Shine', 'Oscar', 'Rebecca', 'Andy', 'Matthew', 'Grant', 'Jacky', 'Nancy', 'Grace X', 'Celine', 'Austen', 'Stella S', 'Kyla', 'Stella Y', 'Grace N', 'June', 'Tyler', 'Hannah ', 'Francis', 'Zach', 'Owen', 'Anne', 'Sophie', 'Jacob', 'Rene', 'Aurora'];
 
 
 
 
 const msBandThursdayStudents = [
-    'Anne', 'Hannah', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zach', 'Aurora'
+    'Anne', 'Hannah ', 'Rebecca', 'Shine', 'Andy', 'Sophie', 'Jacob', 'Owen', 'Tyler', 'Francis', 'Grace N', 'June', 'Stella S', 'Kyla', 'Celine', 'Rene', 'Austen', 'Zach', 'Aurora'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -165,7 +165,7 @@ const msBandThursdayStudents = [
     };
 });
 
-const msBandThursdayTeacherModeOrder = ['Shine', 'Rebecca', 'Andy', 'Celine', 'Austen', 'Stella S', 'Kyla', 'June', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zach', 'Sophie', 'Jacob', 'Rene', 'Hannah', 'Aurora'];
+const msBandThursdayTeacherModeOrder = ['Shine', 'Rebecca', 'Andy', 'Celine', 'Austen', 'Stella S', 'Kyla', 'June', 'Grace N', 'Anne', 'Tyler', 'Francis', 'Owen', 'Zach', 'Sophie', 'Jacob', 'Rene', 'Hannah ', 'Aurora'];
 
 
 

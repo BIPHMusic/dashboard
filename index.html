@@ -278,19 +278,24 @@ function updateCountdowns() {
     const currentClass = classes[currentClassIndex];
     const now = new Date();
     const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
+
     if (!currentClass.days.includes(currentDay)) {
         hasCopiedScores = false;
         hasResetReturned = false;
         return;
     }
+
     const startTime = new Date(now);
     startTime.setHours(currentClass.startTime.hours, currentClass.startTime.minutes, 0, 0);
     const endTime = new Date(now);
     endTime.setHours(currentClass.endTime.hours, currentClass.endTime.minutes, 0, 0);
+
     let startDiff = (startTime - now) / 1000;
     let endDiff = (endTime - now) / 1000;
+
     if (startDiff < -86400) startDiff += 86400;
     if (endDiff < -86400) endDiff += 86400;
+
     if (startDiff > 0 && startDiff <= 1800) {
         const minutes = Math.floor(startDiff / 60);
         const seconds = Math.floor(startDiff % 60);
@@ -299,25 +304,14 @@ function updateCountdowns() {
         startDiv.textContent = `Class begins in ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(startDiv);
     }
-    else if (endDiff <= 600 && endDiff > 300) {
-        const conclusionDiff = endDiff - 300;
-        const minutes = Math.floor(conclusionDiff / 60);
-        const seconds = Math.floor(conclusionDiff % 60);
+    else if (endDiff <= 300 && endDiff >= 0) {           // ← changed: 5 min → conclusion
+        const minutes = Math.floor(endDiff / 60);
+        const seconds = Math.floor(endDiff % 60);
         const conclusionDiv = document.createElement('div');
         conclusionDiv.className = 'conclusion-countdown';
         conclusionDiv.textContent = `Conclusion: ${minutes}m ${seconds}s`;
         countdownContainer.appendChild(conclusionDiv);
         hasResetReturned = false;
-    }
-    else if (endDiff <= 300 && endDiff >= 0) {
-        const minutes = Math.floor(endDiff / 60);
-        const seconds = Math.floor(endDiff % 60);
-        const packupDiv = document.createElement('div');
-        packupDiv.className = 'packup-countdown';
-        packupDiv.textContent = `Pack up: ${minutes}m ${seconds}s`;
-        countdownContainer.appendChild(packupDiv);
-
-        hasCopiedScores = false;
     }
     else if (endDiff < 0 && endDiff > -2 && !hasCopiedScores) {
         exportScores();

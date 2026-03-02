@@ -79,7 +79,7 @@ const masterList = [
     {"name": "Mianmian", "liveschoolName": "Mianmian Mingxuan Lyu", "house": "Red", "birthdate": "2013-03-01", "altName": "Mienn Mienn"},
     {"name": "Vivi", "liveschoolName": "Vivi Xinran Xia", "house": "Red", "birthdate": "", "altName": "Vivi"},
     {"name": "Jason", "liveschoolName": "Jason Junxing Zhu", "house": "Red", "birthdate": "", "altName": "Jason"},
-    {"name": "Karen", "liveschoolName": "Karen Hou", "house": "Red", "birthdate": "", "altName": "Karen"},
+    {"name": "Karen", "liveschoolName": "Karen Hou", "house": "Blue", "birthdate": "2012-09-24", "altName": "Karen"},
     {"name": "LiPai", "liveschoolName": "Pai Li", "house": "Yellow", "birthdate": "", "altName": "LiPai"},
     {"name": "James", "liveschoolName": "James Tianyou Dai", "house": "Blue", "birthdate": "", "altName": "James"},
     {"name": "Alyssa", "liveschoolName": "Alyssa Peng", "house": "Blue", "birthdate": "", "altName": "Alyssa"},

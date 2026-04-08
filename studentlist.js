@@ -5,7 +5,7 @@ const masterList = [
     {"name": "Kevin", "liveschoolName": "Kevin Ka Ming Chen", "house": "Red", "birthdate": "2007-06-29", "altName": "Kevin"},
     {"name": "Mia", "liveschoolName": "Mia Yuhan Chen", "house": "Yellow", "birthdate": "2007-09-19", "altName": "Mia"},
     {"name": "Howard", "liveschoolName": "Howard Haochuan Ding", "house": "Blue", "birthdate": "2008-05-09", "altName": "Howard"},
-    {"name": "Vlan", "liveschoolName": "Vlan Wai Lun Dong", "house": "Green", "birthdate": "2009-02-21", "altName": "Vlan"},
+    {"name": "Vlan", "liveschoolName": "Vlan Wai Lun Dong", "house": "Green", "birthdate": "2009-02-21", "altName": "Vlan"}, 
     {"name": "Zoe", "liveschoolName": "Zoe He", "house": "Green", "birthdate": "2007-06-13", "altName": "Zoe"},
     {"name": "Voorhis", "liveschoolName": "Vivi Qiyue Jin", "house": "Yellow", "birthdate": "2008-01-19", "altName": "Vorhiss"},
     {"name": "Ming Hon", "liveschoolName": "Ming Hon Li", "house": "Red", "birthdate": "2009-02-07", "altName": "Ming Hon"},
@@ -123,7 +123,7 @@ const productionTechStudents = [
 const productionTechTeacherModeOrder = ['Fiona', 'Jimmy', 'Kevin', 'Mia', 'Howard', 'Vlan', 'Zoe', 'Voorhis', 'Ming Hon', 'Kiki', 'Yolanda', 'Stella L', 'Angel', 'Vincent', 'Edward', 'Diego', 'Chloe', 'Jerry', 'Alfred', 'Angelina', 'Howen', 'Tommy', 'Shawn', 'Isaac', 'Hannah Z', 'Thomas'];
 
 
-
+const productionTechSeniorProjects = ['Kevin', 'Mia', 'Howard', 'Zoe', 'Vincent', 'Edward', 'Diego', 'Jerry', 'Howen', 'Shawn', 'Thomas']
 
 
 const msBandStudents = [

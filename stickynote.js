@@ -1,47 +1,33 @@
 const STICKY_NOTES_CONFIG = [
     {
-        id: 'ALL BAND - The Nutcracker QR',
+        id: 'ALL BAND',
         forWhichClasses: ["MS Band", "HS Band", "MS Band ᵀᴴᵁᴿˢ"],
         position: { x: window.innerWidth - 300, y: 300 },
         dimensions: { width: 150, height: 150 },
         textContent: '',
         imageSrc: 'qr-code.png',
-        backgroundColor: '#ffd75e', //yellow
+        backgroundColor: '#ffd75e', // yellow
     },
-
 
     {
         id: 'MIDDLE SCHOOL',
-        forWhichClasses: ["MS Band"],
+        forWhichClasses: ["MS Band"],           // ← only regular MS Band (Mon/Wed)
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
         textContent: 'Don\'t forget to join a HS session this week 💡',
         imageSrc: '',
-        //backgroundColor: '#7BDAC3', //teal
-        backgroundColor: '#ff9999', //red
+        backgroundColor: '#ff9999', // red
     },
 
-        {
+    {
         id: 'MIDDLE SCHOOL (THURSDAY)',
-        forWhichClasses: ["MS Band ᵀᴴᵁᴿˢ"],
+        forWhichClasses: ["MS Band ᵀᴴᵁᴿˢ"],    // ← only Thursday
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
         textContent: 'Last day to join HS! Don\'t forget! 💡',
         imageSrc: '',
-        //backgroundColor: '#7BDAC3', //teal
-        backgroundColor: '#ff9999', //red
+        backgroundColor: '#ff9999', // red
     },
-
-    // {
-    //     id: 'HIGH SCHOOL',
-    //     forWhichClasses: ["HS Band"],
-    //     position: { x: 100, y: 300 },
-    //     dimensions: { width: 250, height: 60 },
-    //     textContent: 'Reminder: ',
-    //     imageSrc: '',
-    //     backgroundColor: '#ff9999', //red
-    // },
-
 
     {
         id: 'PRODUCTION TECH', 
@@ -235,24 +221,28 @@ function removeStickyNote(id) {
     localStorage.removeItem(key);
 }
 
+
 // Load sticky notes for the current class
 function loadStickyNotes() {
-    // Remove existing sticky notes from DOM
+    // Remove ALL existing sticky notes first
     document.querySelectorAll('.sticky-note').forEach(note => note.remove());
 
     const currentClass = classes[currentClassIndex].name;
+
     STICKY_NOTES_CONFIG.forEach(config => {
         if (!isStickyNoteAllowed(config)) return;
+
         const key = `stickyNote_${currentClass}_${config.id}`;
         const savedNoteData = JSON.parse(localStorage.getItem(key));
+
         if (savedNoteData) {
             config.textContent = savedNoteData.textContent || config.textContent;
             config.position = savedNoteData.position || config.position;
             config.dimensions = savedNoteData.dimensions || config.dimensions;
             config.backgroundColor = savedNoteData.backgroundColor || config.backgroundColor;
             config.imageSrc = savedNoteData.imageSrc || config.imageSrc;
-            config.forWhichClasses = savedNoteData.forWhichClasses || config.forWhichClasses;
         }
+
         createStickyNote(config, config.id);
     });
 }

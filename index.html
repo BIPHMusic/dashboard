@@ -16,7 +16,7 @@
             <ul id="objectiveList"></ul>
         </div>
         <div id="title">
-            <h1 onclick="cycleClass()">Class Name</h1>
+            <h1 onclick="cycleClass(1)">Class Name</h1>
             <h2 id="timeRange">Time Range</h2>
             <div id="countdowns"></div>
         </div>
@@ -91,31 +91,35 @@ function playRandomSound(soundArray) {
 
 const classes = [
     {
-        name: "Production Tech",
-        timeRange: "10:45 - 11:35",
-        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        startTime: { hours: 10, minutes: 45 },
-        endTime: { hours: 11, minutes: 35 },
-        students: productionTechStudents,
-        teacherModeOrder: productionTechTeacherModeOrder,
-        objectivesKey: "productionTechObjectives",
-        defaultObjectives: [
-            'Review',
-            'Group Work',
-            'Housekeeping'
-        ],
-        sampleObjectives: [
-            'Review',
-            'Hardware',
-            'Software',
-            'QLab skills',
-            'Independent work',
-            'Group work',
-            'Troubleshooting',
-            'Housekeeping'
-        ],
-        criteria: ['devices', 'engagement', 'review', 'progress']
-    },
+    name: "Production Tech",
+    timeRange: "10:45 - 11:35",
+    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    startTime: { hours: 10, minutes: 45 },
+    endTime: { hours: 11, minutes: 35 },
+    
+    fullStudentList: productionTechStudents,           // ← full list for export order
+    students: productionTechStudents.filter(s => !productionTechSeniorProjects.includes(s.name)),  // visible only
+    teacherModeOrder: productionTechTeacherModeOrder.filter(name => !productionTechSeniorProjects.includes(name)),
+    seniorProjects: productionTechSeniorProjects,
+
+    objectivesKey: "productionTechObjectives",
+    defaultObjectives: [
+        'Review',
+        'Group Work',
+        'Housekeeping'
+    ],
+    sampleObjectives: [
+        'Review',
+        'Hardware',
+        'Software',
+        'QLab skills',
+        'Independent work',
+        'Group work',
+        'Troubleshooting',
+        'Housekeeping'
+    ],
+    criteria: ['devices', 'engagement', 'review', 'progress']
+},
     {
         name: "MS Band",
         timeRange: "12:40 - 1:30",
@@ -225,35 +229,6 @@ function getCurrentClass() {
     return currentClassIndex;
 }
 
-function cycleClass() {
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
-    const currentTime = currentHour * 60 + currentMinute;
-    
-    let nextIndex = currentClassIndex;
-    let attempts = 0;
-    
-    do {
-        nextIndex = (nextIndex + 1) % classes.length;
-        attempts++;
-        const cls = classes[nextIndex];
-        if (cls.days.includes(currentDay)) {
-            const start = cls.startTime.hours * 60 + cls.startTime.minutes;
-            if (currentTime >= start - 30 && currentTime <= start) {
-                currentClassIndex = nextIndex;
-                updateClassDisplay();
-                updateCountdowns();
-                return;
-            }
-        }
-    } while (nextIndex !== currentClassIndex && attempts < classes.length);
-    
-    currentClassIndex = (currentClassIndex + 1) % classes.length;
-    updateClassDisplay();
-    updateCountdowns();
-}
 
 function updateClassDisplay() {
     const cls = classes[currentClassIndex];
@@ -1509,8 +1484,10 @@ window.onload = function() {
 
 function exportScores() {
     let studentsToExport = students;
-    const isMsBandThursday = classes[currentClassIndex].name === "MS Band ᵀᴴᵁᴿˢ";
-    
+    const currentClass = classes[currentClassIndex];
+    const isMsBandThursday = currentClass.name === "MS Band ᵀᴴᵁᴿˢ";
+    const isProductionTech = currentClass.name === "Production Tech";
+
     if (isMsBandThursday) {
         studentsToExport = msBandStudents.map(student => {
             const thursdayStudent = msBandThursdayStudents.find(s => s.name === student.name);
@@ -1540,8 +1517,51 @@ function exportScores() {
                 };
             }
         });
+    } 
+    else if (isProductionTech && currentClass.fullStudentList) {
+        studentsToExport = currentClass.fullStudentList.map(fullStudent => {
+            const name = fullStudent.name;
+
+            if (currentClass.seniorProjects.includes(name)) {
+                return {
+                    name: name,
+                    attendance: 'Absent',
+                    score: 'EX',
+                    devices: false,
+                    engagement: false,
+                    review: false,
+                    progress: false,
+                    housePoints: 0,
+                    manualAdjustment: 0,
+                    isSeniorProject: true
+                };
+            }
+
+            // Find the matching visible student by name and copy its current state
+            const visibleStudent = students.find(s => s.name === name);
+            if (visibleStudent) {
+                return {
+                    ...visibleStudent,
+                    name: name   // ensure name is correct
+                };
+            }
+
+            // Fallback - use the original fullStudent object
+            return { ...fullStudent };
+        });
     }
 
+    // Debug (you can remove this later)
+    console.log("=== PRODUCTION TECH EXPORT DEBUG ===");
+    console.table(studentsToExport.map(s => ({
+        name: s.name,
+        attendance: s.attendance,
+        score: s.score,
+        housePoints: s.housePoints || 0,
+        isSeniorProject: !!s.isSeniorProject
+    })));
+
+    // Original detection logic
     let allAbsent = true;
     for (const student of studentsToExport) {
         if (student.attendance !== 'Absent' || student.score !== 'EX') {
@@ -1549,21 +1569,20 @@ function exportScores() {
             break;
         }
     }
-    
+   
     if (allAbsent) {
         showTemporaryMessage('No changes detected—all students absent/EX. CSV not exported.');
+        console.warn("Export blocked - all students still show Absent/EX");
         return;
     }
 
+    // ==================== YOUR ORIGINAL CSV CODE FROM HERE DOWN ====================
     const regularStudents = studentsToExport.filter(s => !s.isAdditional);
     const additionalStudents = studentsToExport.filter(s => s.isAdditional);
-
     const headers = ['Name', ...regularStudents.map(student => `"${student.name}"`)];
     const classworkRow = ['Classwork', ...regularStudents.map(student => `"${student.score === 'EX' ? 'EX' : `${student.score}%`}"`)];
-
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
-
     const housePointsItemized = studentsToExport
         .filter(student => student.housePoints !== 0)
         .map(student => {
@@ -1573,19 +1592,15 @@ function exportScores() {
         })
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(item => `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`);
-
     const tardiesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Tardy')
         .map(student => `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`);
-
     const absencesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Absent')
         .map(student => `"${student.name}",Absent,=DATEVALUE("${dateStr}")`);
-
     const additionalStudentsMessage = additionalStudents.length > 0
         ? additionalStudents.map(s => `"${s.name}",Additional`)
         : [];
-
     const finalCsvRows = [
         headers.join(','),
         classworkRow.join(','),
@@ -1594,7 +1609,6 @@ function exportScores() {
         ...(absencesItemized.length > 0 ? ['', 'Absences', ...absencesItemized] : []),
         ...(additionalStudentsMessage.length > 0 ? additionalStudentsMessage : [])
     ];
-
     const csvFileDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
     const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_').replace(/_{2,}/g, '_').replace(/^_|_$/g, '');
     const csvContent = finalCsvRows.join('\n');
@@ -1609,19 +1623,19 @@ function exportScores() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    const housePointsDisplay = housePointsItemized.length > 0 
+    const housePointsDisplay = housePointsItemized.length > 0
         ? housePointsItemized.map(item => {
             const [name, points] = item.split(',');
             return `${name.replace(/"/g, '')}: ${points}`;
         }).join('\n')
         : 'No house points';
-    const tardiesDisplay = tardiesItemized.length > 0 
+    const tardiesDisplay = tardiesItemized.length > 0
         ? `Tardies:\n${tardiesItemized.map(item => {
             const [name] = item.split(',');
             return `${name.replace(/"/g, '')}`;
         }).join('\n')}`
         : 'No tardies';
-    const absencesDisplay = absencesItemized.length > 0 
+    const absencesDisplay = absencesItemized.length > 0
         ? `Absences:\n${absencesItemized.map(item => {
             const [name] = item.split(',');
             return `${name.replace(/"/g, '')}`;
@@ -1629,7 +1643,6 @@ function exportScores() {
         : 'No absences';
     const separator = housePointsItemized.length === 0 && tardiesItemized.length === 0 && absencesItemized.length === 0 ? '\n' : '\n\n';
     const message = `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}\n\n${absencesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
-
     showCustomAlert(message);
     showTemporaryMessage('Scores exported as CSV');
     closeSpecificMenu('teacher-mode');

@@ -1551,16 +1551,6 @@ function exportScores() {
         });
     }
 
-    // Debug (you can remove this later)
-    console.log("=== PRODUCTION TECH EXPORT DEBUG ===");
-    console.table(studentsToExport.map(s => ({
-        name: s.name,
-        attendance: s.attendance,
-        score: s.score,
-        housePoints: s.housePoints || 0,
-        isSeniorProject: !!s.isSeniorProject
-    })));
-
     // Original detection logic
     let allAbsent = true;
     for (const student of studentsToExport) {
@@ -1572,7 +1562,6 @@ function exportScores() {
    
     if (allAbsent) {
         showTemporaryMessage('No changes detected—all students absent/EX. CSV not exported.');
-        console.warn("Export blocked - all students still show Absent/EX");
         return;
     }
 

@@ -275,9 +275,6 @@ function handleGlobalHotkeys(event) {
     const floatingMenu = document.getElementById('floating-menu');
     const teacherMode = document.getElementById('teacher-mode');
 
-    // === DEBUG LOGS ===
-    console.log(`[Hotkey] Key: ${event.key}, Meta: ${event.metaKey}, Ctrl: ${event.ctrlKey}, Code: ${event.code}`);
-
     // Allow Cmd + ArrowLeft / ArrowRight even if they're not in validKeys
     const isClassSwitch = event.metaKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight');
 
@@ -286,7 +283,6 @@ function handleGlobalHotkeys(event) {
                       'ArrowRight', 'Enter', 'h', '=', '+', '?'];
 
     if (!validKeys.includes(event.key) && !isClassSwitch) {
-        console.log(`[Hotkey] Ignored - not in validKeys and not class switch`);
         return;
     }
 
@@ -327,7 +323,6 @@ function handleGlobalHotkeys(event) {
         case 'ArrowLeft':
             if (event.metaKey) {
                 const direction = (event.code === 'ArrowRight') ? 1 : -1;
-                console.log(`[Hotkey] Cmd + ${event.code} → cycling ${direction > 0 ? 'forward' : 'backward'}`);
                 cycleClass(direction);
                 event.preventDefault();
             } else {

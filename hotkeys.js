@@ -286,9 +286,39 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    // === Random student logic (unchanged) ===
-    if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 && !event.metaKey && !event.ctrlKey) {
-        // ... your existing random student code ...
+if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 && !event.metaKey && !event.ctrlKey) {
+        // Filter students who are not marked as "EX" or "Absent" and not yet called
+        let eligibleStudents = students.filter(student => 
+            student.attendance !== "EX" && student.attendance !== "Absent" && !calledStudents.includes(student.name)
+        );
+
+        // If no eligible students are left, reset the called students list
+        if (eligibleStudents.length === 0) {
+            calledStudents = [];
+            // Repopulate with all students who are not "EX" or "Absent"
+            eligibleStudents = students.filter(student => 
+                student.attendance !== "EX" && student.attendance !== "Absent"
+            );
+        }
+
+        // Select a random student from eligible students
+        if (eligibleStudents.length > 0) {
+            const randomIndex = Math.floor(Math.random() * eligibleStudents.length);
+            const randomStudent = eligibleStudents[randomIndex];
+            if (randomStudent && randomStudent.name) {
+                // Add student to calledStudents *before* displaying to prevent re-selection
+                calledStudents.push(randomStudent.name);
+                const masterStudent = masterList.find(s => s.name === randomStudent.name);
+                const displayText = randomStudent.name; // Display the name field
+                const speechText = masterStudent && masterStudent.altName ? masterStudent.altName : randomStudent.name; // Speak the altName
+                displayStudentName(displayText);
+                const utterance = new SpeechSynthesisUtterance(speechText);
+                utterance.volume = 1.0;
+                utterance.rate = 1.25;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
         event.preventDefault();
         return;
     }

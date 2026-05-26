@@ -123,7 +123,7 @@ const productionTechStudents = [
 const productionTechTeacherModeOrder = ['Fiona', 'Jimmy', 'Kevin', 'Mia', 'Howard', 'Vlan', 'Zoe', 'Voorhis', 'Ming Hon', 'Kiki', 'Yolanda', 'Stella L', 'Angel', 'Vincent', 'Edward', 'Diego', 'Chloe', 'Jerry', 'Alfred', 'Angelina', 'Howen', 'Tommy', 'Shawn', 'Isaac', 'Hannah Z', 'Thomas'];
 
 
-const productionTechSeniorProjects = ['Kevin', 'Mia', 'Howard', 'Zoe', 'Vincent', 'Edward', 'Diego', 'Jerry', 'Howen', 'Shawn', 'Thomas']
+const productionTechSeniorProjects = ['Angelina','Jimmy','Kiki', 'Isaac', 'Kevin', 'Mia', 'Howard', 'Zoe', 'Vincent', 'Edward', 'Diego', 'Jerry', 'Howen', 'Shawn', 'Thomas']
 
 
 const msBandStudents = [

@@ -1441,6 +1441,19 @@ function toggleOverlay() {
 }
 
 
+function preloadHouseImages() {
+  const houses = ['red', 'blue', 'green', 'yellow'];
+  
+  // keep references so images stay cached
+  window.houseImages = window.houseImages || [];
+
+  houses.forEach(house => {
+    const img = new Image();
+    img.src = `images/${house}house.png`; // matches: images/bluehouse.png etc.
+    window.houseImages.push(img);
+  });
+}
+
 document.addEventListener('click', function(event) {
     if (menuStack.length === 0) return;
 
@@ -1481,6 +1494,7 @@ document.addEventListener('keydown', (event) => {
 }, true);
 
 window.onload = function() {
+    preloadHouseImages();
     currentClassIndex = getCurrentClass();
     updateClassDisplay();
     updateDateTime();

@@ -89,6 +89,37 @@ function playRandomSound(soundArray) {
     audio.play();
 }
 
+const instrumentColors = {
+  "Violin1":    { light: "#ee7471", dark: "#9f4e49" },
+  "Violin2":    { light: "#ef9491", dark: "#9a5c59" },
+  "Violin3":    { light: "#f1b28f", dark: "#9f6f4f" },
+  "Viola":      { light: "#add059", dark: "#6a8f2e" },
+  "Cello1":     { light: "#65b5ce", dark: "#3f7f91" },
+  "Cello2":     { light: "#71abdd", dark: "#3e6e91" },
+  "Contrabass": { light: "#dd865d", dark: "#8b5131" },
+  "Flute":      { light: "#a6d6ca", dark: "#6c8f86" },
+  "Clarinet":   { light: "#ceb5dc", dark: "#7f689a" },
+  "Oboe":       { light: "#ee64e0", dark: "#a03a9f" },
+  "Bassoon":    { light: "#cd30ae", dark: "#7f1e6f" },
+  "Alto Sax":   { light: "#569461", dark: "#3e7047" },
+  "Tenor Sax":  { light: "#5d863c", dark: "#486b2c" },
+  "Trumpet":    { light: "#d3574b", dark: "#8b3730" },
+  "Horn":       { light: "#c57025", dark: "#7f4712" },
+  "Trombone":   { light: "#925cb0", dark: "#5d3870" },
+  "Baritone":   { light: "#7d3f9f", dark: "#4b2463" },
+  "Tuba":       { light: "#627d92", dark: "#3e4f5a" },
+  "Percussion": { light: "#99a4a6", dark: "#5d6769" }
+};
+
+const instrumentPartOrder = [
+    "Violin1", "Violin2", "Violin3", "Viola",
+    "Cello1", "Cello2", "Contrabass",
+    "Flute", "Clarinet", "Oboe", "Bassoon",
+    "Alto Sax", "Tenor Sax",
+    "Trumpet", "Horn", "Trombone", "Baritone", "Tuba",
+    "Percussion"
+];
+
 const classes = [
     {
     name: "Production Tech",
@@ -244,19 +275,27 @@ function updateClassDisplay() {
     document.querySelector('#title h1').textContent = cls.name;
     document.querySelector('#timeRange').textContent = cls.timeRange;
 
+    let baseStudents;
+    let baseTeacherOrder;
+
     // Dynamic senior-project filtering only for Production Tech
     if (cls.name === "Production Tech" && cls.seniorProjects) {
         if (isSeniorProjectPeriod()) {
-            students = cls.fullStudentList.filter(s => !cls.seniorProjects.includes(s.name));
-            teacherModeOrder = cls.teacherModeOrder.filter(name => !cls.seniorProjects.includes(name));
+            baseStudents = cls.fullStudentList.filter(s => !cls.seniorProjects.includes(s.name));
+            baseTeacherOrder = cls.teacherModeOrder.filter(name => !cls.seniorProjects.includes(name));
         } else {
-            students = cls.fullStudentList.slice();               // all students visible
-            teacherModeOrder = productionTechTeacherModeOrder.slice(); // original full order
+            baseStudents = cls.fullStudentList.slice();
+            baseTeacherOrder = productionTechTeacherModeOrder.slice();
         }
     } else {
-        students = cls.students;
-        teacherModeOrder = cls.teacherModeOrder;
+        baseStudents = cls.students.slice();               // copy of original order
+        baseTeacherOrder = cls.teacherModeOrder.slice();   // copy of original teacher order
     }
+
+    // Intelligent instrumentPart sorting for bar graph + teacher mode
+    // (students without instrumentPart keep original relative order and appear after)
+    students = sortByInstrumentPart(baseStudents, false);
+    teacherModeOrder = sortByInstrumentPart(baseTeacherOrder, true);
 
     currentCriteria = cls.criteria;
     loadObjectives(cls.objectivesKey);
@@ -651,6 +690,53 @@ function getHouseColor(house) {
     }
 }
 
+function sortByInstrumentPart(baseList, isNameArray = false) {
+    // Returns a new array sorted by:
+    // 1. instrumentPart (using instrumentPartOrder)
+    // 2. chair number (lower chair first) within the same instrumentPart
+    // 3. original index as final tie-breaker (stable)
+    // Students without a recognized instrumentPart appear after all instrumented students.
+
+    const withIndex = baseList.map((item, idx) => {
+        const name = isNameArray ? item : item.name;
+        const master = masterList.find(s => s.name === name);
+        const part = master && master.instrumentPart ? master.instrumentPart : null;
+        const partIndex = part ? instrumentPartOrder.indexOf(part) : -1;
+
+        // chair is stored as string ("1", "2", "3"…); treat missing as a very large number
+        let chairNum = Infinity;
+        if (master && master.chair !== undefined && master.chair !== null && master.chair !== "") {
+            const parsed = parseInt(master.chair, 10);
+            if (!isNaN(parsed)) chairNum = parsed;
+        }
+
+        return { item, originalIndex: idx, partIndex, chairNum };
+    });
+
+    withIndex.sort((a, b) => {
+        // Both have a recognized instrumentPart
+        if (a.partIndex !== -1 && b.partIndex !== -1) {
+            if (a.partIndex !== b.partIndex) {
+                return a.partIndex - b.partIndex;          // different parts → instrument order
+            }
+            // same part → sort by chair (lower number first)
+            if (a.chairNum !== b.chairNum) {
+                return a.chairNum - b.chairNum;
+            }
+            // same chair (or both missing) → original order
+            return a.originalIndex - b.originalIndex;
+        }
+        // Only a has instrument → a first
+        if (a.partIndex !== -1) return -1;
+        // Only b has instrument → b first
+        if (b.partIndex !== -1) return 1;
+        // Neither has instrument → keep original relative order
+        return a.originalIndex - b.originalIndex;
+    });
+
+    return withIndex.map(entry => entry.item);
+}
+
 function toggleTeacherMode() {
     const teacherMode = document.getElementById('teacher-mode');
     if (teacherMode.style.display === 'block') {
@@ -777,6 +863,10 @@ function updateScoreDisplay(student) {
             bar.classList.remove('bdaycolorful');
         }
         bar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
+
+        // Keep / re-apply instrument color
+        applyBarColor(bar, student);
+
         const houseInfo = masterList.find(s => s.name === student.name);
         const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
         if (student.score === 'EX') {
@@ -918,6 +1008,10 @@ function createBars() {
         bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
         bar.id = `bar-${student.name}`;
         bar.dataset.studentName = student.name;
+
+        // Apply instrument-based color (or fallback)
+        applyBarColor(bar, student);
+
         const houseInfo = masterList.find(s => s.name === student.name);
         const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
         bar.innerHTML = `
@@ -1381,6 +1475,26 @@ function applyHousePointsChange() {
     deactivateHouseshield();
 }
 
+function applyBarColor(bar, student) {
+    const cls = classes[currentClassIndex];
+    const noInstrumentColorClasses = ["Tech Theater", "AP Music Theory", "Production Tech"];
+
+    // Force standard blue for these classes
+    if (noInstrumentColorClasses.includes(cls.name)) {
+        bar.style.background = "linear-gradient(to top, #3378a6, #52a6df)";
+        return;
+    }
+
+    const master = masterList.find(s => s.name === student.name);
+    if (master && master.instrumentPart && instrumentColors[master.instrumentPart]) {
+        const c = instrumentColors[master.instrumentPart];
+        bar.style.background = `linear-gradient(to top, ${c.dark}, ${c.light})`;
+    } else {
+        // fallback to original CSS gradient
+        bar.style.background = "linear-gradient(to top, #3378a6, #52a6df)";
+    }
+}
+
 function deactivateHouseshield() {
     const houseshield = document.getElementById('houseshield');
     const points = document.getElementById('points');
@@ -1546,11 +1660,10 @@ function exportScores() {
             }
         });
     } 
-        else if (isProductionTech && currentClass.fullStudentList) {
+    else if (isProductionTech && currentClass.fullStudentList) {
         studentsToExport = currentClass.fullStudentList.map(fullStudent => {
             const name = fullStudent.name;
 
-            // Only treat as senior-project (force EX) during the designated window
             if (isSeniorProjectPeriod() && currentClass.seniorProjects.includes(name)) {
                 return {
                     name: name,
@@ -1566,7 +1679,6 @@ function exportScores() {
                 };
             }
 
-            // Normal behaviour on every other date
             const visibleStudent = students.find(s => s.name === name);
             if (visibleStudent) {
                 return {
@@ -1578,8 +1690,17 @@ function exportScores() {
             return { ...fullStudent };
         });
     }
+    else {
+        // For regular band classes: export in the original definition order (not the instrument-sorted display order)
+        studentsToExport = currentClass.students.slice();
+        // Overlay current live values onto the original-order list
+        studentsToExport = studentsToExport.map(orig => {
+            const live = students.find(s => s.name === orig.name);
+            return live ? { ...live } : { ...orig };
+        });
+    }
 
-    // Original detection logic
+    // ==================== ORIGINAL CSV LOGIC FROM HERE DOWN (unchanged) ====================
     let allAbsent = true;
     for (const student of studentsToExport) {
         if (student.attendance !== 'Absent' || student.score !== 'EX') {
@@ -1593,7 +1714,6 @@ function exportScores() {
         return;
     }
 
-    // ==================== YOUR ORIGINAL CSV CODE FROM HERE DOWN ====================
     const regularStudents = studentsToExport.filter(s => !s.isAdditional);
     const additionalStudents = studentsToExport.filter(s => s.isAdditional);
     const headers = ['Name', ...regularStudents.map(student => `"${student.name}"`)];

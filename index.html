@@ -207,6 +207,15 @@ let currentCriteria = classes[0].criteria;
 let isObjectiveInputFocused = false;
 let isAddingStudent = false;
 
+function isSeniorProjectPeriod() {
+    const now = new Date();
+    const start = new Date(2027, 3, 5);   // April 5, 2027
+    const end   = new Date(2027, 6, 11);  // July 11, 2027
+    // include the whole end day
+    end.setHours(23, 59, 59, 999);
+    return now >= start && now <= end;
+}
+
 function getCurrentClass() {
     const now = new Date();
     const currentHour = now.getHours();
@@ -234,8 +243,21 @@ function updateClassDisplay() {
     const cls = classes[currentClassIndex];
     document.querySelector('#title h1').textContent = cls.name;
     document.querySelector('#timeRange').textContent = cls.timeRange;
-    students = cls.students;
-    teacherModeOrder = cls.teacherModeOrder;
+
+    // Dynamic senior-project filtering only for Production Tech
+    if (cls.name === "Production Tech" && cls.seniorProjects) {
+        if (isSeniorProjectPeriod()) {
+            students = cls.fullStudentList.filter(s => !cls.seniorProjects.includes(s.name));
+            teacherModeOrder = cls.teacherModeOrder.filter(name => !cls.seniorProjects.includes(name));
+        } else {
+            students = cls.fullStudentList.slice();               // all students visible
+            teacherModeOrder = productionTechTeacherModeOrder.slice(); // original full order
+        }
+    } else {
+        students = cls.students;
+        teacherModeOrder = cls.teacherModeOrder;
+    }
+
     currentCriteria = cls.criteria;
     loadObjectives(cls.objectivesKey);
     createBars();
@@ -1325,11 +1347,11 @@ function activateHouseshield() {
         return;
     }
     if (houseshield) {
-        houseshield.style.backgroundImage = `url('https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${houseInfo.house.toLowerCase()}.png')`;
+        houseshield.style.backgroundImage = `url('images/${houseInfo.house.toLowerCase()}house.png')`;
         houseshield.style.display = 'block';
         void houseshield.offsetWidth;
         houseshield.classList.add('active');
-    }
+        }
     if (points) {
         points.classList.add('active');
     }
@@ -1518,11 +1540,12 @@ function exportScores() {
             }
         });
     } 
-    else if (isProductionTech && currentClass.fullStudentList) {
+        else if (isProductionTech && currentClass.fullStudentList) {
         studentsToExport = currentClass.fullStudentList.map(fullStudent => {
             const name = fullStudent.name;
 
-            if (currentClass.seniorProjects.includes(name)) {
+            // Only treat as senior-project (force EX) during the designated window
+            if (isSeniorProjectPeriod() && currentClass.seniorProjects.includes(name)) {
                 return {
                     name: name,
                     attendance: 'Absent',
@@ -1537,16 +1560,15 @@ function exportScores() {
                 };
             }
 
-            // Find the matching visible student by name and copy its current state
+            // Normal behaviour on every other date
             const visibleStudent = students.find(s => s.name === name);
             if (visibleStudent) {
                 return {
                     ...visibleStudent,
-                    name: name   // ensure name is correct
+                    name: name
                 };
             }
 
-            // Fallback - use the original fullStudent object
             return { ...fullStudent };
         });
     }

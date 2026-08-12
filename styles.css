@@ -625,8 +625,8 @@ background-color: #f0f0f0;
     bottom: -200px;
     left: 50%;
     transform: translateX(-50%);
-    width: 100px;
-    height: 120px;
+    width: 200px;
+    height: 240px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -638,14 +638,14 @@ background-color: #f0f0f0;
 }
 
 #houseshield.active {
-    bottom: calc(50% - 60px); /* Adjusted to center vertically, accounting for height */
+    bottom: calc(50% - 50px); /* Adjusted to center vertically, accounting for height */
     transform: translateX(-50%);
     opacity: 1;
 }
 
 #points {
     width: 100px;
-    transform: translate(calc(-50% + 49px), calc(50% + 5px));
+    transform: translate(calc(-50% + 98px), calc(50% + 65px));
     font-size: 36px;
     font-weight: bold;
     text-align: center;

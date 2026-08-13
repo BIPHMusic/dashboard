@@ -53,10 +53,10 @@ const masterList = [
     //HS Band
     {"name": "Anne", "liveschoolName": "Anne Jiayue An", "house": "Green", "birthdate": "2011-06-13", "altName": "Anne", "instrumentPart": "Trumpet", "chair": "4"},
     {"name": "Tyler", "liveschoolName": "Tyler Xiang Li", "house": "Red", "birthdate": "2011-12-28", "altName": "Tyler", "instrumentPart": "Clarinet", "chair": "4"},
-    {"name": "Ricky L", "liveschoolName": "Ricky Ruiqi Lu", "house": "", "birthdate": "", "altName": "Ricky", "instrumentPart": "Percussion", "chair": "99"},
+    {"name": "Ricky L", "liveschoolName": "Ricky Ruiqi Lu", "house": "Green", "birthdate": "", "altName": "Ricky", "instrumentPart": "Percussion", "chair": "99"},
     {"name": "June", "liveschoolName": "June Ziqiao Qin", "house": "Blue", "birthdate": "2011-06-18", "altName": "June", "instrumentPart": "Flute", "chair": "3"},
     {"name": "Sophie G", "liveschoolName": "Sophie Geng", "house": "Blue", "birthdate": "2012-05-14", "altName": "Sophie", "instrumentPart": "Horn", "chair": "2"},
-    {"name": "Jesse", "liveschoolName": "", "house": "", "birthdate": "", "altName": "Jesse", "instrumentPart": "Percussion", "chair": "99"},
+    {"name": "Jesse", "liveschoolName": "Jesse Junxi Zeng", "house": "Blue", "birthdate": "", "altName": "Jesse", "instrumentPart": "Percussion", "chair": "99"},
 
 
     //all others
@@ -93,8 +93,8 @@ const masterList = [
     {"name": "Odelia", "liveschoolName": "Odelia Yunhan Xie", "house": "Green", "birthdate": "", "altName": "Odelia", "instrumentPart": "Violin3", "chair": "3"},
 ];
 
-const productionTechStudents = [
-    'Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky L', 'Vlan', 'Sophie G'
+const techTheaterStudents = [
+    'Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -110,10 +110,10 @@ const productionTechStudents = [
     };
 });
 
-const productionTechTeacherModeOrder = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z'];
+const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z'];
 
 
-const productionTechSeniorProjects = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z']
+const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z']
 
 
 

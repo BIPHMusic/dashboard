@@ -122,18 +122,18 @@ const instrumentPartOrder = [
 
 const classes = [
     {
-    name: "Production Tech",
+    name: "Tech Theater",
     timeRange: "10:45 - 11:35",
     days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
     startTime: { hours: 10, minutes: 45 },
     endTime: { hours: 11, minutes: 35 },
     
-    fullStudentList: productionTechStudents,           // ← full list for export order
-    students: productionTechStudents.filter(s => !productionTechSeniorProjects.includes(s.name)),  // visible only
-    teacherModeOrder: productionTechTeacherModeOrder.filter(name => !productionTechSeniorProjects.includes(name)),
-    seniorProjects: productionTechSeniorProjects,
+    fullStudentList: techTheaterStudents,           // ← full list for export order
+    students: techTheaterStudents.filter(s => !techTheaterSeniorProjects.includes(s.name)),  // visible only
+    teacherModeOrder: techTheaterTeacherModeOrder.filter(name => !techTheaterSeniorProjects.includes(name)),
+    seniorProjects: techTheaterSeniorProjects,
 
-    objectivesKey: "productionTechObjectives",
+    objectivesKey: "techTheaterObjectives",
     defaultObjectives: [
         'Review',
         'Group Work',
@@ -278,14 +278,14 @@ function updateClassDisplay() {
     let baseStudents;
     let baseTeacherOrder;
 
-    // Dynamic senior-project filtering only for Production Tech
-    if (cls.name === "Production Tech" && cls.seniorProjects) {
+    // Dynamic senior-project filtering only for Tech Theater
+    if (cls.name === "Tech Theater" && cls.seniorProjects) {
         if (isSeniorProjectPeriod()) {
             baseStudents = cls.fullStudentList.filter(s => !cls.seniorProjects.includes(s.name));
             baseTeacherOrder = cls.teacherModeOrder.filter(name => !cls.seniorProjects.includes(name));
         } else {
             baseStudents = cls.fullStudentList.slice();
-            baseTeacherOrder = productionTechTeacherModeOrder.slice();
+            baseTeacherOrder = techTheaterTeacherModeOrder.slice();
         }
     } else {
         baseStudents = cls.students.slice();               // copy of original order
@@ -603,14 +603,14 @@ function closeSpecificMenu(menuId) {
 
 function populateStudents() {
     const spreadsheet = document.querySelector('.spreadsheet');
-    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    const istechTheater = classes[currentClassIndex].name === "Tech Theater";
     spreadsheet.innerHTML = `
         <div class="spreadsheet-header"><strong>Student</strong></div>
         <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
-        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[0]}')">${isProductionTech ? 'Devices' : 'Stands'}</strong></div>
-        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[1]}')">${isProductionTech ? 'Engagement' : 'Intonation'}</strong></div>
-        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[2]}')">${isProductionTech ? 'Review' : 'Returned'}</strong></div>
-        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[3]}')">${isProductionTech ? 'Progress' : 'Engagement'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[0]}')">${istechTheater ? 'Devices' : 'Stands'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[1]}')">${istechTheater ? 'Engagement' : 'Intonation'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[2]}')">${istechTheater ? 'Review' : 'Returned'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[3]}')">${istechTheater ? 'Progress' : 'Engagement'}</strong></div>
         <div class="spreadsheet-header"><strong>Participation</strong></div>
         <div class="spreadsheet-header"><strong>House Points</strong></div>
     `;
@@ -939,7 +939,7 @@ function updateFloatingMenu(student) {
     }
 
     setTimeout(() => {
-        const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+        const istechTheater = classes[currentClassIndex].name === "Tech Theater";
         const attendanceSelect = floatingMenu.querySelector('select');
         if (attendanceSelect) {
             attendanceSelect.value = student.attendance;
@@ -967,6 +967,262 @@ function updateFloatingMenu(student) {
             housePointsSpan.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
         }
     }, 100);
+}
+
+function getStudentsByPart(part) {
+    return students.filter(s => {
+        const m = masterList.find(ms => ms.name === s.name);
+        return m && m.instrumentPart === part;
+    });
+}
+
+function showInstrumentPartMenu(part) {
+    const floatingMenu = document.getElementById('floating-menu');
+    const matchingStudents = getStudentsByPart(part);
+    if (matchingStudents.length === 0) return;
+
+    currentStudentIndex = -1;
+    floatingMenu.dataset.instrumentPart = part;
+
+    const allHave = (prop) => matchingStudents.every(s => s[prop]);
+    const someHave = (prop) => matchingStudents.some(s => s[prop]);
+
+    let commonAttendance = matchingStudents[0].attendance;
+    if (!matchingStudents.every(s => s.attendance === commonAttendance)) {
+        commonAttendance = 'Present';
+    }
+
+    const numericScores = matchingStudents.filter(s => typeof s.score === 'number').map(s => s.score);
+    const avgScore = numericScores.length
+        ? Math.round(numericScores.reduce((a, b) => a + b, 0) / numericScores.length)
+        : 'EX';
+    const houseSum = matchingStudents.reduce((sum, s) => sum + (s.housePoints || 0), 0);
+
+    floatingMenu.innerHTML = `
+        <span class="close-button" onclick="closeTopMenu()">&times;</span>
+        <h3>${part} (${matchingStudents.length})</h3>
+        <div class="checkbox-row">
+            <select class="attendance-dropdown-select ${commonAttendance.toLowerCase()}" onchange="setAttendanceForInstrumentPart('${part}', this.value)">
+                <option value="Absent" ${commonAttendance === 'Absent' ? 'selected' : ''}>Absent</option>
+                <option value="Present" ${commonAttendance === 'Present' ? 'selected' : ''}>Present</option>
+                <option value="Tardy" ${commonAttendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+            </select>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${allHave(currentCriteria[0]) ? 'checked' : ''} onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[0]}', this.checked)"> Stands</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${allHave(currentCriteria[1]) ? 'checked' : ''} onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[1]}', this.checked)"> Intonation</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${allHave(currentCriteria[2]) ? 'checked' : ''} onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[2]}', this.checked)"> Returned</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${allHave(currentCriteria[3]) ? 'checked' : ''} onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[3]}', this.checked)"> Engagement</label>
+        </div>
+        <div class="stepper">
+            <button onclick="updateScoreForInstrumentPart('${part}', -10)">-</button>
+            <span class="score">${avgScore === 'EX' ? 'EX' : avgScore + '%'}</span>
+            <button onclick="updateScoreForInstrumentPart('${part}', 10)">+</button>
+        </div>
+        <div class="stepper">
+            <span>House Points</span>
+            <button onclick="updateHousePointsForInstrumentPart('${part}', -10)">-</button>
+            <span>${houseSum > 0 ? '+' : ''}${houseSum}</span>
+            <button onclick="updateHousePointsForInstrumentPart('${part}', 10)">+</button>
+        </div>
+        <button onclick="closeFloatingMenu()">Close</button>
+    `;
+
+    // Set indeterminate state for mixed checkboxes
+    currentCriteria.forEach(crit => {
+        const cb = floatingMenu.querySelector(`#checkbox-${crit}`);
+        if (cb) {
+            cb.indeterminate = someHave(crit) && !allHave(crit);
+        }
+    });
+
+    floatingMenu.style.left = `50%`;
+    floatingMenu.style.top = `50%`;
+    openMenu('floating-menu');
+
+    // Highlight all bars belonging to this instrument part
+    resetBarHighlights();
+    matchingStudents.forEach(s => {
+        const bar = document.getElementById(`bar-${s.name}`);
+        if (bar) {
+            bar.style.opacity = '1';
+            const nameSpan = bar.querySelector('.main-labels span:first-child');
+            if (nameSpan) nameSpan.style.fontWeight = 'bold';
+        }
+    });
+    document.querySelectorAll('.bar').forEach(bar => {
+        if (!matchingStudents.some(s => bar.id === `bar-${s.name}`)) {
+            bar.style.opacity = '0.7';
+        }
+    });
+}
+
+function setAttendanceForInstrumentPart(part, value) {
+    const matching = getStudentsByPart(part);
+    matching.forEach(s => {
+        s.attendance = value;
+        calculateScore(s);
+        updateScoreDisplay(s);
+        updateTardyLabel(s);
+        updateBarGraph(s);
+        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${s.name}"]`);
+        if (teacherRow) {
+            const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+            if (attendanceSelect) {
+                attendanceSelect.value = s.attendance;
+                attendanceSelect.classList.remove('present', 'tardy', 'absent');
+                attendanceSelect.classList.add(s.attendance.toLowerCase());
+            }
+            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = s.attendance === 'Absent';
+            });
+        }
+    });
+    updateInstrumentPartMenu(part);
+}
+
+function toggleCheckboxForInstrumentPart(part, type, forceValue = null) {
+    const matching = getStudentsByPart(part);
+    let target;
+    if (forceValue !== null) {
+        target = forceValue;
+    } else {
+        target = !matching.every(s => s[type]);
+    }
+    matching.forEach(s => {
+        if (s.attendance !== 'Absent') {
+            s[type] = target;
+            calculateScore(s);
+            updateScoreDisplay(s);
+            updateBarGraph(s);
+            updateTeacherMenu(s);
+        }
+    });
+    updateInstrumentPartMenu(part);
+}
+
+function cycleAttendanceForInstrumentPart(part) {
+    const matching = getStudentsByPart(part);
+    if (matching.length === 0) return;
+    const options = ['Present', 'Tardy', 'Absent'];
+    const current = matching[0].attendance;
+    const nextIndex = (options.indexOf(current) + 1) % options.length;
+    const next = options[nextIndex];
+    matching.forEach(s => {
+        s.attendance = next;
+        calculateScore(s);
+        updateScoreDisplay(s);
+        updateTardyLabel(s);
+        updateBarGraph(s);
+        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${s.name}"]`);
+        if (teacherRow) {
+            const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+            if (attendanceSelect) {
+                attendanceSelect.value = s.attendance;
+                attendanceSelect.classList.remove('present', 'tardy', 'absent');
+                attendanceSelect.classList.add(s.attendance.toLowerCase());
+            }
+            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = s.attendance === 'Absent';
+            });
+        }
+    });
+    updateInstrumentPartMenu(part);
+}
+
+function updateScoreForInstrumentPart(part, change) {
+    const matching = getStudentsByPart(part);
+    let soundPlayed = false;
+    matching.forEach(s => {
+        if (s.score !== 'EX') {
+            const oldScore = s.score;
+            const newScore = Math.max(0, Math.min(100, s.score + change));
+            if (newScore !== oldScore) {
+                s.manualAdjustment = (s.manualAdjustment || 0) + (newScore - oldScore);
+                s.score = newScore;
+                const bar = document.getElementById(`bar-${s.name}`);
+                if (bar) {
+                    bar.style.height = `${s.score}%`;
+                    bar.style.setProperty('--flash-color', change > 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
+                    bar.classList.remove('flash-animation');
+                    void bar.offsetWidth;
+                    bar.classList.add('flash-animation');
+                }
+                updateScoreDisplay(s);
+                if (!soundPlayed) {
+                    if (change > 0) {
+                        playRandomSound(positiveEffects);
+                    } else {
+                        if (newScore === 0) {
+                            const audio = new Audio(negativeEffect0);
+                            audio.play();
+                        } else if (newScore >= 50) {
+                            playRandomSound(negativeEffects50Plus);
+                        } else if (newScore >= 10) {
+                            playRandomSound(negativeEffects10to50);
+                        }
+                    }
+                    soundPlayed = true;
+                }
+            }
+        }
+    });
+    updateInstrumentPartMenu(part);
+}
+
+function updateHousePointsForInstrumentPart(part, change) {
+    getStudentsByPart(part).forEach(s => {
+        updateHousePoints(s.name, change);
+    });
+    updateInstrumentPartMenu(part);
+}
+
+function updateInstrumentPartMenu(part) {
+    const floatingMenu = document.getElementById('floating-menu');
+    if (!floatingMenu || floatingMenu.style.display !== 'block' || floatingMenu.dataset.instrumentPart !== part) {
+        return;
+    }
+    const matching = getStudentsByPart(part);
+    if (matching.length === 0) return;
+
+    const allHave = (prop) => matching.every(s => s[prop]);
+    const someHave = (prop) => matching.some(s => s[prop]);
+
+    let commonAttendance = matching[0].attendance;
+    const allSameAttendance = matching.every(s => s.attendance === commonAttendance);
+    if (!allSameAttendance) {
+        commonAttendance = null;
+    }
+
+    const attSelect = floatingMenu.querySelector('select');
+    if (attSelect && commonAttendance) {
+        attSelect.value = commonAttendance;
+        attSelect.classList.remove('present', 'tardy', 'absent');
+        attSelect.classList.add(commonAttendance.toLowerCase());
+    }
+
+    currentCriteria.forEach(crit => {
+        const cb = floatingMenu.querySelector(`#checkbox-${crit}`);
+        if (cb) {
+            cb.checked = allHave(crit);
+            cb.indeterminate = someHave(crit) && !allHave(crit);
+        }
+    });
+
+    const numericScores = matching.filter(s => typeof s.score === 'number').map(s => s.score);
+    const avgScore = numericScores.length
+        ? Math.round(numericScores.reduce((a, b) => a + b, 0) / numericScores.length)
+        : 'EX';
+    const scoreSpan = floatingMenu.querySelector('.stepper .score');
+    if (scoreSpan) {
+        scoreSpan.textContent = avgScore === 'EX' ? 'EX' : `${avgScore}%`;
+    }
+
+    const houseSum = matching.reduce((sum, s) => sum + (s.housePoints || 0), 0);
+    const houseValueSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
+    if (houseValueSpan) {
+        houseValueSpan.textContent = houseSum > 0 ? `+${houseSum}` : houseSum;
+    }
 }
 
 function updateTardyLabel(student) {
@@ -1122,11 +1378,14 @@ function navigateStudentMenu(direction) {
 function showFloatingMenu(event, studentName) {
     const floatingMenu = document.getElementById('floating-menu');
     const student = students.find(s => s.name === studentName);
-    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    const istechTheater = classes[currentClassIndex].name === "Tech Theater";
     currentStudentIndex = students.findIndex(s => s.name === studentName);
     if (currentStudentIndex === -1) {
         return;
     }
+    // Clear any previous instrument-part group mode
+    delete floatingMenu.dataset.instrumentPart;
+
     const isAbsent = student.attendance === 'Absent';
     floatingMenu.innerHTML = `
         <span class="close-button" onclick="closeTopMenu()">&times;</span>
@@ -1137,10 +1396,10 @@ function showFloatingMenu(event, studentName) {
                 <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
                 <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
             </select>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${isProductionTech ? 'Devices' : 'Stands'}</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${isProductionTech ? 'Engagement' : 'Intonation'}</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${isProductionTech ? 'Review' : 'Returned'}</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${isProductionTech ? 'Progress' : 'Engagement'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${istechTheater ? 'Devices' : 'Stands'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${istechTheater ? 'Engagement' : 'Intonation'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${istechTheater ? 'Review' : 'Returned'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${istechTheater ? 'Progress' : 'Engagement'}</label>
         </div>
         <div class="stepper">
             <button onclick="updateScore('${student.name}', -10)">-</button>
@@ -1155,8 +1414,6 @@ function showFloatingMenu(event, studentName) {
         </div>
         <button onclick="closeFloatingMenu()">Close</button>
     `;
-    const menuWidth = floatingMenu.offsetWidth;
-    const menuHeight = floatingMenu.offsetHeight;
     floatingMenu.style.left = `50%`;
     floatingMenu.style.top = `50%`;
     openMenu('floating-menu');
@@ -1373,9 +1630,11 @@ function updateSearchResults(query) {
             student.name.toLowerCase().includes(query.toLowerCase())
         );
     }
+
     matchingStudents.forEach((student, index) => {
         const result = document.createElement('div');
         result.textContent = student.name;
+        result.dataset.type = 'student';
         result.className = index === 0 ? 'selected' : '';
         result.onclick = () => {
             if (isAddingStudent) {
@@ -1387,6 +1646,36 @@ function updateSearchResults(query) {
         };
         searchResults.appendChild(result);
     });
+
+    // Instrument part search (only for band classes, normal search mode)
+    if (!isAddingStudent) {
+        const cls = classes[currentClassIndex];
+        if (cls.name !== "Tech Theater") {
+            const presentParts = new Set();
+            students.forEach(s => {
+                const m = masterList.find(ms => ms.name === s.name);
+                if (m && m.instrumentPart && instrumentPartOrder.includes(m.instrumentPart)) {
+                    presentParts.add(m.instrumentPart);
+                }
+            });
+            const matchingParts = Array.from(presentParts)
+                .filter(p => p.toLowerCase().includes(query.toLowerCase()))
+                .sort((a, b) => instrumentPartOrder.indexOf(a) - instrumentPartOrder.indexOf(b));
+
+            matchingParts.forEach((part, index) => {
+                const result = document.createElement('div');
+                result.textContent = part;
+                result.dataset.type = 'part';
+                result.className = (matchingStudents.length === 0 && index === 0) ? 'selected' : '';
+                result.onclick = () => {
+                    showInstrumentPartMenu(part);
+                    closeSearchBox();
+                };
+                searchResults.appendChild(result);
+            });
+        }
+    }
+
     const addStudentOption = document.getElementById('add-student-option');
     if (addStudentOption) {
         addStudentOption.style.display = 'none';
@@ -1477,7 +1766,7 @@ function applyHousePointsChange() {
 
 function applyBarColor(bar, student) {
     const cls = classes[currentClassIndex];
-    const noInstrumentColorClasses = ["Tech Theater", "AP Music Theory", "Production Tech"];
+    const noInstrumentColorClasses = ["Tech Theater", "AP Music Theory", "Tech Theater"];
 
     // Force standard blue for these classes
     if (noInstrumentColorClasses.includes(cls.name)) {
@@ -1628,7 +1917,7 @@ function exportScores() {
     let studentsToExport = students;
     const currentClass = classes[currentClassIndex];
     const isMsBandThursday = currentClass.name === "MS Band ᵀᴴᵁᴿˢ";
-    const isProductionTech = currentClass.name === "Production Tech";
+    const istechTheater = currentClass.name === "Tech Theater";
 
     if (isMsBandThursday) {
         studentsToExport = msBandStudents.map(student => {
@@ -1660,7 +1949,7 @@ function exportScores() {
             }
         });
     } 
-    else if (isProductionTech && currentClass.fullStudentList) {
+    else if (istechTheater && currentClass.fullStudentList) {
         studentsToExport = currentClass.fullStudentList.map(fullStudent => {
             const name = fullStudent.name;
 

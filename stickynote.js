@@ -14,7 +14,8 @@ const STICKY_NOTES_CONFIG = [
         forWhichClasses: ["MS Band"],           // ← only regular MS Band (Mon/Wed)
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
-        textContent: 'Don\'t forget to join a HS session this week 💡',
+        textContent: 'Make all arrangements to have instruments next week',
+        // Don\'t forget to join a HS session this week 💡
         imageSrc: '',
         backgroundColor: '#ff9999', // red
     },
@@ -24,17 +25,18 @@ const STICKY_NOTES_CONFIG = [
         forWhichClasses: ["MS Band ᵀᴴᵁᴿˢ"],    // ← only Thursday
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
-        textContent: 'Last day to join HS! Don\'t forget! 💡',
+        textContent: 'Make all arrangements to have instruments next week',
+        // Last day to join HS! Don\'t forget! 💡
         imageSrc: '',
         backgroundColor: '#ff9999', // red
     },
 
     {
-        id: 'PRODUCTION TECH', 
-        forWhichClasses: ["Production Tech"], 
+        id: 'TECH THEATER', 
+        forWhichClasses: ["Tech Theater"], 
         position: { x: 200, y: 200 }, 
         dimensions: { width: 230, height: 150 }, 
-        textContent: 'If you need to make an event request to reserve a space, let me know.', 
+        textContent: 'Macbook check', 
         imageSrc: '',
         backgroundColor: '#ff9999', 
     },

@@ -15,13 +15,13 @@ const hotkeys = [
 let calledStudents = [];
 
 function getMenuHotkeys() {
-    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    const isTechTheater = classes[currentClassIndex].name === "Tech Theater";
     return [
         { key: "a", description: "Toggle Attendance." },
-        { key: isProductionTech ? "d" : "s", description: `Toggle ${isProductionTech ? 'Devices' : 'Stands'} checkbox(es).` },
-        { key: isProductionTech ? "e" : "i", description: `Toggle ${isProductionTech ? 'Engagement' : 'intonation'} checkbox(es).` },
-        { key: isProductionTech ? "r" : "r", description: `Toggle ${isProductionTech ? 'Review' : 'Returned'} checkbox(es).` },
-        { key: isProductionTech ? "p" : "e", description: `Toggle ${isProductionTech ? 'Progress' : 'Engagement'} checkbox(es).` },
+        { key: isTechTheater ? "d" : "s", description: `Toggle ${isTechTheater ? 'Devices' : 'Stands'} checkbox(es).` },
+        { key: isTechTheater ? "e" : "i", description: `Toggle ${isTechTheater ? 'Engagement' : 'intonation'} checkbox(es).` },
+        { key: isTechTheater ? "r" : "r", description: `Toggle ${isTechTheater ? 'Review' : 'Returned'} checkbox(es).` },
+        { key: isTechTheater ? "p" : "e", description: `Toggle ${isTechTheater ? 'Progress' : 'Engagement'} checkbox(es).` },
         { key: "h", description: "Toggle House Shield." },
         { key: "Esc", description: "Close current window or House Shield." }
     ];
@@ -55,6 +55,36 @@ function handleHouseShieldHotkey(event) {
 function handleFloatingMenuHotkeys(event, studentName) {
     if (window.isObjectiveInputFocused) return;
 
+    const floatingMenu = document.getElementById('floating-menu');
+    const part = floatingMenu ? floatingMenu.dataset.instrumentPart : null;
+
+    if (part) {
+        // Group (instrument part) mode
+        switch (event.key) {
+            case 'a':
+                cycleAttendanceForInstrumentPart(part);
+                break;
+            case 's':
+                toggleCheckboxForInstrumentPart(part, 'stands');
+                break;
+            case 'i':
+                toggleCheckboxForInstrumentPart(part, 'intonation');
+                break;
+            case 'r':
+                toggleCheckboxForInstrumentPart(part, 'returned');
+                break;
+            case 'e':
+                toggleCheckboxForInstrumentPart(part, 'engagement');
+                break;
+            case 'h':
+                // House shield not supported for groups
+                break;
+        }
+        updateInstrumentPartMenu(part);
+        return;
+    }
+
+    // Original single-student logic
     const student = students.find(s => s.name === studentName);
     if (!student) return;
 
@@ -62,23 +92,23 @@ function handleFloatingMenuHotkeys(event, studentName) {
         currentStudentIndex = students.findIndex(s => s.name === studentName);
     }
 
-    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    const isTechTheater = classes[currentClassIndex].name === "Tech Theater";
     
     switch (event.key) {
         case 'a':
             cycleAttendanceForStudent(student);
             break;
-        case isProductionTech ? 'd' : 's':
-            toggleCheckboxForStudent(student, isProductionTech ? 'devices' : 'stands');
+        case isTechTheater ? 'd' : 's':
+            toggleCheckboxForStudent(student, isTechTheater ? 'devices' : 'stands');
             break;
-        case isProductionTech ? 'e' : 'i':
-            toggleCheckboxForStudent(student, isProductionTech ? 'engagement' : 'intonation');
+        case isTechTheater ? 'e' : 'i':
+            toggleCheckboxForStudent(student, isTechTheater ? 'engagement' : 'intonation');
             break;
         case 'r':
-            toggleCheckboxForStudent(student, isProductionTech ? 'review' : 'returned');
+            toggleCheckboxForStudent(student, isTechTheater ? 'review' : 'returned');
             break;
-        case isProductionTech ? 'p' : 'e':
-            toggleCheckboxForStudent(student, isProductionTech ? 'progress' : 'engagement');
+        case isTechTheater ? 'p' : 'e':
+            toggleCheckboxForStudent(student, isTechTheater ? 'progress' : 'engagement');
             break;
         case 'h':
             toggleHouseShield();
@@ -122,11 +152,16 @@ function handleSearchBoxKeys(event) {
         case 'Enter':
             event.preventDefault();
             if (results[selectedIndex]) {
-                const studentName = results[selectedIndex].textContent;
+                const item = results[selectedIndex];
+                const type = item.dataset.type;
+                const value = item.textContent;
                 if (isAddingStudent) {
-                    addStudent(studentName);
+                    addStudent(value);
+                } else if (type === 'part') {
+                    showInstrumentPartMenu(value);
+                    closeSearchBox();
                 } else {
-                    showFloatingMenu(null, studentName);
+                    showFloatingMenu(null, value);
                     closeSearchBox();
                 }
             }
@@ -271,15 +306,15 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    const isTechTheater = classes[currentClassIndex].name === "Tech Theater";
     const floatingMenu = document.getElementById('floating-menu');
     const teacherMode = document.getElementById('teacher-mode');
 
     // Allow Cmd + ArrowLeft / ArrowRight even if they're not in validKeys
     const isClassSwitch = event.metaKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight');
 
-    const validKeys = ['t', 'a', isProductionTech ? 'd' : 's', isProductionTech ? 'e' : 'i', 'r', 
-                      isProductionTech ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 
+    const validKeys = ['t', 'a', isTechTheater ? 'd' : 's', isTechTheater ? 'e' : 'i', 'r', 
+                      isTechTheater ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 
                       'ArrowRight', 'Enter', 'h', '=', '+', '?'];
 
     if (!validKeys.includes(event.key) && !isClassSwitch) {
@@ -365,11 +400,20 @@ if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 
 
         case 'ArrowUp':
             if (floatingMenu.style.display === 'block') {
-                const studentName = floatingMenu.querySelector('h3').textContent;
-                if (event.altKey) {
-                    updateHousePoints(studentName, 10);
+                const part = floatingMenu.dataset.instrumentPart;
+                if (part) {
+                    if (event.altKey) {
+                        updateHousePointsForInstrumentPart(part, 10);
+                    } else {
+                        updateScoreForInstrumentPart(part, 10);
+                    }
                 } else {
-                    updateScore(studentName, 10);
+                    const studentName = floatingMenu.querySelector('h3').textContent;
+                    if (event.altKey) {
+                        updateHousePoints(studentName, 10);
+                    } else {
+                        updateScore(studentName, 10);
+                    }
                 }
                 event.preventDefault();
             }
@@ -377,11 +421,20 @@ if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 
 
         case 'ArrowDown':
             if (floatingMenu.style.display === 'block') {
-                const studentName = floatingMenu.querySelector('h3').textContent;
-                if (event.altKey) {
-                    updateHousePoints(studentName, -10);
+                const part = floatingMenu.dataset.instrumentPart;
+                if (part) {
+                    if (event.altKey) {
+                        updateHousePointsForInstrumentPart(part, -10);
+                    } else {
+                        updateScoreForInstrumentPart(part, -10);
+                    }
                 } else {
-                    updateScore(studentName, -10);
+                    const studentName = floatingMenu.querySelector('h3').textContent;
+                    if (event.altKey) {
+                        updateHousePoints(studentName, -10);
+                    } else {
+                        updateScore(studentName, -10);
+                    }
                 }
                 event.preventDefault();
             }
@@ -402,10 +455,10 @@ if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 
                 // your existing teacher mode logic...
                 switch (event.key) {
                     case 'a': cycleAttendance(); break;
-                    case isProductionTech ? 'd' : 's': toggleAllCheckboxes(isProductionTech ? 'devices' : 'stands'); break;
-                    case isProductionTech ? 'e' : 'i': toggleAllCheckboxes(isProductionTech ? 'engagement' : 'intonation'); break;
-                    case 'r': toggleAllCheckboxes(isProductionTech ? 'review' : 'returned'); break;
-                    case isProductionTech ? 'p' : 'e': toggleAllCheckboxes(isProductionTech ? 'progress' : 'engagement'); break;
+                    case isTechTheater ? 'd' : 's': toggleAllCheckboxes(isTechTheater ? 'devices' : 'stands'); break;
+                    case isTechTheater ? 'e' : 'i': toggleAllCheckboxes(isTechTheater ? 'engagement' : 'intonation'); break;
+                    case 'r': toggleAllCheckboxes(isTechTheater ? 'review' : 'returned'); break;
+                    case isTechTheater ? 'p' : 'e': toggleAllCheckboxes(isTechTheater ? 'progress' : 'engagement'); break;
                 }
                 event.preventDefault();
             }

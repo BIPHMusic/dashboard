@@ -122,35 +122,61 @@ const instrumentPartOrder = [
 
 const classes = [
     {
-    name: "Tech Theater",
-    timeRange: "10:45 - 11:35",
-    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    startTime: { hours: 10, minutes: 45 },
-    endTime: { hours: 11, minutes: 35 },
-    
-    fullStudentList: techTheaterStudents,           // ← full list for export order
-    students: techTheaterStudents.filter(s => !techTheaterSeniorProjects.includes(s.name)),  // visible only
-    teacherModeOrder: techTheaterTeacherModeOrder.filter(name => !techTheaterSeniorProjects.includes(name)),
-    seniorProjects: techTheaterSeniorProjects,
+        name: "Tech Theater",
+        timeRange: "8:00 - 8:50", 
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        startTime: { hours: 8, minutes: 0 },
+        endTime: { hours: 8, minutes: 50 },
+        
+        fullStudentList: techTheaterStudents,
+        students: techTheaterStudents.filter(s => !techTheaterSeniorProjects.includes(s.name)),
+        teacherModeOrder: techTheaterTeacherModeOrder.filter(name => !techTheaterSeniorProjects.includes(name)),
+        seniorProjects: techTheaterSeniorProjects,
 
-    objectivesKey: "techTheaterObjectives",
-    defaultObjectives: [
-        'Review',
-        'Group Work',
-        'Housekeeping'
-    ],
-    sampleObjectives: [
-        'Review',
-        'Hardware',
-        'Software',
-        'QLab skills',
-        'Independent work',
-        'Group work',
-        'Troubleshooting',
-        'Housekeeping'
-    ],
-    criteria: ['devices', 'engagement', 'review', 'progress']
-},
+        objectivesKey: "techTheaterObjectives",
+        defaultObjectives: [
+            'Review',
+            'Group Work',
+            'Housekeeping'
+        ],
+        sampleObjectives: [
+            'Review',
+            'Hardware',
+            'Software',
+            'QLab skills',
+            'Independent work',
+            'Group work',
+            'Troubleshooting',
+            'Housekeeping'
+        ],
+        criteria: ['devices', 'engagement', 'review', 'progress']
+    },
+    {
+        name: "AP Music Theory",
+        timeRange: "10:45 - 11:35",                   
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        startTime: { hours: 10, minutes: 45 },
+        endTime: { hours: 11, minutes: 35 },
+        students: apMusicTheoryStudents,
+        teacherModeOrder: apMusicTheoryStudents.map(s => s.name),   // falls back to student list order
+        objectivesKey: "apMusicTheoryObjectives",
+        defaultObjectives: [
+            'Review theory concepts',
+            'Ear training / dictation',
+            'Score analysis'
+        ],
+        sampleObjectives: [
+            'Review',
+            'Ear Training',
+            'Harmonic Analysis',
+            'Sight Singing',
+            'Composition',
+            'Listening Quiz',
+            'Independent work',
+            'Housekeeping'
+        ],
+        criteria: ['stands', 'intonation', 'returned', 'engagement']  // reuses existing band-style criteria & hotkeys
+    },
     {
         name: "MS Band",
         timeRange: "12:40 - 1:30",
@@ -175,7 +201,7 @@ const classes = [
             'Announcements',
             'Housekeeping'
         ],
-        criteria: ['stands', 'intonation', 'returned', 'engagement']  // ← changed
+        criteria: ['stands', 'intonation', 'returned', 'engagement']
     },
     {
         name: "MS Band ᵀᴴᵁᴿˢ",
@@ -201,7 +227,7 @@ const classes = [
             'Announcements',
             'Housekeeping'
         ],
-        criteria: ['stands', 'intonation', 'returned', 'engagement']  // ← changed
+        criteria: ['stands', 'intonation', 'returned', 'engagement']
     },
     {
         name: "HS Band",
@@ -227,7 +253,7 @@ const classes = [
             'Announcements',
             'Housekeeping'
         ],
-        criteria: ['stands', 'intonation', 'returned', 'engagement']  // ← changed
+        criteria: ['stands', 'intonation', 'returned', 'engagement']
     }
 ];
 
@@ -1904,12 +1930,12 @@ window.onload = function() {
     loadStickyNotes();
     setInterval(updateDateTime, 60000);
     setInterval(() => {
-        const newIndex = getCurrentClass();
-        if (newIndex !== currentClassIndex) {
-            currentClassIndex = newIndex;
-            updateClassDisplay();
-        }
-    }, 1000);
+    const newIndex = getCurrentClass();
+    if (newIndex !== currentClassIndex) {
+        currentClassIndex = newIndex;
+        updateClassDisplay();
+    }
+}, 10000); 
     setInterval(updateCountdowns, 1000);
 };
 

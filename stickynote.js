@@ -1,5 +1,26 @@
 const STICKY_NOTES_CONFIG = [
     {
+        id: 'TECH THEATER', 
+        forWhichClasses: ["Tech Theater"], 
+        position: { x: 200, y: 200 }, 
+        dimensions: { width: 230, height: 150 }, 
+        textContent: 'Macbook check', 
+        imageSrc: '',
+        backgroundColor: '#ff9999', 
+    },
+
+    {
+        id: 'AP MUSIC THEORY',
+        forWhichClasses: ["AP Music Theory"],          
+        position: { x: 100, y: 300 },
+        dimensions: { width: 250, height: 200 },
+        textContent: 'Get a melodica on 淘宝',
+        // Don\'t forget to join a HS session this week 💡
+        imageSrc: '',
+        backgroundColor: '#ff9999', // red
+    },
+
+    {
         id: 'ALL BAND',
         forWhichClasses: ["MS Band", "HS Band", "MS Band ᵀᴴᵁᴿˢ"],
         position: { x: window.innerWidth - 300, y: 300 },
@@ -11,7 +32,7 @@ const STICKY_NOTES_CONFIG = [
 
     {
         id: 'MIDDLE SCHOOL',
-        forWhichClasses: ["MS Band"],           // ← only regular MS Band (Mon/Wed)
+        forWhichClasses: ["MS Band"],      
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
         textContent: 'Make all arrangements to have instruments next week',
@@ -31,15 +52,17 @@ const STICKY_NOTES_CONFIG = [
         backgroundColor: '#ff9999', // red
     },
 
-    {
-        id: 'TECH THEATER', 
-        forWhichClasses: ["Tech Theater"], 
-        position: { x: 200, y: 200 }, 
-        dimensions: { width: 230, height: 150 }, 
-        textContent: 'Macbook check', 
+        {
+        id: 'HS BAND',
+        forWhichClasses: ["HS Band"],      
+        position: { x: 100, y: 300 },
+        dimensions: { width: 250, height: 200 },
+        textContent: 'Make all arrangements to have instruments next week',
         imageSrc: '',
-        backgroundColor: '#ff9999', 
+        backgroundColor: '#ff9999', // red
     },
+
+
 ];
 
 function isStickyNoteAllowed(config) {

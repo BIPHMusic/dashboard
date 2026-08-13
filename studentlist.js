@@ -8,9 +8,9 @@ const masterList = [
     {"name": "Allen", "liveschoolName": "Allen He", "house": "Red", "birthdate": "", "altName": "Allen"},
     {"name": "Cynthia", "liveschoolName": "Cynthia Sum Chi Liaw", "house": "Green", "birthdate": "", "altName": "Cynthia"},
     {"name": "Yaffa", "liveschoolName": "Yaffa Hei Wun Luo", "house": "Green", "birthdate": "", "altName": "Yaffa", "instrumentPart": "Violin3"},
-    {"name": "Rachelle", "liveschoolName": "Rachelle Xinxin Zhang", "house": "Yellow", "birthdate": "", "altName": "Rachelle"},
+    {"name": "Rachelle", "liveschoolName": "Rachelle Xinxin Zhang", "house": "Yellow", "birthdate": "", "altName": "Racial"},
     {"name": "Beryl", "liveschoolName": "Tina Yantong Dong", "house": "Blue", "birthdate": "", "altName": "Beryl"},
-    {"name": "Stella", "liveschoolName": "Stella Yuxuan Li", "house": "Green", "birthdate": "2008-07-02", "altName": "Stella"},
+    {"name": "Stella L", "liveschoolName": "Stella Yuxuan Li", "house": "Green", "birthdate": "2008-07-02", "altName": "Stella"},
     {"name": "Kenny", "liveschoolName": "Kenny Yuan Wang", "house": "Green", "birthdate": "", "altName": "Kenny"},
     {"name": "Ricky C", "liveschoolName": "Ricky Ruiqi Chen", "house": "Green", "birthdate": "", "altName": "Ricky"},
     {"name": "Vlan", "liveschoolName": "Vlan Wai Lun Dong", "house": "Green", "birthdate": "2009-02-21", "altName": "Vlan"},
@@ -29,7 +29,7 @@ const masterList = [
     {"name": "Anton", "liveschoolName": "Anton Jiayu Ding", "house": "Green", "birthdate": "", "altName": "Anton", "instrumentPart": "Percussion", "chair": "99"},
     {"name": "Jefferey", "liveschoolName": "Jeffrey Nie", "house": "Blue", "birthdate": "", "altName": "Jefferey", "instrumentPart": "Percussion", "chair": "99"},
     {"name": "Jason", "liveschoolName": "Jason Junfeng Shen", "house": "Red", "birthdate": "", "altName": "Jason", "instrumentPart": "Percussion", "chair": "99"},
-    {"name": "Stella S", "liveschoolName": "Stella Yizhi Shang", "house": "Green", "birthdate": "2012-02-29", "altName": "Stella Shaong", "instrumentPart": "Cello1", "chair": "1"},
+    {"name": "Stella S", "liveschoolName": "Stella Yizhi Shang", "house": "Green", "birthdate": "2012-02-29", "altName": "Stella", "instrumentPart": "Cello1", "chair": "1"},
     {"name": "Zachary", "liveschoolName": "Zachary Yang", "house": "Green", "birthdate": "2012-12-29", "altName": "Zachary", "instrumentPart": "Trumpet", "chair": "2"},
     {"name": "Rebecca", "liveschoolName": "Rebecca Tsz Yin Cheung", "house": "Blue", "birthdate": "2012-05-28", "altName": "Rebecca", "instrumentPart": "Violin1", "chair": "4"},
     {"name": "Shine", "liveschoolName": "Shine Yu Duan", "house": "Blue", "birthdate": "2013-02-14", "altName": "Shine", "instrumentPart": "Violin1", "chair": "2"},
@@ -42,7 +42,7 @@ const masterList = [
     {"name": "Jacky", "liveschoolName": "Jacky Tsz Hin Cheung", "house": "Green", "birthdate": "2014-08-30", "altName": "Jacky", "instrumentPart": "Violin2", "chair": "5"},
     {"name": "Matthew", "liveschoolName": "Matthew Enhao Feng", "house": "Yellow", "birthdate": "2013-12-16", "altName": "Matthew", "instrumentPart": "Violin2", "chair": "4"},
     {"name": "Oscar", "liveschoolName": "Oscar Xinchen Fang", "house": "Red", "birthdate": "2013-03-20", "altName": "Oscar", "instrumentPart": "Violin1", "chair": "3"},
-    {"name": "Grace X", "liveschoolName": "Grace Leqi Xiong", "house": "Red", "birthdate": "2013-01-19", "altName": "Grace--x", "instrumentPart": "Violin3", "chair": "5"},
+    {"name": "Grace", "liveschoolName": "Grace Leqi Xiong", "house": "Red", "birthdate": "2013-01-19", "altName": "Grace", "instrumentPart": "Violin3", "chair": "5"},
     {"name": "Kyra", "liveschoolName": "Kyra Jiaqi Yan", "house": "Yellow", "birthdate": "", "altName": "Kyra", "instrumentPart": "Percussion", "chair": "99"},
     {"name": "Nancy", "liveschoolName": "Nancy Han", "house": "Yellow", "birthdate": "2013-07-16", "altName": "Nancy", "instrumentPart": "Violin3", "chair": "4"},
     {"name": "Felix", "liveschoolName": "Felix Jiaxi Hong", "house": "Blue", "birthdate": "", "altName": "Felix", "instrumentPart": "Percussion", "chair": "99"},
@@ -94,7 +94,7 @@ const masterList = [
 ];
 
 const techTheaterStudents = [
-    'Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z'
+    'Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella L', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -110,10 +110,10 @@ const techTheaterStudents = [
     };
 });
 
-const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z'];
+const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella L', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z'];
 
 
-const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z']
+const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella L', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z']
 
 
 
@@ -142,7 +142,7 @@ const apMusicTheorySeniorProjects = ['Simone', 'Thomas', 'Dora']
 
 
 const msBandStudents = [
-   'Anton', 'Jefferey', 'Jason', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace X', 'Kyra', 'Nancy', 'Felix', 'Paris', 'Coco', 'Grant'
+   'Anton', 'Jefferey', 'Jason', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace', 'Kyra', 'Nancy', 'Felix', 'Paris', 'Coco', 'Grant'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -158,13 +158,13 @@ const msBandStudents = [
     };
 });
 
-const msBandTeacherModeOrder = ['Anton', 'Jefferey', 'Jason', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace X', 'Kyra', 'Nancy', 'Felix', 'Paris', 'Coco', 'Grant'];
+const msBandTeacherModeOrder = ['Anton', 'Jefferey', 'Jason', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace', 'Kyra', 'Nancy', 'Felix', 'Paris', 'Coco', 'Grant'];
 
 
 
 
 const msBandThursdayStudents = [
-    'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace X', 'Kyra', 'Nancy', 'Felix', 'Paris', 'Coco', 'Grant'
+    'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace', 'Kyra', 'Nancy', 'Felix', 'Paris', 'Coco', 'Grant'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -180,7 +180,7 @@ const msBandThursdayStudents = [
     };
 });
 
-const msBandThursdayTeacherModeOrder = ['Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace X', 'Kyra', 'Nancy', 'Felix', 'Paris', 'Coco', 'Grant'];
+const msBandThursdayTeacherModeOrder = ['Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace', 'Kyra', 'Nancy', 'Felix', 'Paris', 'Coco', 'Grant'];
 
 
 

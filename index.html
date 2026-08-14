@@ -90,26 +90,49 @@ function playRandomSound(soundArray) {
 }
 
 const instrumentColors = {
-  "Violin1":    { light: "#ee7471", dark: "#9f4e49" },
-  "Violin2":    { light: "#ef9491", dark: "#9a5c59" },
-  "Violin3":    { light: "#f1b28f", dark: "#9f6f4f" },
-  "Viola":      { light: "#add059", dark: "#6a8f2e" },
-  "Cello1":     { light: "#65b5ce", dark: "#3f7f91" },
-  "Cello2":     { light: "#71abdd", dark: "#3e6e91" },
-  "Contrabass": { light: "#dd865d", dark: "#8b5131" },
-  "Flute":      { light: "#a6d6ca", dark: "#6c8f86" },
-  "Clarinet":   { light: "#ceb5dc", dark: "#7f689a" },
-  "Oboe":       { light: "#ee64e0", dark: "#a03a9f" },
-  "Bassoon":    { light: "#cd30ae", dark: "#7f1e6f" },
-  "Alto Sax":   { light: "#569461", dark: "#3e7047" },
-  "Tenor Sax":  { light: "#5d863c", dark: "#486b2c" },
-  "Trumpet":    { light: "#d3574b", dark: "#8b3730" },
-  "Horn":       { light: "#c57025", dark: "#7f4712" },
-  "Trombone":   { light: "#925cb0", dark: "#5d3870" },
-  "Baritone":   { light: "#7d3f9f", dark: "#4b2463" },
-  "Tuba":       { light: "#627d92", dark: "#3e4f5a" },
-  "Percussion": { light: "#99a4a6", dark: "#5d6769" }
+  "Violin1":    "#ffe1b4",
+  "Violin2":    "#f8d48a",
+  "Violin3":    "#e7ba77",
+  "Viola":      "#d99c59",
+  "Cello1":     "#d78934",
+  "Cello2":     "#b67928",
+  "Contrabass": "#966022",
+  "Flute":      "#b7ebde",
+  "Clarinet":   "#73c0f8",
+  "Oboe":       "#5ec9a1",
+  "Bassoon":    "#459c87",
+  "Alto Sax":   "#59ac64",
+  "Tenor Sax":  "#468c46",
+  "Trumpet":    "#d65746",
+  "Horn":       "#f17130",
+  "Trombone":   "#a65cb0",
+  "Baritone":   "#925daf",
+  "Tuba":       "#623f79",
+  "Percussion": "#9ba1a2"
 };
+
+
+// const instrumentColors = {
+//   "Violin1":    { light: "#ee7471", dark: "#9f4e49" },
+//   "Violin2":    { light: "#ef9491", dark: "#9a5c59" },
+//   "Violin3":    { light: "#f1b28f", dark: "#9f6f4f" },
+//   "Viola":      { light: "#add059", dark: "#6a8f2e" },
+//   "Cello1":     { light: "#65b5ce", dark: "#3f7f91" },
+//   "Cello2":     { light: "#71abdd", dark: "#3e6e91" },
+//   "Contrabass": { light: "#dd865d", dark: "#8b5131" },
+//   "Flute":      { light: "#a6d6ca", dark: "#6c8f86" },
+//   "Clarinet":   { light: "#ceb5dc", dark: "#7f689a" },
+//   "Oboe":       { light: "#ee64e0", dark: "#a03a9f" },
+//   "Bassoon":    { light: "#cd30ae", dark: "#7f1e6f" },
+//   "Alto Sax":   { light: "#569461", dark: "#3e7047" },
+//   "Tenor Sax":  { light: "#5d863c", dark: "#486b2c" },
+//   "Trumpet":    { light: "#d3574b", dark: "#8b3730" },
+//   "Horn":       { light: "#c57025", dark: "#7f4712" },
+//   "Trombone":   { light: "#925cb0", dark: "#5d3870" },
+//   "Baritone":   { light: "#7d3f9f", dark: "#4b2463" },
+//   "Tuba":       { light: "#627d92", dark: "#3e4f5a" },
+//   "Percussion": { light: "#99a4a6", dark: "#5d6769" }
+// };
 
 const instrumentPartOrder = [
     "Violin1", "Violin2", "Violin3", "Viola",
@@ -1790,9 +1813,27 @@ function applyHousePointsChange() {
     deactivateHouseshield();
 }
 
+function darkenHex(hex, amount = 0.35) {
+    // amount = how much black to mix in (0 = no change, 1 = pure black)
+    hex = hex.replace('#', '');
+    if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+    }
+    const num = parseInt(hex, 16);
+    let r = (num >> 16) & 255;
+    let g = (num >> 8) & 255;
+    let b = num & 255;
+
+    r = Math.round(r * (1 - amount));
+    g = Math.round(g * (1 - amount));
+    b = Math.round(b * (1 - amount));
+
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
 function applyBarColor(bar, student) {
     const cls = classes[currentClassIndex];
-    const noInstrumentColorClasses = ["Tech Theater", "AP Music Theory", "Tech Theater"];
+    const noInstrumentColorClasses = ["Tech Theater", "AP Music Theory"];
 
     // Force standard blue for these classes
     if (noInstrumentColorClasses.includes(cls.name)) {
@@ -1802,10 +1843,11 @@ function applyBarColor(bar, student) {
 
     const master = masterList.find(s => s.name === student.name);
     if (master && master.instrumentPart && instrumentColors[master.instrumentPart]) {
-        const c = instrumentColors[master.instrumentPart];
-        bar.style.background = `linear-gradient(to top, ${c.dark}, ${c.light})`;
+        const light = instrumentColors[master.instrumentPart];
+        const dark  = darkenHex(light);          // ← consistent darkening
+        bar.style.background = `linear-gradient(to top, ${dark}, ${light})`;
     } else {
-        // fallback to original CSS gradient
+        // fallback
         bar.style.background = "linear-gradient(to top, #3378a6, #52a6df)";
     }
 }

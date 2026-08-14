@@ -131,6 +131,7 @@ margin-top: -13px;
 .bar {
     width: 50px;
     background: linear-gradient(to top, #3378a6, #52a6df);
+    border: 1px solid #0000004e; box-sizing: border-box; 
     box-shadow: 2px 0 15px rgba(0,0,0,0.2);
     transition: height 0.5s ease-in-out, opacity 0.8s ease;
     position: relative;

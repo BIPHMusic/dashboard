@@ -1913,16 +1913,47 @@ function toggleOverlay() {
 
 
 function preloadHouseImages() {
-  const houses = ['red', 'blue', 'green', 'yellow'];
-  
-  // keep references so images stay cached
-  window.houseImages = window.houseImages || [];
+    const houses = ['red', 'blue', 'green', 'yellow'];
 
-  houses.forEach(house => {
-    const img = new Image();
-    img.src = `images/${house}house.png`; // matches: images/bluehouse.png etc.
-    window.houseImages.push(img);
-  });
+    window.houseImages = window.houseImages || [];
+    houses.forEach(house => {
+        const img = new Image();
+        img.src = `images/${house}house.png`;
+        window.houseImages.push(img);
+    });
+
+    let container = document.getElementById('house-preload-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'house-preload-container';
+        container.style.cssText = `
+            position: fixed;
+            bottom: -600px;          /* safely below the viewport */
+            left: 0;
+            width: 200px;
+            height: 240px;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0.01;           /* almost invisible but still “painted” */
+            z-index: -9999;
+        `;
+        document.body.appendChild(container);
+    }
+
+    container.innerHTML = '';
+    houses.forEach(house => {
+        const div = document.createElement('div');
+        div.style.cssText = `
+            width: 200px;
+            height: 240px;
+            background-image: url('images/${house}house.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-bottom: 10px;
+        `;
+        container.appendChild(div);
+    });
 }
 
 document.addEventListener('click', function(event) {

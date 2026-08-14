@@ -1783,7 +1783,7 @@ function activateHouseshield() {
         return;
     }
     if (houseshield) {
-        houseshield.style.backgroundImage = `url('images/${houseInfo.house.toLowerCase()}house.png')`;
+        houseshield.style.backgroundImage = `url('images/${houseInfo.house.toLowerCase()}house.webp')`;
         houseshield.style.display = 'block';
         void houseshield.offsetWidth;
         houseshield.classList.add('active');
@@ -1956,7 +1956,7 @@ function preloadHouseImages() {
         div.style.cssText = `
             width: 200px;
             height: 240px;
-            background-image: url('images/${house}house.png');
+            background-image: url('images/${house}house.webp');
             background-size: contain;
             background-repeat: no-repeat;
         `;

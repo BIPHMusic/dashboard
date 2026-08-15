@@ -298,6 +298,27 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
+                // Enter after random student call(s)
+            if (event.key === 'Enter' && currentMode === MODES.GLOBAL) {
+                const display = document.querySelector('.student-name-display');
+                if (display) {
+                    const names = Array.from(display.querySelectorAll('h2'))
+                                    .map(h => h.textContent.trim())
+                                    .filter(Boolean);
+
+                    if (names.length === 1) {
+                        showFloatingMenu(null, names[0]);
+                    } else if (names.length > 1) {
+                        showStudentsGroupMenu(names);
+                    }
+
+                    // optional: clear the name display immediately
+                    display.remove();
+                    event.preventDefault();
+                    return;
+                }
+            }
+
     if (event.key === '/' && currentMode === MODES.GLOBAL) {
         if (!document.getElementById('search-box')) {
             createSearchBox();
@@ -399,46 +420,44 @@ if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 
             break;
 
         case 'ArrowUp':
-            if (floatingMenu.style.display === 'block') {
-                const part = floatingMenu.dataset.instrumentPart;
-                if (part) {
-                    if (event.altKey) {
-                        updateHousePointsForInstrumentPart(part, 10);
-                    } else {
-                        updateScoreForInstrumentPart(part, 10);
-                    }
-                } else {
-                    const studentName = floatingMenu.querySelector('h3').textContent;
-                    if (event.altKey) {
-                        updateHousePoints(studentName, 10);
-                    } else {
-                        updateScore(studentName, 10);
-                    }
-                }
-                event.preventDefault();
-            }
-            break;
+    if (floatingMenu.style.display === 'block') {
+        const part = floatingMenu.dataset.instrumentPart;
+        const isGroup = !!floatingMenu.dataset.groupStudents;
 
-        case 'ArrowDown':
-            if (floatingMenu.style.display === 'block') {
-                const part = floatingMenu.dataset.instrumentPart;
-                if (part) {
-                    if (event.altKey) {
-                        updateHousePointsForInstrumentPart(part, -10);
-                    } else {
-                        updateScoreForInstrumentPart(part, -10);
-                    }
-                } else {
-                    const studentName = floatingMenu.querySelector('h3').textContent;
-                    if (event.altKey) {
-                        updateHousePoints(studentName, -10);
-                    } else {
-                        updateScore(studentName, -10);
-                    }
-                }
-                event.preventDefault();
-            }
-            break;
+        if (part) {
+            if (event.altKey) updateHousePointsForInstrumentPart(part, 10);
+            else updateScoreForInstrumentPart(part, 10);
+        } else if (isGroup) {
+            if (event.altKey) updateHousePointsForGroup(10);
+            else updateScoreForGroup(10);
+        } else {
+            const studentName = floatingMenu.querySelector('h3').textContent;
+            if (event.altKey) updateHousePoints(studentName, 10);
+            else updateScore(studentName, 10);
+        }
+        event.preventDefault();
+    }
+    break;
+
+case 'ArrowDown':
+    if (floatingMenu.style.display === 'block') {
+        const part = floatingMenu.dataset.instrumentPart;
+        const isGroup = !!floatingMenu.dataset.groupStudents;
+
+        if (part) {
+            if (event.altKey) updateHousePointsForInstrumentPart(part, -10);
+            else updateScoreForInstrumentPart(part, -10);
+        } else if (isGroup) {
+            if (event.altKey) updateHousePointsForGroup(-10);
+            else updateScoreForGroup(-10);
+        } else {
+            const studentName = floatingMenu.querySelector('h3').textContent;
+            if (event.altKey) updateHousePoints(studentName, -10);
+            else updateScore(studentName, -10);
+        }
+        event.preventDefault();
+    }
+    break;
 
         case 'a':
         case 'd':

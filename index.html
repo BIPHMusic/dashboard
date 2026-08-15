@@ -1022,6 +1022,206 @@ function updateFloatingMenu(student) {
     }, 100);
 }
 
+function showStudentsGroupMenu(studentNames) {
+    const floatingMenu = document.getElementById('floating-menu');
+    const matchingStudents = studentNames
+        .map(name => students.find(s => s.name === name))
+        .filter(Boolean);
+
+    if (matchingStudents.length === 0) return;
+
+    // Re-use the same group machinery we already built for instrument parts
+    currentStudentIndex = -1;
+    floatingMenu.dataset.instrumentPart = '';           // clear
+floatingMenu.dataset.groupStudents = JSON.stringify(studentNames);
+
+    const allHave = (prop) => matchingStudents.every(s => s[prop]);
+    const someHave = (prop) => matchingStudents.some(s => s[prop]);
+
+    let commonAttendance = matchingStudents[0].attendance;
+    if (!matchingStudents.every(s => s.attendance === commonAttendance)) {
+        commonAttendance = 'Present';
+    }
+
+    const numericScores = matchingStudents.filter(s => typeof s.score === 'number').map(s => s.score);
+    const avgScore = numericScores.length
+        ? Math.round(numericScores.reduce((a, b) => a + b, 0) / numericScores.length)
+        : 'EX';
+    const houseSum = matchingStudents.reduce((sum, s) => sum + (s.housePoints || 0), 0);
+
+    const title = matchingStudents.length === 1
+        ? matchingStudents[0].name
+        : `Selected (${matchingStudents.length})`;
+
+    floatingMenu.innerHTML = `
+        <span class="close-button" onclick="closeTopMenu()">&times;</span>
+        <h3>${title}</h3>
+        <div class="checkbox-row">
+            <select class="attendance-dropdown-select ${commonAttendance.toLowerCase()}" 
+                    onchange="setAttendanceForGroup(this.value)">
+                <option value="Absent"  ${commonAttendance === 'Absent'  ? 'selected' : ''}>Absent</option>
+                <option value="Present" ${commonAttendance === 'Present' ? 'selected' : ''}>Present</option>
+                <option value="Tardy"   ${commonAttendance === 'Tardy'   ? 'selected' : ''}>Tardy</option>
+            </select>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" 
+                ${allHave(currentCriteria[0]) ? 'checked' : ''} 
+                onchange="toggleCheckboxForGroup('${currentCriteria[0]}', this.checked)"> Stands</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" 
+                ${allHave(currentCriteria[1]) ? 'checked' : ''} 
+                onchange="toggleCheckboxForGroup('${currentCriteria[1]}', this.checked)"> Intonation</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" 
+                ${allHave(currentCriteria[2]) ? 'checked' : ''} 
+                onchange="toggleCheckboxForGroup('${currentCriteria[2]}', this.checked)"> Returned</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" 
+                ${allHave(currentCriteria[3]) ? 'checked' : ''} 
+                onchange="toggleCheckboxForGroup('${currentCriteria[3]}', this.checked)"> Engagement</label>
+        </div>
+        <div class="stepper">
+            <button onclick="updateScoreForGroup(-10)">-</button>
+            <span class="score">${avgScore === 'EX' ? 'EX' : avgScore + '%'}</span>
+            <button onclick="updateScoreForGroup(10)">+</button>
+        </div>
+        <div class="stepper">
+            <span>House Points</span>
+            <button onclick="updateHousePointsForGroup(-10)">-</button>
+            <span>${houseSum > 0 ? '+' : ''}${houseSum}</span>
+            <button onclick="updateHousePointsForGroup(10)">+</button>
+        </div>
+        <button onclick="closeFloatingMenu()">Close</button>
+    `;
+
+    // indeterminate state
+    currentCriteria.forEach(crit => {
+        const cb = floatingMenu.querySelector(`#checkbox-${crit}`);
+        if (cb) cb.indeterminate = someHave(crit) && !allHave(crit);
+    });
+
+    floatingMenu.style.left = '50%';
+    floatingMenu.style.top  = '50%';
+    openMenu('floating-menu');
+
+    // highlight the bars
+    resetBarHighlights();
+    matchingStudents.forEach(s => {
+        const bar = document.getElementById(`bar-${s.name}`);
+        if (bar) {
+            bar.style.opacity = '1';
+            const nameSpan = bar.querySelector('.main-labels span:first-child');
+            if (nameSpan) nameSpan.style.fontWeight = 'bold';
+        }
+    });
+}
+
+function getGroupStudents() {
+    const floatingMenu = document.getElementById('floating-menu');
+    if (!floatingMenu || !floatingMenu.dataset.groupStudents) return [];
+    const names = JSON.parse(floatingMenu.dataset.groupStudents);
+    return names.map(n => students.find(s => s.name === n)).filter(Boolean);
+}
+
+function updateStudentsGroupMenu() {
+    const floatingMenu = document.getElementById('floating-menu');
+    if (!floatingMenu || !floatingMenu.dataset.groupStudents) return;
+
+    const matching = getGroupStudents();
+    if (matching.length === 0) return;
+
+    const allHave = (prop) => matching.every(s => s[prop]);
+    const someHave = (prop) => matching.some(s => s[prop]);
+
+    // attendance
+    let commonAttendance = matching[0].attendance;
+    if (!matching.every(s => s.attendance === commonAttendance)) commonAttendance = null;
+
+    const attSelect = floatingMenu.querySelector('select');
+    if (attSelect && commonAttendance) {
+        attSelect.value = commonAttendance;
+        attSelect.className = `attendance-dropdown-select ${commonAttendance.toLowerCase()}`;
+    }
+
+    // checkboxes
+    currentCriteria.forEach(crit => {
+        const cb = floatingMenu.querySelector(`#checkbox-${crit}`);
+        if (cb) {
+            cb.checked = allHave(crit);
+            cb.indeterminate = someHave(crit) && !allHave(crit);
+        }
+    });
+
+    // average score
+    const numericScores = matching.filter(s => typeof s.score === 'number').map(s => s.score);
+    const avgScore = numericScores.length
+        ? Math.round(numericScores.reduce((a, b) => a + b, 0) / numericScores.length)
+        : 'EX';
+    const scoreSpan = floatingMenu.querySelector('.stepper .score');
+    if (scoreSpan) scoreSpan.textContent = avgScore === 'EX' ? 'EX' : `${avgScore}%`;
+
+    // house points sum
+    const houseSum = matching.reduce((sum, s) => sum + (s.housePoints || 0), 0);
+    const houseSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
+    if (houseSpan) houseSpan.textContent = houseSum > 0 ? `+${houseSum}` : houseSum;
+}
+
+function setAttendanceForGroup(value) {
+    getGroupStudents().forEach(s => {
+        s.attendance = value;
+        calculateScore(s);
+        updateScoreDisplay(s);
+        updateTardyLabel(s);
+        updateBarGraph(s);
+    });
+    updateStudentsGroupMenu();
+}
+
+function toggleCheckboxForGroup(type, forceValue = null) {
+    const matching = getGroupStudents();
+    const target = forceValue !== null ? forceValue : !matching.every(s => s[type]);
+    matching.forEach(s => {
+        if (s.attendance !== 'Absent') {
+            s[type] = target;
+            calculateScore(s);
+            updateScoreDisplay(s);
+            updateBarGraph(s);
+        }
+    });
+    updateStudentsGroupMenu();
+}
+
+function updateScoreForGroup(change) {
+    let soundPlayed = false;
+    getGroupStudents().forEach(s => {
+        if (s.score !== 'EX') {
+            const old = s.score;
+            const neu = Math.max(0, Math.min(100, s.score + change));
+            if (neu !== old) {
+                s.manualAdjustment = (s.manualAdjustment || 0) + (neu - old);
+                s.score = neu;
+                updateScoreDisplay(s);
+                const bar = document.getElementById(`bar-${s.name}`);
+                if (bar) {
+                    bar.style.setProperty('--flash-color', change > 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
+                    bar.classList.remove('flash-animation');
+                    void bar.offsetWidth;
+                    bar.classList.add('flash-animation');
+                }
+                if (!soundPlayed) {
+                    if (change > 0) playRandomSound(positiveEffects);
+                    else if (neu === 0) new Audio(negativeEffect0).play();
+                    else if (neu >= 50) playRandomSound(negativeEffects50Plus);
+                    else if (neu >= 10) playRandomSound(negativeEffects10to50);
+                    soundPlayed = true;
+                }
+            }
+        }
+    });
+    updateStudentsGroupMenu();
+}
+
+function updateHousePointsForGroup(change) {
+    getGroupStudents().forEach(s => updateHousePoints(s.name, change));
+    updateStudentsGroupMenu();
+}
+
 function getStudentsByPart(part) {
     return students.filter(s => {
         const m = masterList.find(ms => ms.name === s.name);

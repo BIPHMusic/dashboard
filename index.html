@@ -115,29 +115,6 @@ const instrumentColors = {
   "Percussion": "#9ba1a2"
 };
 
-
-// const instrumentColors = {
-//   "Violin1":    { light: "#ee7471", dark: "#9f4e49" },
-//   "Violin2":    { light: "#ef9491", dark: "#9a5c59" },
-//   "Violin3":    { light: "#f1b28f", dark: "#9f6f4f" },
-//   "Viola":      { light: "#add059", dark: "#6a8f2e" },
-//   "Cello1":     { light: "#65b5ce", dark: "#3f7f91" },
-//   "Cello2":     { light: "#71abdd", dark: "#3e6e91" },
-//   "Contrabass": { light: "#dd865d", dark: "#8b5131" },
-//   "Flute":      { light: "#a6d6ca", dark: "#6c8f86" },
-//   "Clarinet":   { light: "#ceb5dc", dark: "#7f689a" },
-//   "Oboe":       { light: "#ee64e0", dark: "#a03a9f" },
-//   "Bassoon":    { light: "#cd30ae", dark: "#7f1e6f" },
-//   "Alto Sax":   { light: "#569461", dark: "#3e7047" },
-//   "Tenor Sax":  { light: "#5d863c", dark: "#486b2c" },
-//   "Trumpet":    { light: "#d3574b", dark: "#8b3730" },
-//   "Horn":       { light: "#c57025", dark: "#7f4712" },
-//   "Trombone":   { light: "#925cb0", dark: "#5d3870" },
-//   "Baritone":   { light: "#7d3f9f", dark: "#4b2463" },
-//   "Tuba":       { light: "#627d92", dark: "#3e4f5a" },
-//   "Percussion": { light: "#99a4a6", dark: "#5d6769" }
-// };
-
 const instrumentPartOrder = [
     "Violin1", "Violin2", "Violin3", "Viola",
     "Cello1", "Cello2", "Contrabass",
@@ -290,6 +267,47 @@ let teacherModeOrder = classes[0].teacherModeOrder;
 let currentCriteria = classes[0].criteria;
 let isObjectiveInputFocused = false;
 let isAddingStudent = false;
+let announcedCountdowns = new Set();
+let lastAnnouncedClassKey = null;
+let audioContext = null;
+
+function getClassAnnouncementKey() {
+    const cls = classes[currentClassIndex];
+    const today = new Date().toLocaleDateString('en-US');
+    return `${cls.name}|${today}`;
+}
+
+function speakCountdown(text) {
+    // Cancel any ongoing speech so announcements stay clean
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 1.05;
+    utter.volume = 1.0;
+    window.speechSynthesis.speak(utter);
+}
+
+// Tiny base64 WAVs (sine beeps) – no external files needed
+const BOOP_SRC = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='; // placeholder – see note below
+const BEEP_SRC = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+
+function playBoop() {
+    const a = new Audio('sounds/boop.mp3');
+    a.volume = 0.45;
+    a.play().catch(() => {});
+}
+
+function playFinalBeep() {
+    const a = new Audio('sounds/beep.mp3');
+    a.volume = 0.55;
+    a.play().catch(() => {});
+}
+
+function playFinalCountdownBeeps() {
+    playBoop();                                   // 3
+    setTimeout(playBoop, 1000);                   // 2
+    setTimeout(playBoop, 2000);                   // 1
+    setTimeout(playFinalBeep, 3000);              // START
+}
 
 function isSeniorProjectPeriod() {
     const now = new Date();
@@ -371,6 +389,8 @@ function updateCountdowns() {
     if (!currentClass.days.includes(currentDay)) {
         hasCopiedScores = false;
         hasResetReturned = false;
+        announcedCountdowns.clear();
+        lastAnnouncedClassKey = null;
         return;
     }
 
@@ -385,15 +405,61 @@ function updateCountdowns() {
     if (startDiff < -86400) startDiff += 86400;
     if (endDiff < -86400) endDiff += 86400;
 
-    if (startDiff > 0 && startDiff <= 1800) {
-        const minutes = Math.floor(startDiff / 60);
-        const seconds = Math.floor(startDiff % 60);
-        const startDiv = document.createElement('div');
-        startDiv.className = 'start-countdown';
-        startDiv.textContent = `Class begins in ${minutes}m ${seconds}s`;
-        countdownContainer.appendChild(startDiv);
+    // ---------- PRE-CLASS COUNTDOWN ----------
+if (startDiff > 0 && startDiff <= 1800) {
+    const remaining = Math.floor(startDiff);
+const minutes   = Math.floor(remaining / 60);
+const seconds   = remaining % 60;
+
+const startDiv = document.createElement('div');
+startDiv.className = 'start-countdown';
+
+if (remaining > 1) {
+    startDiv.textContent = `Class begins in ${minutes}m ${seconds}s`;
+} else if (remaining === 1) {
+    startDiv.textContent = 'Class begins in 0m 1s';
+} else {
+    // remaining === 0
+    startDiv.textContent = 'Begin!';
+    startDiv.style.transition = 'opacity 1s ease-out';
+    setTimeout(() => {
+        startDiv.style.opacity = '0';
+        setTimeout(() => startDiv.remove(), 1000);
+    }, 600);
+}
+countdownContainer.appendChild(startDiv);
+
+    // Reset tracker when class/day changes
+    const key = getClassAnnouncementKey();
+    if (key !== lastAnnouncedClassKey) {
+        announcedCountdowns.clear();
+        lastAnnouncedClassKey = key;
     }
-    else if (endDiff <= 300 && endDiff >= 0) {           // ← changed: 5 min → conclusion
+
+    // Spoken announcements only
+    if (remaining === 300 && !announcedCountdowns.has('5min')) {
+        announcedCountdowns.add('5min');
+        speakCountdown('5 minutes');
+    } else if (remaining === 120 && !announcedCountdowns.has('2min')) {
+        announcedCountdowns.add('2min');
+        speakCountdown('2 minutes');
+    } else if (remaining === 60 && !announcedCountdowns.has('1min')) {
+        announcedCountdowns.add('1min');
+        speakCountdown('1 minute');
+    } else if (remaining === 30 && !announcedCountdowns.has('30sec')) {
+        announcedCountdowns.add('30sec');
+        speakCountdown('30 seconds');
+    }
+
+    // Final tones
+    if (remaining === 3 && !announcedCountdowns.has('finalbeeps')) {
+        announcedCountdowns.add('finalbeeps');
+        playFinalCountdownBeeps();
+    }
+}
+
+    // ---------- END-OF-CLASS COUNTDOWN (unchanged, silent) ----------
+    else if (endDiff <= 300 && endDiff >= 0) {
         const minutes = Math.floor(endDiff / 60);
         const seconds = Math.floor(endDiff % 60);
         const conclusionDiv = document.createElement('div');

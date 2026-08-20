@@ -1822,6 +1822,12 @@ function addStudent(name) {
         };
         students.push(newStudent);
         teacherModeOrder.push(name);
+
+        // Re-sort so the new student appears in the correct instrument-part / chair order
+        // (and so applyBarColor in createBars uses the proper position)
+        students = sortByInstrumentPart(students, false);
+        teacherModeOrder = sortByInstrumentPart(teacherModeOrder, true);
+
         createBars();
         const newBar = document.getElementById(`bar-${newStudent.name}`);
         if (newBar) {

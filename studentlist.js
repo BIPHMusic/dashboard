@@ -53,14 +53,14 @@ const masterList = [
     {"name": "Grant", "liveschoolName": "Grant Zhang", "house": "Green", "birthdate": "2014-02-11", "altName": "Grant", "instrumentPart": "Violin2", "chair": "6"},
 
     //HS Band
-    {"name": "Kerry", "liveschoolName": "Kerry Liu", "house": "Green", "birthdate": "", "altName": "Kerry", "instrumentPart": "Flute", "chair": "Kerry"},
-    {"name": "Calvin", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "", "altName": "Calvin", "instrumentPart": "Tuba", "chair": "Calvin"},
-    {"name": "Steven", "liveschoolName": "Steven Siyuan Meng", "house": "Red", "birthdate": "", "altName": "Steven", "instrumentPart": "Baritone", "chair": "Steven"},
-    {"name": "Anne", "liveschoolName": "Anne Jiayue An", "house": "Green", "birthdate": "", "altName": "Anne", "instrumentPart": "Trumpet", "chair": "Anne"},
-    {"name": "Tyler", "liveschoolName": "Tyler Xiang Li", "house": "Red", "birthdate": "", "altName": "Tyler", "instrumentPart": "Clarinet", "chair": "Tyler"},
-    {"name": "June", "liveschoolName": "June Ziqiao Qin", "house": "Blue", "birthdate": "", "altName": "June", "instrumentPart": "Flute", "chair": "June"},
-    {"name": "Sophie", "liveschoolName": "Sophie Geng", "house": "Blue", "birthdate": "", "altName": "Sophie", "instrumentPart": "Horn", "chair": "Sophie"},
-    {"name": "Jesse", "liveschoolName": "Jesse Junxi Zeng", "house": "Blue", "birthdate": "", "altName": "Jesse", "instrumentPart": "Percussion", "chair": "Jesse"},
+    {"name": "Kerry", "liveschoolName": "Kerry Liu", "house": "Green", "birthdate": "", "altName": "Kerry", "instrumentPart": "Flute", "chair": "1"},
+    {"name": "Calvin", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "", "altName": "Calvin", "instrumentPart": "Tuba", "chair": "1"},
+    {"name": "Steven", "liveschoolName": "Steven Siyuan Meng", "house": "Red", "birthdate": "", "altName": "Steven", "instrumentPart": "Baritone", "chair": "1"},
+    {"name": "Anne", "liveschoolName": "Anne Jiayue An", "house": "Green", "birthdate": "", "altName": "Anne", "instrumentPart": "Trumpet", "chair": "3"},
+    {"name": "Tyler", "liveschoolName": "Tyler Xiang Li", "house": "Red", "birthdate": "", "altName": "Tyler", "instrumentPart": "Clarinet", "chair": "3"},
+    {"name": "June", "liveschoolName": "June Ziqiao Qin", "house": "Blue", "birthdate": "", "altName": "June", "instrumentPart": "Flute", "chair": "3"},
+    {"name": "Sophie", "liveschoolName": "Sophie Geng", "house": "Blue", "birthdate": "", "altName": "Sophie", "instrumentPart": "Horn", "chair": "2"},
+    {"name": "Jesse", "liveschoolName": "Jesse Junxi Zeng", "house": "Blue", "birthdate": "", "altName": "Jesse", "instrumentPart": "Percussion", "chair": "2"},
 
     //all others
     {"name": "Grace", "liveschoolName": "Grace Leqi Xiong", "house": "Red", "birthdate": "2013-01-19", "altName": "Grace", "instrumentPart": "Violin3", "chair": "5"},

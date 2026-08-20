@@ -1,24 +1,24 @@
 const masterList = [
     //Tech Theater
-    {"name": "Bella", "liveschoolName": "Fiona Fangyuan Bi", "house": "Red", "birthdate": "2009-04-21", "altName": "Fiona"},
-    {"name": "Julius", "liveschoolName": "Bella Yufei Bi", "house": "Yellow", "birthdate": "", "altName": "Bella"},
-    {"name": "Ricky C", "liveschoolName": "Julius Jinchen Che", "house": "Green", "birthdate": "", "altName": "Julius"},
-    {"name": "Vlan", "liveschoolName": "Ricky Ruiqi Chen", "house": "Green", "birthdate": "", "altName": "Ricky C"},
-    {"name": "Beryl", "liveschoolName": "Vlan Wai Lun Dong", "house": "Green", "birthdate": "", "altName": "Vlan"},
-    {"name": "Allen", "liveschoolName": "Tina Yantong Dong", "house": "Blue", "birthdate": "", "altName": "Beryl"},
-    {"name": "Yolanda", "liveschoolName": "Allen He", "house": "Red", "birthdate": "", "altName": "Allen"},
-    {"name": "Stella", "liveschoolName": "Yolanda Yuqian Li", "house": "Red", "birthdate": "", "altName": "Yolanda"},
-    {"name": "Cynthia", "liveschoolName": "Stella Yuxuan Li", "house": "Green", "birthdate": "", "altName": "Stella"},
-    {"name": "Annie", "liveschoolName": "Cynthia Sum Chi Liaw", "house": "Green", "birthdate": "", "altName": "Cynthia"},
-    {"name": "Yaffa", "liveschoolName": "Annie Huiling Liu", "house": "Red", "birthdate": "2008-07-02", "altName": "Annie"},
-    {"name": "Kenny", "liveschoolName": "Yaffa Hei Wun Luo", "house": "Green", "birthdate": "", "altName": "Yaffa"},
-    {"name": "Harry", "liveschoolName": "Kenny Yuan Wang", "house": "Green", "birthdate": "", "altName": "Kenny"},
-    {"name": "Aaliyah", "liveschoolName": "Harry Chak Hau Zhang", "house": "Yellow", "birthdate": "2009-02-21", "altName": "Harry"},
-    {"name": "Rachelle", "liveschoolName": "Aaliyah Hairuo Zhang", "house": "Yellow", "birthdate": "", "altName": "Aaliyah"},
-    {"name": "Kevin", "liveschoolName": "Rachelle Xinxin Zhang", "house": "Yellow", "birthdate": "", "altName": "Rachelle"},
-    {"name": "Sophie", "liveschoolName": "Kevin Haichen Zhao", "house": "Blue", "birthdate": "", "altName": "Kevin"},
-    {"name": "Ricky Z", "liveschoolName": "Sophie Zhijia Zhuang", "house": "Yellow", "birthdate": "", "altName": "Sophie"},
-    {"name": "Fiona", "liveschoolName": "Ricky Zong", "house": "Blue", "birthdate": "", "altName": "Ricky Z"},
+    {"name": "Fiona", "liveschoolName": "Fiona Fangyuan Bi", "house": "Red", "birthdate": "", "altName": "Ffi-ona"},
+    {"name": "Julius", "liveschoolName": "Julius Jinchen Che", "house": "Green", "birthdate": "", "altName": "Julius"},
+    {"name": "Harry", "liveschoolName": "Harry Chak Hau Zhang", "house": "Yellow", "birthdate": "", "altName": "Harry"},
+    {"name": "Kevin", "liveschoolName": "Kevin Haichen Zhao", "house": "Blue", "birthdate": "", "altName": "Kevin"},
+    {"name": "Bella", "liveschoolName": "Bella Yufei Bi", "house": "Yellow", "birthdate": "", "altName": "Bella"},
+    {"name": "Allen", "liveschoolName": "Allen He", "house": "Red", "birthdate": "", "altName": "Allen"},
+    {"name": "Yolanda", "liveschoolName": "Yolanda Yuqian Li", "house": "Red", "birthdate": "", "altName": "Yolawnda"},
+    {"name": "Cynthia", "liveschoolName": "Cynthia Sum Chi Liaw", "house": "Green", "birthdate": "", "altName": "Cynthia"},
+    {"name": "Yaffa", "liveschoolName": "Yaffa Hei Wun Luo", "house": "Green", "birthdate": "", "altName": "Yaffa"},
+    {"name": "Aaliyah", "liveschoolName": "Aaliyah Hairuo Zhang", "house": "Yellow", "birthdate": "", "altName": "Aaliyah"},
+    {"name": "Rachelle", "liveschoolName": "Rachelle Xinxin Zhang", "house": "Yellow", "birthdate": "", "altName": "Raciale"},
+    {"name": "Beryl", "liveschoolName": "Tina Yantong Dong", "house": "Blue", "birthdate": "", "altName": "Barrel"},
+    {"name": "Stella L", "liveschoolName": "Stella Yuxuan Li", "house": "Green", "birthdate": "", "altName": "Stella"},
+    {"name": "Kenny", "liveschoolName": "Kenny Yuan Wang", "house": "Green", "birthdate": "", "altName": "Kenny"},
+    {"name": "Ricky C", "liveschoolName": "Ricky Ruiqi Chen", "house": "Green", "birthdate": "", "altName": "Ricky C"},
+    {"name": "Vlan", "liveschoolName": "Vlan Wai Lun Dong", "house": "Green", "birthdate": "", "altName": "Vlan"},
+    {"name": "Annie", "liveschoolName": "Annie Huiling Liu", "house": "Red", "birthdate": "", "altName": "Annie"},
+    {"name": "Sophie Z", "liveschoolName": "Sophie Zhijia Zhuang", "house": "Yellow", "birthdate": "", "altName": "Sophie"},
+    {"name": "Ricky Z", "liveschoolName": "Ricky Zong", "house": "Blue", "birthdate": "", "altName": "Ricky Z"},
 
     //AP Music Theory
     {"name": "Jocelyn", "liveschoolName": "Jocelyn Lan Bai", "house": "Blue", "birthdate": "", "altName": "Jocelyn"},
@@ -29,29 +29,28 @@ const masterList = [
     {"name": "William", "liveschoolName": "William Zhiwen Zheng", "house": "Yellow", "birthdate": "", "altName": "William"},
     
     //MS Band
-    {"name": "Anton", "liveschoolName": "Anton Jiayu Ding", "house": "Green", "birthdate": "", "altName": "Anton", "instrumentPart": "Percussion", "chair": "99"},
+    {"name": "Anton", "liveschoolName": "Anton Jiayu Ding", "house": "Green", "birthdate": "", "altName": "Anton", "instrumentPart": "Trumpet", "chair": "3"},
     {"name": "Jefferey", "liveschoolName": "Jeffrey Nie", "house": "Blue", "birthdate": "", "altName": "Jefferey", "instrumentPart": "Alto Sax", "chair": "3"},
-    {"name": "Jason", "liveschoolName": "Jason Junfeng Shen", "house": "Red", "birthdate": "", "altName": "Jason", "instrumentPart": "Flute", "chair": "5"},
-    {"name": "Daniel D", "liveschoolName": "Daniel Zeyang Dou", "house": "Blue", "birthdate": "", "altName": "Daniel", "instrumentPart": "Flute", "chair": "5"},
-    {"name": "Stella S", "liveschoolName": "Stella Yizhi Shang", "house": "Green", "birthdate": "2012-02-29", "altName": "Stella", "instrumentPart": "Cello1", "chair": "1"},
+    {"name": "Jason", "liveschoolName": "Jason Junfeng Shen", "house": "Red", "birthdate": "", "altName": "Jason", "instrumentPart": "Flute", "chair": "4"},
+    {"name": "Daniel D", "liveschoolName": "Daniel Zeyang Dou", "house": "Blue", "birthdate": "", "altName": "Daniel", "instrumentPart": "Trumpet", "chair": "5"},
+    {"name": "Stella S", "liveschoolName": "Stella Yizhi Shang", "house": "Green", "birthdate": "2012-02-29", "altName": "Stella", "instrumentPart": "Cello", "chair": "1"},
     {"name": "Zachary", "liveschoolName": "Zachary Yang", "house": "Green", "birthdate": "2012-12-29", "altName": "Zachary", "instrumentPart": "Trumpet", "chair": "2"},
-    {"name": "Rebecca", "liveschoolName": "Rebecca Tsz Yin Cheung", "house": "Blue", "birthdate": "2012-05-28", "altName": "Rebecca", "instrumentPart": "Violin1", "chair": "4"},
-    {"name": "Shine", "liveschoolName": "Shine Yu Duan", "house": "Blue", "birthdate": "2013-02-14", "altName": "Shine", "instrumentPart": "Violin1", "chair": "2"},
-    {"name": "Kyla", "liveschoolName": "Kyla Shi", "house": "Red", "birthdate": "2013-03-25", "altName": "Kyla", "instrumentPart": "Cello1", "chair": "2"},
-    {"name": "Amanda", "liveschoolName": "Amanda Seoah Song", "house": "Green", "birthdate": "", "altName": "Amanda", "instrumentPart": "Percussion", "chair": "99"},
-    {"name": "Austen", "liveschoolName": "Austen Lihan Xie", "house": "Yellow", "birthdate": "2013-01-02", "altName": "Austen", "instrumentPart": "Cello2", "chair": "3"},
-    {"name": "Rene", "liveschoolName": "Rene King Hei Tang", "house": "Red", "birthdate": "2013-03-28", "altName": "Renee", "instrumentPart": "Contrabass", "chair": "2"},
-    {"name": "Ethan", "liveschoolName": "Ethan Tsz Ip Zhang", "house": "Blue", "birthdate": "", "altName": "Ethan", "instrumentPart": "Trumpet", "chair": "6"},
+    {"name": "Rebecca", "liveschoolName": "Rebecca Tsz Yin Cheung", "house": "Blue", "birthdate": "2012-05-28", "altName": "Rebecca", "instrumentPart": "Violin", "chair": "4"},
+    {"name": "Shine", "liveschoolName": "Shine Yu Duan", "house": "Blue", "birthdate": "2013-02-14", "altName": "Shine", "instrumentPart": "Violin", "chair": "2"},
+    {"name": "Kyla", "liveschoolName": "Kyla Shi", "house": "Red", "birthdate": "2013-03-25", "altName": "Kyla", "instrumentPart": "Cello", "chair": "2"},
+    {"name": "Amanda", "liveschoolName": "Amanda Seoah Song", "house": "Green", "birthdate": "", "altName": "Amanda", "instrumentPart": "Percussion", "chair": "3"},
+    {"name": "Austen", "liveschoolName": "Austen Lihan Xie", "house": "Yellow", "birthdate": "2013-01-02", "altName": "Austen", "instrumentPart": "Cello", "chair": "5"},
+    {"name": "Rene", "liveschoolName": "Rene King Hei Tang", "house": "Red", "birthdate": "2013-03-28", "altName": "Rene", "instrumentPart": "Contrabass", "chair": "2"},
+    {"name": "Ethan", "liveschoolName": "Ethan Tsz Ip Zhang", "house": "Blue", "birthdate": "", "altName": "Ethan", "instrumentPart": "Trumpet", "chair": "3"},
     {"name": "Francis", "liveschoolName": "Francis Liu", "house": "Blue", "birthdate": "2013-01-31", "altName": "Francis", "instrumentPart": "Alto Sax", "chair": "2"},
-    {"name": "Jacky", "liveschoolName": "Jacky Tsz Hin Cheung", "house": "Green", "birthdate": "2014-08-30", "altName": "Jacky", "instrumentPart": "Violin2", "chair": "5"},
-    {"name": "Matthew", "liveschoolName": "Matthew Enhao Feng", "house": "Yellow", "birthdate": "2013-12-16", "altName": "Matthew", "instrumentPart": "Violin2", "chair": "4"},
-    {"name": "Oscar", "liveschoolName": "Oscar Xinchen Fang", "house": "Red", "birthdate": "2013-03-20", "altName": "Oscar", "instrumentPart": "Violin1", "chair": "3"},
-    {"name": "Grace", "liveschoolName": "Grace Leqi Xiong", "house": "Red", "birthdate": "2013-01-19", "altName": "Grace", "instrumentPart": "Violin3", "chair": "5"},
-    {"name": "Kyra", "liveschoolName": "Kyra Jiaqi Yan", "house": "Yellow", "birthdate": "", "altName": "Kira", "instrumentPart": "Percussion", "chair": "99"},
-    {"name": "Felix", "liveschoolName": "Felix Jiaxi Hong", "house": "Blue", "birthdate": "", "altName": "Felix", "instrumentPart": "Cello2", "chair": "4"},
-    {"name": "Paris", "liveschoolName": "Paris Shiyu Liang", "house": "Blue", "birthdate": "", "altName": "Paris", "instrumentPart": "Flute", "chair": "4"},
-    {"name": "Coco", "liveschoolName": "Coco Yuguo Luo", "house": "Yellow", "birthdate": "", "altName": "Coco", "instrumentPart": "Cello2", "chair": "8"},
-    {"name": "Grant", "liveschoolName": "Grant Zhang", "house": "Green", "birthdate": "2014-02-11", "altName": "Grant", "instrumentPart": "Violin2", "chair": "8"},
+    {"name": "Jacky", "liveschoolName": "Jacky Tsz Hin Cheung", "house": "Green", "birthdate": "2014-08-30", "altName": "Jacky", "instrumentPart": "Violin", "chair": "5"},
+    {"name": "Matthew", "liveschoolName": "Matthew Enhao Feng", "house": "Yellow", "birthdate": "2013-12-16", "altName": "Matthew", "instrumentPart": "Violin", "chair": "7"},
+    {"name": "Oscar", "liveschoolName": "Oscar Xinchen Fang", "house": "Red", "birthdate": "2013-03-20", "altName": "Oscar", "instrumentPart": "Violin", "chair": "3"},
+    {"name": "Kyra", "liveschoolName": "Kyra Jiaqi Yan", "house": "Yellow", "birthdate": "", "altName": "Kira", "instrumentPart": "Viola", "chair": "2"},
+    {"name": "Felix", "liveschoolName": "Felix Jiaxi Hong", "house": "Blue", "birthdate": "", "altName": "Felix", "instrumentPart": "Cello", "chair": "6"},
+    {"name": "Paris", "liveschoolName": "Paris Shiyu Liang", "house": "Blue", "birthdate": "", "altName": "Paris", "instrumentPart": "Flute", "chair": "3"},
+    {"name": "Coco", "liveschoolName": "Coco Yuguo Luo", "house": "Yellow", "birthdate": "", "altName": "Coco", "instrumentPart": "Viola", "chair": "2"},
+    {"name": "Grant", "liveschoolName": "Grant Zhang", "house": "Green", "birthdate": "2014-02-11", "altName": "Grant", "instrumentPart": "Violin", "chair": "6"},
 
     //HS Band
     {"name": "Anne", "liveschoolName": "Anne Jiayue An", "house": "Green", "birthdate": "2011-06-13", "altName": "Anne", "instrumentPart": "Trumpet", "chair": "4"},
@@ -64,6 +63,7 @@ const masterList = [
     {"name": "Jesse", "liveschoolName": "Jesse Junxi Zeng", "house": "Blue", "birthdate": "", "altName": "Jesse", "instrumentPart": "Percussion", "chair": "99"},
 
     //all others
+    {"name": "Grace", "liveschoolName": "Grace Leqi Xiong", "house": "Red", "birthdate": "2013-01-19", "altName": "Grace", "instrumentPart": "Violin3", "chair": "5"},
     {"name": "Nancy", "liveschoolName": "Nancy Han", "house": "Yellow", "birthdate": "2013-07-16", "altName": "Nancy", "instrumentPart": "Violin3", "chair": "4"},
     {"name": "Hannah", "liveschoolName": "Hannah Ruihan Chen", "house": "Yellow", "birthdate": "2013-01-19", "altName": "Hannah", "instrumentPart": "Clarinet", "chair": "7"},
     {"name": "Andy", "liveschoolName": "Andy Xuanyu Feng", "house": "Green", "birthdate": "2012-01-13", "altName": "Andy", "instrumentPart": "Violin2", "chair": "3"},
@@ -97,7 +97,7 @@ const masterList = [
 ];
 
 const techTheaterStudents = [
-    'Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella L', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z'
+    'Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Yolanda', 'Cynthia', 'Yaffa', 'Aaliyah', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Annie', 'Sophie', 'Ricky Z'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -113,10 +113,10 @@ const techTheaterStudents = [
     };
 });
 
-const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella L', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z'];
+const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Yolanda', 'Cynthia', 'Yaffa', 'Aaliyah', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Annie', 'Sophie', 'Ricky Z'];
 
 
-const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Cynthia', 'Yaffa', 'Rachelle', 'Beryl', 'Stella L', 'Kenny', 'Ricky C', 'Vlan', 'Sophie Z']
+const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Yolanda', 'Cynthia', 'Yaffa', 'Aaliyah', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Annie', 'Sophie', 'Ricky Z']
 
 
 
@@ -145,7 +145,7 @@ const apMusicTheorySeniorProjects = ['Thomas']
 
 
 const msBandStudents = [
-   'Anton', 'Jefferey', 'Jason', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace', 'Kyra', 'Felix', 'Paris', 'Coco', 'Grant'
+   'Anton', 'Jefferey', 'Jason', 'Daniel D', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Kyra', 'Felix', 'Paris', 'Coco', 'Grant'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -161,13 +161,13 @@ const msBandStudents = [
     };
 });
 
-const msBandTeacherModeOrder = ['Anton', 'Jefferey', 'Jason', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace', 'Kyra', 'Felix', 'Paris', 'Coco', 'Grant'];
+const msBandTeacherModeOrder = ['Anton', 'Jefferey', 'Jason', 'Daniel D', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Kyra', 'Felix', 'Paris', 'Coco', 'Grant'];
 
 
 
 
 const msBandThursdayStudents = [
-    'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace', 'Kyra', 'Felix', 'Paris', 'Coco', 'Grant'
+    'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Kyra', 'Felix', 'Paris', 'Coco', 'Grant'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -183,7 +183,7 @@ const msBandThursdayStudents = [
     };
 });
 
-const msBandThursdayTeacherModeOrder = ['Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Grace', 'Kyra', 'Felix', 'Paris', 'Coco', 'Grant'];
+const msBandThursdayTeacherModeOrder = ['Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Ethan', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Kyra', 'Felix', 'Paris', 'Coco', 'Grant'];
 
 
 

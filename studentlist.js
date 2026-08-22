@@ -2,23 +2,21 @@ const masterList = [
     //Tech Theater
     {"name": "Fiona", "liveschoolName": "Fiona Fangyuan Bi", "house": "Red", "birthdate": "", "altName": "Ffi-ona"},
     {"name": "Julius", "liveschoolName": "Julius Jinchen Che", "house": "Green", "birthdate": "", "altName": "Julius"},
-    {"name": "Harry", "liveschoolName": "Harry Chak Hau Zhang", "house": "Yellow", "birthdate": "", "altName": "Harry"},
-    {"name": "Kevin", "liveschoolName": "Kevin Haichen Zhao", "house": "Blue", "birthdate": "", "altName": "Kevin"},
-    {"name": "Bella", "liveschoolName": "Bella Yufei Bi", "house": "Yellow", "birthdate": "", "altName": "Bella"},
+    {"name": "Vlan", "liveschoolName": "Vlan Wai Lun Dong", "house": "Green", "birthdate": "", "altName": "Vlan"},
+    {"name": "Beryl", "liveschoolName": "Tina Yantong Dong", "house": "Blue", "birthdate": "", "altName": "Barrel"},
     {"name": "Allen", "liveschoolName": "Allen He", "house": "Red", "birthdate": "", "altName": "Allen"},
     {"name": "Yolanda", "liveschoolName": "Yolanda Yuqian Li", "house": "Red", "birthdate": "", "altName": "Yolawnda"},
+    {"name": "Stella", "liveschoolName": "Stella Yuxuan Li", "house": "Green", "birthdate": "", "altName": "Stella"},
     {"name": "Cynthia", "liveschoolName": "Cynthia Sum Chi Liaw", "house": "Green", "birthdate": "", "altName": "Cynthia"},
     {"name": "Yaffa", "liveschoolName": "Yaffa Hei Wun Luo", "house": "Green", "birthdate": "", "altName": "Yaffa"},
+    {"name": "Kenny", "liveschoolName": "Kenny Yuan Wang", "house": "Green", "birthdate": "", "altName": "Kenny"},
+    {"name": "Harry", "liveschoolName": "Harry Chak Hau Zhang", "house": "Yellow", "birthdate": "", "altName": "Harry"},
     {"name": "Aaliyah", "liveschoolName": "Aaliyah Hairuo Zhang", "house": "Yellow", "birthdate": "", "altName": "Aaliyah"},
     {"name": "Rachelle", "liveschoolName": "Rachelle Xinxin Zhang", "house": "Yellow", "birthdate": "", "altName": "Raciale"},
-    {"name": "Beryl", "liveschoolName": "Tina Yantong Dong", "house": "Blue", "birthdate": "", "altName": "Barrel"},
-    {"name": "Stella L", "liveschoolName": "Stella Yuxuan Li", "house": "Green", "birthdate": "", "altName": "Stella"},
-    {"name": "Kenny", "liveschoolName": "Kenny Yuan Wang", "house": "Green", "birthdate": "", "altName": "Kenny"},
-    {"name": "Ricky C", "liveschoolName": "Ricky Ruiqi Chen", "house": "Green", "birthdate": "", "altName": "Ricky C"},
-    {"name": "Vlan", "liveschoolName": "Vlan Wai Lun Dong", "house": "Green", "birthdate": "", "altName": "Vlan"},
-    {"name": "Annie", "liveschoolName": "Annie Huiling Liu", "house": "Red", "birthdate": "", "altName": "Annie"},
-    {"name": "Sophie Z", "liveschoolName": "Sophie Zhijia Zhuang", "house": "Yellow", "birthdate": "", "altName": "Sophie"},
+    {"name": "Kevin", "liveschoolName": "Kevin Haichen Zhao", "house": "Blue", "birthdate": "", "altName": "Kevin"},
+    {"name": "Sophie", "liveschoolName": "Sophie Zhijia Zhuang", "house": "Yellow", "birthdate": "", "altName": "Sophie"},
     {"name": "Ricky Z", "liveschoolName": "Ricky Zong", "house": "Blue", "birthdate": "", "altName": "Ricky Z"},
+    {"name": "Eric", "liveschoolName": "Eric Yiru Zeng", "house": "Green", "birthdate": "", "altName": "Eric"},
 
     //AP Music Theory
     {"name": "Jocelyn", "liveschoolName": "Jocelyn Lan Bai", "house": "Blue", "birthdate": "", "altName": "Jocelyn"},
@@ -97,7 +95,7 @@ const masterList = [
 ];
 
 const techTheaterStudents = [
-    'Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Yolanda', 'Cynthia', 'Yaffa', 'Aaliyah', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Annie', 'Sophie', 'Ricky Z'
+    'Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky Z', 'Eric'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -113,10 +111,10 @@ const techTheaterStudents = [
     };
 });
 
-const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Yolanda', 'Cynthia', 'Yaffa', 'Aaliyah', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Annie', 'Sophie', 'Ricky Z'];
+const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky Z', 'Eric'];
 
 
-const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Harry', 'Kevin', 'Bella', 'Allen', 'Yolanda', 'Cynthia', 'Yaffa', 'Aaliyah', 'Rachelle', 'Beryl', 'Stella', 'Kenny', 'Ricky C', 'Vlan', 'Annie', 'Sophie', 'Ricky Z']
+const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky Z', 'Eric']
 
 
 

@@ -14,7 +14,7 @@ const STICKY_NOTES_CONFIG = [
         forWhichClasses: ["AP Music Theory"],          
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
-        textContent: 'Get a melodica on 淘宝',
+        textContent: 'Keep upping your high scores! Practice makes perfect',
         // Don\'t forget to join a HS session this week 💡
         imageSrc: '',
         backgroundColor: '#ff9999', // red

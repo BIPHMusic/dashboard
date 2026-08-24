@@ -155,6 +155,31 @@ const classes = [
         ],
         criteria: ['devices', 'engagement', 'review', 'progress']
     },
+
+    {
+        name: "AE",
+        timeRange: "9:50 - 10:10",                   
+        days: ["Monday",  "Wednesday", "Friday"], 
+        startTime: { hours: 9, minutes: 50 },        
+        endTime:   { hours: 10, minutes: 10 },       
+        students: aeStudents,                     
+        teacherModeOrder: aeStudents.map(s => s.name),
+        objectivesKey: "aeObjectives",
+        defaultObjectives: [
+            'Complete homework',
+            'Review for tests',
+            'Ask questions'
+        ],
+        sampleObjectives: [
+            'Complete homework',
+            'Review for tests',
+            'Ask questions',
+            'Independent work',
+            'Housekeeping'
+        ],
+        criteria: ['devices', 'engagement', 'review', 'progress']  
+    },
+
     {
         name: "AP Music Theory",
         timeRange: "10:45 - 11:35",                   
@@ -162,7 +187,7 @@ const classes = [
         startTime: { hours: 10, minutes: 45 },
         endTime: { hours: 11, minutes: 35 },
         students: apMusicTheoryStudents,
-        teacherModeOrder: apMusicTheoryStudents.map(s => s.name),   // falls back to student list order
+        teacherModeOrder: apMusicTheoryStudents.map(s => s.name),  
         objectivesKey: "apMusicTheoryObjectives",
         defaultObjectives: [
             'Review theory concepts',
@@ -179,7 +204,7 @@ const classes = [
             'Independent work',
             'Housekeeping'
         ],
-        criteria: ['stands', 'intonation', 'returned', 'engagement']  // reuses existing band-style criteria & hotkeys
+        criteria: ['devices', 'engagement', 'review', 'progress']  
     },
     {
         name: "MS Band",
@@ -1949,6 +1974,7 @@ function updateSearchResults(query) {
         const currentStudentNames = students.map(s => s.name);
         matchingStudents = masterList
             .filter(student => !currentStudentNames.includes(student.name))
+            .filter(student => student.addable !== "no")   // ← new filter: only show addable students
             .filter(student => student.name.toLowerCase().includes(query.toLowerCase()));
     } else {
         matchingStudents = students.filter(student => 
@@ -2109,7 +2135,7 @@ function darkenHex(hex, amount = 0.35) {
 
 function applyBarColor(bar, student) {
     const cls = classes[currentClassIndex];
-    const noInstrumentColorClasses = ["Tech Theater", "AP Music Theory"];
+    const noInstrumentColorClasses = ["Tech Theater", "AP Music Theory", "AE"];
 
     // Force standard blue for these classes
     if (noInstrumentColorClasses.includes(cls.name)) {

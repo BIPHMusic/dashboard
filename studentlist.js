@@ -1,30 +1,55 @@
 const masterList = [
     //Tech Theater
-    {"name": "Fiona", "liveschoolName": "Fiona Fangyuan Bi", "house": "Red", "birthdate": "", "altName": "Ffi-ona"},
-    {"name": "Julius", "liveschoolName": "Julius Jinchen Che", "house": "Green", "birthdate": "", "altName": "Julius"},
-    {"name": "Vlan", "liveschoolName": "Vlan Wai Lun Dong", "house": "Green", "birthdate": "", "altName": "Vlan"},
-    {"name": "Beryl", "liveschoolName": "Tina Yantong Dong", "house": "Blue", "birthdate": "", "altName": "Barrel"},
-    {"name": "Allen", "liveschoolName": "Allen He", "house": "Red", "birthdate": "", "altName": "Allen"},
-    {"name": "Yolanda", "liveschoolName": "Yolanda Yuqian Li", "house": "Red", "birthdate": "", "altName": "Yolawnda"},
-    {"name": "Stella", "liveschoolName": "Stella Yuxuan Li", "house": "Green", "birthdate": "", "altName": "Stella"},
-    {"name": "Cynthia", "liveschoolName": "Cynthia Sum Chi Liaw", "house": "Green", "birthdate": "", "altName": "Cynthia"},
-    {"name": "Yaffa", "liveschoolName": "Yaffa Hei Wun Luo", "house": "Green", "birthdate": "", "altName": "Yaffa"},
-    {"name": "Kenny", "liveschoolName": "Kenny Yuan Wang", "house": "Green", "birthdate": "", "altName": "Kenny"},
-    {"name": "Harry", "liveschoolName": "Harry Chak Hau Zhang", "house": "Yellow", "birthdate": "", "altName": "Harry"},
-    {"name": "Aaliyah", "liveschoolName": "Aaliyah Hairuo Zhang", "house": "Yellow", "birthdate": "", "altName": "Aaliyah"},
-    {"name": "Rachelle", "liveschoolName": "Rachelle Xinxin Zhang", "house": "Yellow", "birthdate": "", "altName": "Raciale"},
-    {"name": "Kevin", "liveschoolName": "Kevin Haichen Zhao", "house": "Blue", "birthdate": "", "altName": "Kevin"},
-    {"name": "Sophie", "liveschoolName": "Sophie Zhijia Zhuang", "house": "Yellow", "birthdate": "", "altName": "Sophie"},
-    {"name": "Ricky Z", "liveschoolName": "Ricky Zong", "house": "Blue", "birthdate": "", "altName": "Ricky Z"},
-    {"name": "Eric", "liveschoolName": "Eric Yiru Zeng", "house": "Green", "birthdate": "", "altName": "Eric"},
+    {"name": "Fiona", "liveschoolName": "Fiona Fangyuan Bi", "house": "Red", "birthdate": "", "altName": "Ffi-ona", "addable": "no"},
+    {"name": "Julius", "liveschoolName": "Julius Jinchen Che", "house": "Green", "birthdate": "", "altName": "Julius", "addable": "no"},
+    {"name": "Vlan", "liveschoolName": "Vlan Wai Lun Dong", "house": "Green", "birthdate": "", "altName": "Vlan", "addable": "no"},
+    {"name": "Beryl", "liveschoolName": "Tina Yantong Dong", "house": "Blue", "birthdate": "", "altName": "Barrel", "addable": "no"},
+    {"name": "Allen", "liveschoolName": "Allen He", "house": "Red", "birthdate": "", "altName": "Allen", "addable": "no"},
+    {"name": "Yolanda", "liveschoolName": "Yolanda Yuqian Li", "house": "Red", "birthdate": "", "altName": "Yolawnda", "addable": "no"},
+    {"name": "Stella", "liveschoolName": "Stella Yuxuan Li", "house": "Green", "birthdate": "", "altName": "Stella", "addable": "no"},
+    {"name": "Cynthia", "liveschoolName": "Cynthia Sum Chi Liaw", "house": "Green", "birthdate": "", "altName": "Cynthia", "addable": "no"},
+    {"name": "Yaffa", "liveschoolName": "Yaffa Hei Wun Luo", "house": "Green", "birthdate": "", "altName": "Yaffa", "addable": "yes"},
+    {"name": "Kenny", "liveschoolName": "Kenny Yuan Wang", "house": "Green", "birthdate": "", "altName": "Kenny", "addable": "no"},
+    {"name": "Harry", "liveschoolName": "Harry Chak Hau Zhang", "house": "Yellow", "birthdate": "", "altName": "Harry", "addable": "no"},
+    {"name": "Aaliyah", "liveschoolName": "Aaliyah Hairuo Zhang", "house": "Yellow", "birthdate": "", "altName": "Aaliyah", "addable": "no"},
+    {"name": "Rachelle", "liveschoolName": "Rachelle Xinxin Zhang", "house": "Yellow", "birthdate": "", "altName": "Raciale", "addable": "no"},
+    {"name": "Kevin", "liveschoolName": "Kevin Haichen Zhao", "house": "Blue", "birthdate": "", "altName": "Kevin", "addable": "no"},
+    {"name": "Sophie", "liveschoolName": "Sophie Zhijia Zhuang", "house": "Yellow", "birthdate": "", "altName": "Sophie", "addable": "no"},
+    {"name": "Ricky Z", "liveschoolName": "Ricky Zong", "house": "Blue", "birthdate": "", "altName": "Ricky Z", "addable": "no"},
+    {"name": "Eric", "liveschoolName": "Eric Yiru Zeng", "house": "Green", "birthdate": "", "altName": "Eric", "addable": "no"},
+
+    //AE
+    {"name": "Shawn", "liveschoolName": "Shawn Chengkun Bi", "house": "Red", "birthdate": "", "altName": "Shawn", "addable": "no"},
+    {"name": "Sisi", "liveschoolName": "Arianna Sisi Chen", "house": "Green", "birthdate": "", "altName": "Arianna", "addable": "no"},
+    {"name": "Bella", "liveschoolName": "Bella Yaxi Chen", "house": "Red", "birthdate": "", "altName": "Bella", "addable": "no"},
+    {"name": "Rebecca", "liveschoolName": "Rebecca Tsz Yin Cheung", "house": "Blue", "birthdate": "", "altName": "Rebecca", "addable": "no"},
+    {"name": "Shine", "liveschoolName": "Shine Yu Duan", "house": "Blue", "birthdate": "", "altName": "Shine", "addable": "no"},
+    {"name": "Jonathan", "liveschoolName": "", "house": "Blue", "birthdate": "", "altName": "Jonathan", "addable": "no"},
+    {"name": "Olivia", "liveschoolName": "", "house": "Yellow", "birthdate": "", "altName": "Olivia", "addable": "no"},
+    {"name": "Kim", "liveschoolName": "", "house": "Blue", "birthdate": "", "altName": "Kim", "addable": "no"},
+    {"name": "Phyllis", "liveschoolName": "", "house": "Red", "birthdate": "", "altName": "Phyllis", "addable": "no"},
+    {"name": "Laura", "liveschoolName": "", "house": "Yellow", "birthdate": "", "altName": "Laura", "addable": "no"},
+    {"name": "Andy", "liveschoolName": "", "house": "Yellow", "birthdate": "", "altName": "Andy", "addable": "no"},
+    {"name": "Kyla", "liveschoolName": "Kyla Shi", "house": "Red", "birthdate": "", "altName": "Kyla", "addable": "no"},
+    {"name": "Amanda", "liveschoolName": "Amanda Seoah Song", "house": "Green", "birthdate": "", "altName": "Amanda", "addable": "no"},
+    {"name": "Damon", "liveschoolName": "", "house": "Green", "birthdate": "", "altName": "Damon", "addable": "no"},
+    {"name": "Daisy", "liveschoolName": "", "house": "Red", "birthdate": "", "altName": "Daisy", "addable": "no"},
+    {"name": "Austen", "liveschoolName": "Austen Lihan Xie", "house": "Yellow", "birthdate": "", "altName": "Austen", "addable": "no"},
+    {"name": "Elon", "liveschoolName": "", "house": "Green", "birthdate": "", "altName": "Elon", "addable": "no"},
+    {"name": "Eva", "liveschoolName": "", "house": "Blue", "birthdate": "", "altName": "Eva", "addable": "no"},
+    {"name": "William", "liveschoolName": "", "house": "Green", "birthdate": "", "altName": "William", "addable": "no"},
+    {"name": "Molly", "liveschoolName": "", "house": "Green", "birthdate": "", "altName": "Molly", "addable": "no"},
+    {"name": "Lucky", "liveschoolName": "", "house": "Green", "birthdate": "", "altName": "Lucky", "addable": "no"},
+    {"name": "Jerry", "liveschoolName": "", "house": "Red", "birthdate": "", "altName": "Jerry", "addable": "no"},
+    {"name": "Bob", "liveschoolName": "", "house": "Yellow", "birthdate": "", "altName": "Bob", "addable": "no"},
 
     //AP Music Theory
-    {"name": "Jocelyn", "liveschoolName": "Jocelyn Lan Bai", "house": "Blue", "birthdate": "", "altName": "Jocelyn"},
-    {"name": "Maggie", "liveschoolName": "Maggie Gan", "house": "Red", "birthdate": "", "altName": "Maggie"},
-    {"name": "Teresa", "liveschoolName": "Teresa Mingxun Jiang", "house": "Green", "birthdate": "", "altName": "Teresa"},
-    {"name": "Thomas", "liveschoolName": "Thomas Hongyi Long", "house": "Red", "birthdate": "", "altName": "Thomas"},
-    {"name": "Calvin", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "", "altName": "Calvin", "instrumentPart": "Tuba"},
-    {"name": "William", "liveschoolName": "William Zhiwen Zheng", "house": "Yellow", "birthdate": "", "altName": "William"},
+    {"name": "Thomas", "liveschoolName": "Thomas Hongyi Long", "house": "Red", "birthdate": "", "altName": "Thomas", "addable": "no"},
+    {"name": "Calvin", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "", "altName": "Calvin", "addable": "no"},
+    {"name": "William", "liveschoolName": "William Zhiwen Zheng", "house": "Yellow", "birthdate": "", "altName": "William", "addable": "no"},
+    {"name": "Jocelyn", "liveschoolName": "Jocelyn Lan Bai", "house": "Blue", "birthdate": "", "altName": "Jocelyn", "addable": "no"},
+    {"name": "Maggie", "liveschoolName": "Maggie Gan", "house": "Red", "birthdate": "", "altName": "Maggie", "addable": "no"},
+    {"name": "Teresa", "liveschoolName": "Teresa Mingxun Jiang", "house": "Green", "birthdate": "", "altName": "Teresa", "addable": "no"},
     
     //MS Band
     {"name": "Anton", "liveschoolName": "Anton Jiayu Ding", "house": "Green", "birthdate": "", "altName": "Anton", "instrumentPart": "Trumpet", "chair": "3"},
@@ -94,6 +119,7 @@ const masterList = [
     {"name": "Odelia", "liveschoolName": "Odelia Yunhan Xie", "house": "Green", "birthdate": "", "altName": "Odelia", "instrumentPart": "Violin3", "chair": "3"},
 ];
 
+
 const techTheaterStudents = [
     'Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky Z', 'Eric'
 ].map(name => {
@@ -103,10 +129,10 @@ const techTheaterStudents = [
         birthdate: studentInfo ? studentInfo.birthdate : null,
         score: 'EX',
         attendance: 'Absent',
-        stands: false,
-        ipads: false,
-        returned: false,
+        devices: false,
         engagement: false,
+        review: false,
+        progress: false,
         housePoints: 0
     };
 });
@@ -115,6 +141,28 @@ const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen'
 
 
 const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky Z', 'Eric']
+
+
+
+const aeStudents = [
+    'Shawn', 'Sisi', 'Bella', 'Rebecca', 'Shine', 'Jonathan', 'Olivia', 'Kim', 'Phyllis', 'Laura', 'Andy', 'Kyla', 'Amanda', 'Damon', 'Daisy', 'Austen', 'Elon', 'Eva', 'William', 'Molly', 'Lucky', 'Jerry', 'Bob'
+].map(name => {
+    const studentInfo = masterList.find(s => s.name === name);
+    return {
+        name,
+        birthdate: studentInfo ? studentInfo.birthdate : null,
+        score: 'EX',
+        attendance: 'Absent',
+        devices: false,
+        engagement: false,
+        review: false,
+        progress: false,
+        housePoints: 0
+    };
+});
+
+const aeTeacherModeOrder = ['Shawn', 'Sisi', 'Bella', 'Rebecca', 'Shine', 'Jonathan', 'Olivia', 'Kim', 'Phyllis', 'Laura', 'Andy', 'Kyla', 'Amanda', 'Damon', 'Daisy', 'Austen', 'Elon', 'Eva', 'William', 'Molly', 'Lucky', 'Jerry', 'Bob'];
+
 
 
 
@@ -127,10 +175,10 @@ const apMusicTheoryStudents = [
         birthdate: studentInfo ? studentInfo.birthdate : null,
         score: 'EX',
         attendance: 'Absent',
-        stands: false,
-        ipads: false,
-        returned: false,
+        devices: false,
         engagement: false,
+        review: false,
+        progress: false,
         housePoints: 0
     };
 });

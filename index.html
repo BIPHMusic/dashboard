@@ -296,6 +296,23 @@ let announcedCountdowns = new Set();
 let lastAnnouncedClassKey = null;
 let audioContext = null;
 
+function getMasterStudent(name) {
+    const clsName = classes[currentClassIndex].name;
+    const normalizedClass = clsName === "MS Band ᵀᴴᵁᴿˢ" ? "MS Band" : clsName;
+
+    // 1. Exact class match (normal case for students who belong to this class)
+    let entry = masterList.find(s => s.name === name && s.class === normalizedClass);
+    if (entry) return entry;
+
+    // 2. Prefer any entry that has an instrumentPart
+    //    (this is the key for students you pull in from another class)
+    entry = masterList.find(s => s.name === name && s.instrumentPart);
+    if (entry) return entry;
+
+    // 3. Any remaining entry
+    return masterList.find(s => s.name === name) || null;
+}
+
 function getClassAnnouncementKey() {
     const cls = classes[currentClassIndex];
     const today = new Date().toLocaleDateString('en-US');
@@ -813,8 +830,8 @@ function updateHousePoints(name, change) {
         updateBarGraph(student);
         const housePointsElement = document.querySelector(`#bar-${CSS.escape(student.name)} .house-points`);
         if (housePointsElement) {
-            const houseInfo = masterList.find(s => s.name === student.name);
-            const houseColor = getHouseColor(houseInfo.house);
+            const houseInfo = getMasterStudent(student.name);
+            const houseColor = getHouseColor(houseInfo ? houseInfo.house : "gray");
             housePointsElement.style.transition = 'background-color 1.0s ease, backdrop-filter 1.0s ease';
             housePointsElement.style.backgroundColor = `${houseColor}CC`;
             setTimeout(() => {
@@ -835,19 +852,12 @@ function getHouseColor(house) {
 }
 
 function sortByInstrumentPart(baseList, isNameArray = false) {
-    // Returns a new array sorted by:
-    // 1. instrumentPart (using instrumentPartOrder)
-    // 2. chair number (lower chair first) within the same instrumentPart
-    // 3. original index as final tie-breaker (stable)
-    // Students without a recognized instrumentPart appear after all instrumented students.
-
     const withIndex = baseList.map((item, idx) => {
         const name = isNameArray ? item : item.name;
-        const master = masterList.find(s => s.name === name);
+        const master = getMasterStudent(name);
         const part = master && master.instrumentPart ? master.instrumentPart : null;
         const partIndex = part ? instrumentPartOrder.indexOf(part) : -1;
 
-        // chair is stored as string ("1", "2", "3"…); treat missing as a very large number
         let chairNum = Infinity;
         if (master && master.chair !== undefined && master.chair !== null && master.chair !== "") {
             const parsed = parseInt(master.chair, 10);
@@ -858,23 +868,13 @@ function sortByInstrumentPart(baseList, isNameArray = false) {
     });
 
     withIndex.sort((a, b) => {
-        // Both have a recognized instrumentPart
         if (a.partIndex !== -1 && b.partIndex !== -1) {
-            if (a.partIndex !== b.partIndex) {
-                return a.partIndex - b.partIndex;          // different parts → instrument order
-            }
-            // same part → sort by chair (lower number first)
-            if (a.chairNum !== b.chairNum) {
-                return a.chairNum - b.chairNum;
-            }
-            // same chair (or both missing) → original order
+            if (a.partIndex !== b.partIndex) return a.partIndex - b.partIndex;
+            if (a.chairNum !== b.chairNum) return a.chairNum - b.chairNum;
             return a.originalIndex - b.originalIndex;
         }
-        // Only a has instrument → a first
         if (a.partIndex !== -1) return -1;
-        // Only b has instrument → b first
         if (b.partIndex !== -1) return 1;
-        // Neither has instrument → keep original relative order
         return a.originalIndex - b.originalIndex;
     });
 
@@ -1315,7 +1315,7 @@ function updateHousePointsForGroup(change) {
 
 function getStudentsByPart(part) {
     return students.filter(s => {
-        const m = masterList.find(ms => ms.name === s.name);
+        const m = getMasterStudent(s.name);
         return m && m.instrumentPart === part;
     });
 }
@@ -1828,49 +1828,64 @@ function toggleAllCheckboxes(type) {
     });
 }
 
+function findAddableMasterStudent(name) {
+    // Prefer the addable entry that also has an instrumentPart
+    let entry = masterList.find(s =>
+        s.name === name &&
+        s.addable !== "no" &&
+        s.instrumentPart
+    );
+    if (entry) return entry;
+
+    // Otherwise any addable entry
+    return masterList.find(s => s.name === name && s.addable !== "no") || null;
+}
+
 function addStudent(name) {
-    const masterStudent = masterList.find(s => s.name === name);
-    if (masterStudent && !students.some(s => s.name === name)) {
-        const newStudent = {
-            name: masterStudent.name,
-            birthdate: masterStudent.birthdate,
-            house: masterStudent.house,
-            attendance: 'Present',
-            [currentCriteria[0]]: true,
-            [currentCriteria[1]]: true,
-            [currentCriteria[2]]: true,
-            [currentCriteria[3]]: true,
-            score: 100,
-            housePoints: 10,
-            manualAdjustment: 0,
-            isAdditional: true
-        };
-        students.push(newStudent);
-        teacherModeOrder.push(name);
+    const masterStudent = findAddableMasterStudent(name);
+    if (!masterStudent || students.some(s => s.name === name)) return;
 
-        // Re-sort so the new student appears in the correct instrument-part / chair order
-        // (and so applyBarColor in createBars uses the proper position)
-        students = sortByInstrumentPart(students, false);
-        teacherModeOrder = sortByInstrumentPart(teacherModeOrder, true);
+    const newStudent = {
+        name: masterStudent.name,
+        birthdate: masterStudent.birthdate,
+        house: masterStudent.house,
+        attendance: 'Present',
+        [currentCriteria[0]]: true,
+        [currentCriteria[1]]: true,
+        [currentCriteria[2]]: true,
+        [currentCriteria[3]]: true,
+        score: 100,
+        housePoints: 10,
+        manualAdjustment: 0,
+        isAdditional: true
+    };
 
-        createBars();
-        const newBar = document.getElementById(`bar-${newStudent.name}`);
-        if (newBar) {
-            newBar.style.height = '0%';
-            setTimeout(() => {
-                newBar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
-                newBar.style.height = `${newStudent.score}%`;
-                newBar.style.setProperty('--flash-color', 'rgba(46, 204, 113, 0.6)');
-                newBar.classList.remove('flash-animation');
-                void newBar.offsetWidth;
-                newBar.classList.add('flash-animation');
-            }, 10);
-        }
-        if (document.getElementById('teacher-mode').style.display === 'block') {
-            populateStudents();
-        }
-        closeSearchBox();
+    students.push(newStudent);
+    teacherModeOrder.push(name);
+
+    // Re-sort so the new student lands in the correct instrument/chair position
+    students = sortByInstrumentPart(students, false);
+    teacherModeOrder = sortByInstrumentPart(teacherModeOrder, true);
+
+    createBars();
+
+    const newBar = document.getElementById(`bar-${newStudent.name}`);
+    if (newBar) {
+        newBar.style.height = '0%';
+        setTimeout(() => {
+            newBar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
+            newBar.style.height = `${newStudent.score}%`;
+            newBar.style.setProperty('--flash-color', 'rgba(46, 204, 113, 0.6)');
+            newBar.classList.remove('flash-animation');
+            void newBar.offsetWidth;
+            newBar.classList.add('flash-animation');
+        }, 10);
     }
+
+    if (document.getElementById('teacher-mode').style.display === 'block') {
+        populateStudents();
+    }
+    closeSearchBox();
 }
 
 function createSearchBox() {
@@ -2137,19 +2152,19 @@ function applyBarColor(bar, student) {
     const cls = classes[currentClassIndex];
     const noInstrumentColorClasses = ["Tech Theater", "AP Music Theory", "AE"];
 
-    // Force standard blue for these classes
+    // Force standard blue for non-band classes
     if (noInstrumentColorClasses.includes(cls.name)) {
         bar.style.background = "linear-gradient(to top, #3378a6, #52a6df)";
         return;
     }
 
-    const master = masterList.find(s => s.name === student.name);
+    // MS Band / HS Band / MS Band Thursday → use instrument color when available
+    const master = getMasterStudent(student.name);
     if (master && master.instrumentPart && instrumentColors[master.instrumentPart]) {
         const light = instrumentColors[master.instrumentPart];
-        const dark  = darkenHex(light);          // ← consistent darkening
+        const dark  = darkenHex(light);
         bar.style.background = `linear-gradient(to top, ${dark}, ${light})`;
     } else {
-        // fallback
         bar.style.background = "linear-gradient(to top, #3378a6, #52a6df)";
     }
 }
@@ -2417,7 +2432,7 @@ function exportScores() {
     const housePointsItemized = studentsToExport
         .filter(student => student.housePoints !== 0)
         .map(student => {
-            const masterStudent = masterList.find(s => s.name === student.name);
+            const masterStudent = getMasterStudent(student.name);
             const liveschoolName = masterStudent ? masterStudent.liveschoolName : student.name;
             return { name: liveschoolName, points: student.housePoints };
         })

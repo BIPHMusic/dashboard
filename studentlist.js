@@ -189,7 +189,7 @@ const apMusicTheorySeniorProjects = ['Thomas']
 
 
 const msBandStudents = [
-   'Anton', 'Jefferey', 'Jason', 'Daniel D', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Kyra', 'Felix', 'Coco', 'Grant'
+   'Jacky', 'Rebecca', 'Anton', 'Daniel D', 'Shine', 'Oscar', 'Matthew', 'Felix', 'Francis', 'Coco', 'Jefferey', 'Stella S', 'Jason', 'Kyla', 'Rene', 'Austen', 'Kyra', 'Zachary', 'Grant'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -205,13 +205,13 @@ const msBandStudents = [
     };
 });
 
-const msBandTeacherModeOrder = ['Anton', 'Jefferey', 'Jason', 'Daniel D', 'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Kyra', 'Felix', 'Coco', 'Grant'];
+const msBandTeacherModeOrder = ['Jacky', 'Rebecca', 'Anton', 'Daniel D', 'Shine', 'Oscar', 'Matthew', 'Felix', 'Francis', 'Coco', 'Jefferey', 'Stella S', 'Jason', 'Kyla', 'Rene', 'Austen', 'Kyra', 'Zachary', 'Grant'];
 
 
 
 
 const msBandThursdayStudents = [
-    'Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Kyra', 'Felix', 'Coco', 'Grant'
+    'Jacky', 'Rebecca', 'Shine', 'Oscar', 'Matthew', 'Felix', 'Francis', 'Coco', 'Stella S', 'Kyla', 'Rene', 'Austen', 'Kyra', 'Zachary', 'Grant'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -227,7 +227,7 @@ const msBandThursdayStudents = [
     };
 });
 
-const msBandThursdayTeacherModeOrder = ['Stella S', 'Zachary', 'Rebecca', 'Shine', 'Kyla', 'Amanda', 'Austen', 'Rene', 'Francis', 'Jacky', 'Matthew', 'Oscar', 'Kyra', 'Felix', 'Coco', 'Grant'];
+const msBandThursdayTeacherModeOrder = ['Jacky', 'Rebecca', 'Shine', 'Oscar', 'Matthew', 'Felix', 'Francis', 'Coco', 'Stella S', 'Kyla', 'Rene', 'Austen', 'Kyra', 'Zachary', 'Grant'];
 
 
 

@@ -48,6 +48,7 @@ const masterList = [
     //AP Music Theory
     {"name": "Jocelyn", "liveschoolName": "Jocelyn Lan Bai", "house": "Blue", "birthdate": "2011-01-19", "altName": "Jocelyn", "class": "AP Music Theory", "addable": "no"},
     {"name": "Maggie", "liveschoolName": "Maggie Gan", "house": "Red", "birthdate": "2011-02-12", "altName": "Maggie", "class": "AP Music Theory", "addable": "no"},
+    {"name": "Alex", "liveschoolName": "Alex Tsz To Huang", "house": "Blue", "birthdate": "2011-10-19", "altName": "Alex", "class": "AP Music Theory", "addable": "no"},
     {"name": "Teresa", "liveschoolName": "Teresa Mingxun Jiang", "house": "Green", "birthdate": "2011-02-10", "altName": "Teresa", "class": "AP Music Theory", "addable": "no"},
     {"name": "Thomas", "liveschoolName": "Thomas Hongyi Long", "house": "Red", "birthdate": "2008-02-12", "altName": "Thomas", "class": "AP Music Theory", "addable": "no"},
     {"name": "Calvin", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "2010-04-21", "altName": "Calvin", "class": "AP Music Theory", "addable": "no"},
@@ -165,7 +166,7 @@ const aeTeacherModeOrder = ['Shawn', 'Arianna', 'Bella', 'Rebecca', 'Shine', 'Jo
 
 
 const apMusicTheoryStudents = [
-   'Jocelyn', 'Maggie', 'Teresa', 'Thomas', 'Calvin', 'William'
+   'Jocelyn', 'Maggie', 'Alex', 'Teresa', 'Thomas', 'Calvin', 'William'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -181,7 +182,7 @@ const apMusicTheoryStudents = [
     };
 });
 
-const apMusicTheoryTeacherModeOrder = ['Jocelyn', 'Maggie', 'Teresa', 'Thomas', 'Calvin', 'William'];
+const apMusicTheoryTeacherModeOrder = ['Jocelyn', 'Maggie', 'Alex', 'Teresa', 'Thomas', 'Calvin', 'William'];
 
 
 const apMusicTheorySeniorProjects = ['Thomas']

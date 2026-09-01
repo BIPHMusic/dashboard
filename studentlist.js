@@ -235,7 +235,7 @@ const msBandThursdayTeacherModeOrder = ['Jacky', 'Rebecca', 'Shine', 'Oscar', 'M
 
 
 const hsBandStudents = [
-    'Kerry', 'Calvin', 'Steven', 'Anne', 'Tyler', 'June', 'Sophie', 'Jesse'
+   'Anne', 'Sophie', 'Tyler', 'Kerry', 'Steven', 'June', 'Jesse', 'Calvin'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -251,4 +251,4 @@ const hsBandStudents = [
     };
 });
 
-const hsBandTeacherModeOrder = ['Kerry', 'Calvin', 'Steven', 'Anne', 'Tyler', 'June', 'Sophie', 'Jesse'];
+const hsBandTeacherModeOrder = ['Anne', 'Sophie', 'Tyler', 'Kerry', 'Steven', 'June', 'Jesse', 'Calvin'];

@@ -16,7 +16,7 @@ const masterList = [
     {"name": "Rachelle", "liveschoolName": "Rachelle Xinxin Zhang", "house": "Yellow", "birthdate": "2009-05-01", "altName": "Raciale", "class": "Tech Theater", "addable": "no"},
     {"name": "Kevin", "liveschoolName": "Kevin Haichen Zhao", "house": "Blue", "birthdate": "2009-01-15", "altName": "Kevin", "class": "Tech Theater", "addable": "no"},
     {"name": "Sophie", "liveschoolName": "Sophie Zhijia Zhuang", "house": "Yellow", "birthdate": "2007-10-29", "altName": "Sophie", "class": "Tech Theater", "addable": "no"},
-    {"name": "Ricky Z", "liveschoolName": "Ricky Zong", "house": "Blue", "birthdate": "2009-04-20", "altName": "Ricky Z", "class": "Tech Theater", "addable": "no"},
+    {"name": "Ricky", "liveschoolName": "Rickyong", "house": "Blue", "birthdate": "2009-04-20", "altName": "Ricky", "class": "Tech Theater", "addable": "no"},
 
     //AE
     {"name": "Shawn", "liveschoolName": "Shawn Chengkun Bi", "house": "Red", "birthdate": "2012-10-17", "altName": "Shawn", "class": "AE", "addable": "no"},
@@ -120,7 +120,7 @@ const masterList = [
 
 
 const techTheaterStudents = [
-    'Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Eric', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky Z'
+    'Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Eric', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -136,10 +136,10 @@ const techTheaterStudents = [
     };
 });
 
-const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Eric', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky Z'];
+const techTheaterTeacherModeOrder = ['Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Eric', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky'];
 
 
-const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Eric', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky Z']
+const techTheaterSeniorProjects = ['Fiona', 'Julius', 'Vlan', 'Beryl', 'Allen', 'Yolanda', 'Stella', 'Cynthia', 'Yaffa', 'Kenny', 'Eric', 'Harry', 'Aaliyah', 'Rachelle', 'Kevin', 'Sophie', 'Ricky']
 
 
 

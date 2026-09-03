@@ -764,14 +764,14 @@ function closeSpecificMenu(menuId) {
 
 function populateStudents() {
     const spreadsheet = document.querySelector('.spreadsheet');
-    const istechTheater = classes[currentClassIndex].name === "Tech Theater";
+    const useDevices = isDevicesCriteriaClass();
     spreadsheet.innerHTML = `
         <div class="spreadsheet-header"><strong>Student</strong></div>
         <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
-        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[0]}')">${istechTheater ? 'Devices' : 'Stands'}</strong></div>
-        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[1]}')">${istechTheater ? 'Engagement' : 'Intonation'}</strong></div>
-        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[2]}')">${istechTheater ? 'Review' : 'Returned'}</strong></div>
-        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[3]}')">${istechTheater ? 'Progress' : 'Engagement'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[0]}')">${useDevices ? 'Devices' : 'Stands'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[1]}')">${useDevices ? 'Engagement' : 'Intonation'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[2]}')">${useDevices ? 'Review' : 'Returned'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[3]}')">${useDevices ? 'Progress' : 'Engagement'}</strong></div>
         <div class="spreadsheet-header"><strong>Participation</strong></div>
         <div class="spreadsheet-header"><strong>House Points</strong></div>
     `;
@@ -820,7 +820,7 @@ function populateStudents() {
 function updateHousePoints(name, change) {
     const student = students.find(s => s.name === name);
     if (student) {
-        student.housePoints += change;
+        student.housePoints = Math.max(-100, Math.min(100, student.housePoints + change));
         updateScoreDisplay(student);
         const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
         if (housePointsSpan) {
@@ -987,7 +987,10 @@ function calculateScore(student) {
         student.score = 'EX';
     } else {
         let baseScore = 60;
-        if (student.attendance === 'Tardy') baseScore -= 20;
+        if (student.attendance === 'Tardy') {
+            // Tech Theater (and AE / AP Music Theory) only lose 10 % for being tardy
+            baseScore -= isDevicesCriteriaClass() ? 10 : 20;
+        }
         if (student[currentCriteria[0]]) baseScore += 10;
         if (student[currentCriteria[1]]) baseScore += 10;
         if (student[currentCriteria[2]]) baseScore += 10;
@@ -1722,7 +1725,7 @@ function navigateStudentMenu(direction) {
 function showFloatingMenu(event, studentName) {
     const floatingMenu = document.getElementById('floating-menu');
     const student = students.find(s => s.name === studentName);
-    const istechTheater = classes[currentClassIndex].name === "Tech Theater";
+    const useDevices = isDevicesCriteriaClass();
     currentStudentIndex = students.findIndex(s => s.name === studentName);
     if (currentStudentIndex === -1) {
         return;
@@ -1740,10 +1743,10 @@ function showFloatingMenu(event, studentName) {
                 <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
                 <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
             </select>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${istechTheater ? 'Devices' : 'Stands'}</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${istechTheater ? 'Engagement' : 'Intonation'}</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${istechTheater ? 'Review' : 'Returned'}</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${istechTheater ? 'Progress' : 'Engagement'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${useDevices ? 'Devices' : 'Stands'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${useDevices ? 'Engagement' : 'Intonation'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${useDevices ? 'Review' : 'Returned'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${useDevices ? 'Progress' : 'Engagement'}</label>
         </div>
         <div class="stepper">
             <button onclick="updateScore('${student.name}', -10)">-</button>
@@ -2091,7 +2094,7 @@ function activateHouseshield() {
         return;
     }
     const student = students[currentStudentIndex];
-    const houseInfo = masterList.find(s => s.name === student.name);
+    const houseInfo = getMasterStudent(student.name);   // ← was masterList.find(...)
     if (!houseInfo) {
         return;
     }
@@ -2100,7 +2103,7 @@ function activateHouseshield() {
         houseshield.style.display = 'block';
         void houseshield.offsetWidth;
         houseshield.classList.add('active');
-        }
+    }
     if (points) {
         points.classList.add('active');
     }

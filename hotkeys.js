@@ -14,14 +14,19 @@ const hotkeys = [
 // Track called students for the current class
 let calledStudents = [];
 
+function isDevicesCriteriaClass() {
+    const name = classes[currentClassIndex].name;
+    return name === "Tech Theater" || name === "AP Music Theory" || name === "AE";
+}
+
 function getMenuHotkeys() {
-    const isTechTheater = classes[currentClassIndex].name === "Tech Theater";
+    const useDevices = isDevicesCriteriaClass();
     return [
         { key: "a", description: "Toggle Attendance." },
-        { key: isTechTheater ? "d" : "s", description: `Toggle ${isTechTheater ? 'Devices' : 'Stands'} checkbox(es).` },
-        { key: isTechTheater ? "e" : "i", description: `Toggle ${isTechTheater ? 'Engagement' : 'intonation'} checkbox(es).` },
-        { key: isTechTheater ? "r" : "r", description: `Toggle ${isTechTheater ? 'Review' : 'Returned'} checkbox(es).` },
-        { key: isTechTheater ? "p" : "e", description: `Toggle ${isTechTheater ? 'Progress' : 'Engagement'} checkbox(es).` },
+        { key: useDevices ? "d" : "s", description: `Toggle ${useDevices ? 'Devices' : 'Stands'} checkbox(es).` },
+        { key: useDevices ? "e" : "i", description: `Toggle ${useDevices ? 'Engagement' : 'intonation'} checkbox(es).` },
+        { key: "r", description: `Toggle ${useDevices ? 'Review' : 'Returned'} checkbox(es).` },
+        { key: useDevices ? "p" : "e", description: `Toggle ${useDevices ? 'Progress' : 'Engagement'} checkbox(es).` },
         { key: "h", description: "Toggle House Shield." },
         { key: "Esc", description: "Close current window or House Shield." }
     ];
@@ -92,23 +97,23 @@ function handleFloatingMenuHotkeys(event, studentName) {
         currentStudentIndex = students.findIndex(s => s.name === studentName);
     }
 
-    const isTechTheater = classes[currentClassIndex].name === "Tech Theater";
+    const useDevices = isDevicesCriteriaClass();
     
     switch (event.key) {
         case 'a':
             cycleAttendanceForStudent(student);
             break;
-        case isTechTheater ? 'd' : 's':
-            toggleCheckboxForStudent(student, isTechTheater ? 'devices' : 'stands');
+        case useDevices ? 'd' : 's':
+            toggleCheckboxForStudent(student, useDevices ? 'devices' : 'stands');
             break;
-        case isTechTheater ? 'e' : 'i':
-            toggleCheckboxForStudent(student, isTechTheater ? 'engagement' : 'intonation');
+        case useDevices ? 'e' : 'i':
+            toggleCheckboxForStudent(student, useDevices ? 'engagement' : 'intonation');
             break;
         case 'r':
-            toggleCheckboxForStudent(student, isTechTheater ? 'review' : 'returned');
+            toggleCheckboxForStudent(student, useDevices ? 'review' : 'returned');
             break;
-        case isTechTheater ? 'p' : 'e':
-            toggleCheckboxForStudent(student, isTechTheater ? 'progress' : 'engagement');
+        case useDevices ? 'p' : 'e':
+            toggleCheckboxForStudent(student, useDevices ? 'progress' : 'engagement');
             break;
         case 'h':
             toggleHouseShield();
@@ -298,26 +303,26 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-                // Enter after random student call(s)
-            if (event.key === 'Enter' && currentMode === MODES.GLOBAL) {
-                const display = document.querySelector('.student-name-display');
-                if (display) {
-                    const names = Array.from(display.querySelectorAll('h2'))
-                                    .map(h => h.textContent.trim())
-                                    .filter(Boolean);
+    // Enter after random student call(s)
+    if (event.key === 'Enter' && currentMode === MODES.GLOBAL) {
+        const display = document.querySelector('.student-name-display');
+        if (display) {
+            const names = Array.from(display.querySelectorAll('h2'))
+                            .map(h => h.textContent.trim())
+                            .filter(Boolean);
 
-                    if (names.length === 1) {
-                        showFloatingMenu(null, names[0]);
-                    } else if (names.length > 1) {
-                        showStudentsGroupMenu(names);
-                    }
-
-                    // optional: clear the name display immediately
-                    display.remove();
-                    event.preventDefault();
-                    return;
-                }
+            if (names.length === 1) {
+                showFloatingMenu(null, names[0]);
+            } else if (names.length > 1) {
+                showStudentsGroupMenu(names);
             }
+
+            // optional: clear the name display immediately
+            display.remove();
+            event.preventDefault();
+            return;
+        }
+    }
 
     if (event.key === '/' && currentMode === MODES.GLOBAL) {
         if (!document.getElementById('search-box')) {
@@ -327,22 +332,22 @@ function handleGlobalHotkeys(event) {
         return;
     }
 
-    const isTechTheater = classes[currentClassIndex].name === "Tech Theater";
+    const useDevices = isDevicesCriteriaClass();
     const floatingMenu = document.getElementById('floating-menu');
     const teacherMode = document.getElementById('teacher-mode');
 
     // Allow Cmd + ArrowLeft / ArrowRight even if they're not in validKeys
     const isClassSwitch = event.metaKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight');
 
-    const validKeys = ['t', 'a', isTechTheater ? 'd' : 's', isTechTheater ? 'e' : 'i', 'r', 
-                      isTechTheater ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 
+    const validKeys = ['t', 'a', useDevices ? 'd' : 's', useDevices ? 'e' : 'i', 'r', 
+                      useDevices ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 
                       'ArrowRight', 'Enter', 'h', '=', '+', '?'];
 
     if (!validKeys.includes(event.key) && !isClassSwitch) {
         return;
     }
 
-if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 && !event.metaKey && !event.ctrlKey) {
+    if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 && !event.metaKey && !event.ctrlKey) {
         // Filter students who are not marked as "EX" or "Absent" and not yet called
         let eligibleStudents = students.filter(student => 
             student.attendance !== "EX" && student.attendance !== "Absent" && !calledStudents.includes(student.name)
@@ -404,7 +409,7 @@ if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 
             }
             break;
 
-// Class switching with Cmd + Arrow
+        // Class switching with Cmd + Arrow
         case 'ArrowRight':
         case 'ArrowLeft':
             if (event.metaKey) {
@@ -420,44 +425,44 @@ if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 
             break;
 
         case 'ArrowUp':
-    if (floatingMenu.style.display === 'block') {
-        const part = floatingMenu.dataset.instrumentPart;
-        const isGroup = !!floatingMenu.dataset.groupStudents;
+            if (floatingMenu.style.display === 'block') {
+                const part = floatingMenu.dataset.instrumentPart;
+                const isGroup = !!floatingMenu.dataset.groupStudents;
 
-        if (part) {
-            if (event.altKey) updateHousePointsForInstrumentPart(part, 10);
-            else updateScoreForInstrumentPart(part, 10);
-        } else if (isGroup) {
-            if (event.altKey) updateHousePointsForGroup(10);
-            else updateScoreForGroup(10);
-        } else {
-            const studentName = floatingMenu.querySelector('h3').textContent;
-            if (event.altKey) updateHousePoints(studentName, 10);
-            else updateScore(studentName, 10);
-        }
-        event.preventDefault();
-    }
-    break;
+                if (part) {
+                    if (event.altKey) updateHousePointsForInstrumentPart(part, 10);
+                    else updateScoreForInstrumentPart(part, 10);
+                } else if (isGroup) {
+                    if (event.altKey) updateHousePointsForGroup(10);
+                    else updateScoreForGroup(10);
+                } else {
+                    const studentName = floatingMenu.querySelector('h3').textContent;
+                    if (event.altKey) updateHousePoints(studentName, 10);
+                    else updateScore(studentName, 10);
+                }
+                event.preventDefault();
+            }
+            break;
 
-case 'ArrowDown':
-    if (floatingMenu.style.display === 'block') {
-        const part = floatingMenu.dataset.instrumentPart;
-        const isGroup = !!floatingMenu.dataset.groupStudents;
+        case 'ArrowDown':
+            if (floatingMenu.style.display === 'block') {
+                const part = floatingMenu.dataset.instrumentPart;
+                const isGroup = !!floatingMenu.dataset.groupStudents;
 
-        if (part) {
-            if (event.altKey) updateHousePointsForInstrumentPart(part, -10);
-            else updateScoreForInstrumentPart(part, -10);
-        } else if (isGroup) {
-            if (event.altKey) updateHousePointsForGroup(-10);
-            else updateScoreForGroup(-10);
-        } else {
-            const studentName = floatingMenu.querySelector('h3').textContent;
-            if (event.altKey) updateHousePoints(studentName, -10);
-            else updateScore(studentName, -10);
-        }
-        event.preventDefault();
-    }
-    break;
+                if (part) {
+                    if (event.altKey) updateHousePointsForInstrumentPart(part, -10);
+                    else updateScoreForInstrumentPart(part, -10);
+                } else if (isGroup) {
+                    if (event.altKey) updateHousePointsForGroup(-10);
+                    else updateScoreForGroup(-10);
+                } else {
+                    const studentName = floatingMenu.querySelector('h3').textContent;
+                    if (event.altKey) updateHousePoints(studentName, -10);
+                    else updateScore(studentName, -10);
+                }
+                event.preventDefault();
+            }
+            break;
 
         case 'a':
         case 'd':
@@ -471,13 +476,12 @@ case 'ArrowDown':
                 handleFloatingMenuHotkeys(event, studentName);
                 event.preventDefault();
             } else if (teacherMode.style.display === 'block') {
-                // your existing teacher mode logic...
                 switch (event.key) {
                     case 'a': cycleAttendance(); break;
-                    case isTechTheater ? 'd' : 's': toggleAllCheckboxes(isTechTheater ? 'devices' : 'stands'); break;
-                    case isTechTheater ? 'e' : 'i': toggleAllCheckboxes(isTechTheater ? 'engagement' : 'intonation'); break;
-                    case 'r': toggleAllCheckboxes(isTechTheater ? 'review' : 'returned'); break;
-                    case isTechTheater ? 'p' : 'e': toggleAllCheckboxes(isTechTheater ? 'progress' : 'engagement'); break;
+                    case useDevices ? 'd' : 's': toggleAllCheckboxes(useDevices ? 'devices' : 'stands'); break;
+                    case useDevices ? 'e' : 'i': toggleAllCheckboxes(useDevices ? 'engagement' : 'intonation'); break;
+                    case 'r': toggleAllCheckboxes(useDevices ? 'review' : 'returned'); break;
+                    case useDevices ? 'p' : 'e': toggleAllCheckboxes(useDevices ? 'progress' : 'engagement'); break;
                 }
                 event.preventDefault();
             }

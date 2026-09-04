@@ -4,7 +4,7 @@ const STICKY_NOTES_CONFIG = [
         forWhichClasses: ["Tech Theater"], 
         position: { x: 200, y: 200 }, 
         dimensions: { width: 230, height: 150 }, 
-        textContent: 'Macbook check', 
+        textContent: 'Don\'t forget to put event requests in on BG cloud 💡', 
         imageSrc: '',
         backgroundColor: '#ff9999', 
     },
@@ -14,7 +14,7 @@ const STICKY_NOTES_CONFIG = [
         forWhichClasses: ["AP Music Theory"],          
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
-        textContent: 'Keep upping your high scores! Practice makes perfect',
+        textContent: 'Don\'t neglect www.teoria.com 💡',
         // Don\'t forget to join a HS session this week 💡
         imageSrc: '',
         backgroundColor: '#ff9999', // red
@@ -35,8 +35,8 @@ const STICKY_NOTES_CONFIG = [
         forWhichClasses: ["MS Band"],      
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
-        textContent: 'Make all arrangements to have instruments next week',
-        // Don\'t forget to join a HS session this week 💡
+        textContent: 'High School sessions. Who went? Who did not?',
+        // textContent: 'Don\'t forget to join a HS session this week 💡',
         imageSrc: '',
         backgroundColor: '#ff9999', // red
     },
@@ -46,21 +46,21 @@ const STICKY_NOTES_CONFIG = [
         forWhichClasses: ["MS Band ᵀᴴᵁᴿˢ"],    // ← only Thursday
         position: { x: 100, y: 300 },
         dimensions: { width: 250, height: 200 },
-        textContent: 'Make all arrangements to have instruments next week',
-        // Last day to join HS! Don\'t forget! 💡
+        textContent: 'Last day to join HS! Don\'t forget! 💡',
+        // textContent: 'Last day to join HS! Don\'t forget! 💡',
         imageSrc: '',
         backgroundColor: '#ff9999', // red
     },
 
-        {
-        id: 'HS BAND',
-        forWhichClasses: ["HS Band"],      
-        position: { x: 100, y: 300 },
-        dimensions: { width: 250, height: 200 },
-        textContent: 'Make all arrangements to have instruments next week',
-        imageSrc: '',
-        backgroundColor: '#ff9999', // red
-    },
+    //     {
+    //     id: 'HS BAND',
+    //     forWhichClasses: ["HS Band"],      
+    //     position: { x: 100, y: 300 },
+    //     dimensions: { width: 250, height: 200 },
+    //     textContent: 'Playing tests',
+    //     imageSrc: '',
+    //     backgroundColor: '#ff9999', // red
+    // },
 
 
 ];

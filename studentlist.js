@@ -116,6 +116,8 @@ const masterList = [
     {"name": "Esther", "liveschoolName": "Esther Sicong Chen", "house": "Green", "birthdate": "", "altName": "Esther", "instrumentPart": "Percussion", "chair": "6"},
     {"name": "Christi", "liveschoolName": "Christi Yawen Zhu", "house": "Yellow", "birthdate": "", "altName": "Christi", "instrumentPart": "Horn", "chair": "1"},
     {"name": "Odelia", "liveschoolName": "Odelia Yunhan Xie", "house": "Green", "birthdate": "", "altName": "Odelia", "instrumentPart": "Violin3", "chair": "3"},
+
+    {"name": "Mr. Tubbs", "liveschoolName": "Francis Liu", "house": "Blue", "birthdate": "1990-08-29", "altName": "Mr. Tubbs", "class": "None", "addable": "yes"},
 ];
 
 

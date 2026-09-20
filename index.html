@@ -658,6 +658,21 @@ let isActive = false;
 let currentPoints = 0;
 
 function globalKeydownHandler(event) {
+    // Sticky-note editing takes priority over the application's global hotkeys.
+    // This prevents letters such as t, h, r, etc. from being intercepted if
+    // the mode has momentarily returned to GLOBAL while clicking back into a note.
+    const stickyNoteContent = event.target && event.target.closest
+        ? event.target.closest('.sticky-note-content')
+        : null;
+
+    if (stickyNoteContent) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            stickyNoteContent.blur();
+        }
+        return;
+    }
+
     if (event.key === '/' && currentMode === MODES.GLOBAL) {
         event.preventDefault();
         toggleSearchBox();

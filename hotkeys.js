@@ -373,10 +373,13 @@ function handleGlobalHotkeys(event) {
                 const displayText = randomStudent.name; // Display the name field
                 const speechText = masterStudent && masterStudent.altName ? masterStudent.altName : randomStudent.name; // Speak the altName
                 displayStudentName(displayText);
+                window.speechSynthesis.cancel();
+
                 const utterance = new SpeechSynthesisUtterance(speechText);
                 utterance.volume = 1.0;
                 utterance.rate = 1.25;
                 utterance.pitch = 1.0;
+
                 window.speechSynthesis.speak(utterance);
             }
         }

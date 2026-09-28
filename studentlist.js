@@ -76,13 +76,14 @@ const masterList = [
     {"name": "Grant", "liveschoolName": "Grant Zhang", "house": "Green", "birthdate": "2014-02-11", "altName": "Grant", "class": "MS Band", "instrumentPart": "Violin2", "chair": "6", "addable": "yes"},
 
     //HS Band
-    {"name": "Kerry", "liveschoolName": "Kerry Liu", "house": "Green", "birthdate": "2011-06-13", "altName": "Kerry", "class": "HS Band", "instrumentPart": "Flute", "chair": "1", "addable": "yes"},
-    {"name": "Calvin", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "2012-05-14", "altName": "Calvin", "class": "HS Band", "instrumentPart": "Tuba", "chair": "1", "addable": "yes"},
     {"name": "Anne", "liveschoolName": "Anne Jiayue An", "house": "Green", "birthdate": "2010-02-07", "altName": "Anne", "class": "HS Band", "instrumentPart": "Trumpet", "chair": "3", "addable": "yes"},
-    {"name": "Tyler", "liveschoolName": "Tyler Xiang Li", "house": "Red", "birthdate": "2010-06-24", "altName": "Tyler", "class": "HS Band", "instrumentPart": "Clarinet", "chair": "3", "addable": "yes"},
-    {"name": "June", "liveschoolName": "June Ziqiao Qin", "house": "Blue", "birthdate": "2011-06-18", "altName": "June", "class": "HS Band", "instrumentPart": "Flute", "chair": "3", "addable": "yes"},
     {"name": "Sophie", "liveschoolName": "Sophie Geng", "house": "Blue", "birthdate": "2011-07-25", "altName": "Sophie", "class": "HS Band", "instrumentPart": "Horn", "chair": "2", "addable": "yes"},
+    {"name": "Ronald", "liveschoolName": "Ronald Li", "house": "Green", "birthdate": "", "altName": "Ronald", "class": "HS Band", "instrumentPart": "", "chair": "", "addable": "yes"},
+    {"name": "Tyler", "liveschoolName": "Tyler Xiang Li", "house": "Red", "birthdate": "2010-06-24", "altName": "Tyler", "class": "HS Band", "instrumentPart": "Clarinet", "chair": "3", "addable": "yes"},
+    {"name": "Kerry", "liveschoolName": "Kerry Liu", "house": "Green", "birthdate": "2011-06-13", "altName": "Kerry", "class": "HS Band", "instrumentPart": "Flute", "chair": "1", "addable": "yes"},
+    {"name": "June", "liveschoolName": "June Ziqiao Qin", "house": "Blue", "birthdate": "2011-06-18", "altName": "June", "class": "HS Band", "instrumentPart": "Flute", "chair": "3", "addable": "yes"},
     {"name": "Jesse", "liveschoolName": "Jesse Junxi Zeng", "house": "Blue", "birthdate": "2010-04-21", "altName": "Jesse", "class": "HS Band", "instrumentPart": "Percussion", "chair": "2", "addable": "yes"},
+    {"name": "Calvin", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "2012-05-14", "altName": "Calvin", "class": "HS Band", "instrumentPart": "Tuba", "chair": "1", "addable": "yes"},
 
     //all others
     {"name": "Grace", "liveschoolName": "Grace Leqi Xiong", "house": "Red", "birthdate": "2013-01-19", "altName": "Grace", "instrumentPart": "Violin3", "chair": "5"},
@@ -236,7 +237,7 @@ const msBandThursdayTeacherModeOrder = ['Jacky', 'Rebecca', 'Shine', 'Oscar', 'M
 
 
 const hsBandStudents = [
-   'Anne', 'Sophie', 'Tyler', 'Kerry', 'June', 'Jesse', 'Calvin'
+   'Anne', 'Sophie', 'Tyler', 'Kerry', 'Ronald', 'June', 'Jesse', 'Calvin'
 ].map(name => {
     const studentInfo = masterList.find(s => s.name === name);
     return {
@@ -252,4 +253,4 @@ const hsBandStudents = [
     };
 });
 
-const hsBandTeacherModeOrder = ['Anne', 'Sophie', 'Tyler', 'Kerry', 'June', 'Jesse', 'Calvin'];
+const hsBandTeacherModeOrder = ['Anne', 'Sophie', 'Tyler', 'Kerry', 'Ronald', 'June', 'Jesse', 'Calvin'];

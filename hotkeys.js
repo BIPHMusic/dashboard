@@ -14,6 +14,17 @@ const hotkeys = [
 // Track called students for the current class
 let calledStudents = [];
 
+// Always determine objective-input focus from the actual DOM state.
+// This prevents a stale flag from disabling keyboard shortcuts.
+function isObjectiveInputActive() {
+    const objectiveInput = document.getElementById('objectiveInput');
+    const isFocused = !!objectiveInput && document.activeElement === objectiveInput;
+
+    window.isObjectiveInputFocused = isFocused;
+
+    return isFocused;
+}
+
 function isDevicesCriteriaClass() {
     const name = classes[currentClassIndex].name;
     return name === "Tech Theater" || name === "AP Music Theory" || name === "AE";
@@ -21,6 +32,7 @@ function isDevicesCriteriaClass() {
 
 function getMenuHotkeys() {
     const useDevices = isDevicesCriteriaClass();
+
     return [
         { key: "a", description: "Toggle Attendance." },
         { key: useDevices ? "d" : "s", description: `Toggle ${useDevices ? 'Devices' : 'Stands'} checkbox(es).` },
@@ -35,6 +47,7 @@ function getMenuHotkeys() {
 function populateHotkeys(hotkeys, elementId) {
     const container = document.getElementById(elementId);
     container.innerHTML = '';
+
     hotkeys.forEach(hotkey => {
         const div = document.createElement('div');
         div.innerHTML = `<strong>${hotkey.key}</strong>\t: ${hotkey.description}`;
@@ -48,7 +61,7 @@ function updateHotkeysDisplay() {
 }
 
 function handleHouseShieldHotkey(event) {
-    if (window.isObjectiveInputFocused) return;
+    if (isObjectiveInputActive()) return;
 
     if (event.key === 'h' && !isActive) {
         activateHouseshield();
@@ -58,7 +71,8 @@ function handleHouseShieldHotkey(event) {
 }
 
 function handleFloatingMenuHotkeys(event, studentName) {
-    if (window.isObjectiveInputFocused) return;
+    // Do not run menu shortcuts while the objective field is being edited.
+    if (isObjectiveInputActive()) return;
 
     const floatingMenu = document.getElementById('floating-menu');
     const part = floatingMenu ? floatingMenu.dataset.instrumentPart : null;
@@ -85,6 +99,7 @@ function handleFloatingMenuHotkeys(event, studentName) {
                 // House shield not supported for groups
                 break;
         }
+
         updateInstrumentPartMenu(part);
         return;
     }
@@ -98,7 +113,7 @@ function handleFloatingMenuHotkeys(event, studentName) {
     }
 
     const useDevices = isDevicesCriteriaClass();
-    
+
     switch (event.key) {
         case 'a':
             cycleAttendanceForStudent(student);
@@ -119,11 +134,12 @@ function handleFloatingMenuHotkeys(event, studentName) {
             toggleHouseShield();
             break;
     }
+
     updateFloatingMenu(student);
 }
 
 function handleSearchBoxKeys(event) {
-    if (window.isObjectiveInputFocused) return;
+    if (isObjectiveInputActive()) return;
 
     const searchInput = document.getElementById('search-input');
     const results = searchResults.children;
@@ -138,28 +154,35 @@ function handleSearchBoxKeys(event) {
         case 'Escape':
             closeSearchBox();
             break;
+
         case 'ArrowUp':
             event.preventDefault();
+
             if (selectedIndex > 0) {
                 results[selectedIndex].classList.remove('selected');
                 selectedIndex--;
                 results[selectedIndex].classList.add('selected');
             }
             break;
+
         case 'ArrowDown':
             event.preventDefault();
+
             if (selectedIndex < results.length - 1) {
                 results[selectedIndex].classList.remove('selected');
                 selectedIndex++;
                 results[selectedIndex].classList.add('selected');
             }
             break;
+
         case 'Enter':
             event.preventDefault();
+
             if (results[selectedIndex]) {
                 const item = results[selectedIndex];
                 const type = item.dataset.type;
                 const value = item.textContent;
+
                 if (isAddingStudent) {
                     addStudent(value);
                 } else if (type === 'part') {
@@ -171,6 +194,7 @@ function handleSearchBoxKeys(event) {
                 }
             }
             break;
+
         default:
             setTimeout(() => updateSearchResults(searchInput.value), 0);
     }
@@ -181,6 +205,7 @@ function handleActiveHouseshield(event) {
         deactivateHouseshield();
         return;
     }
+
     if (event.key.toLowerCase() === 'h') {
         toggleHouseShield();
     } else if (event.key === 'ArrowUp') {
@@ -198,23 +223,35 @@ function handleActiveHouseshield(event) {
 }
 
 function handleObjectiveInputKeys(event) {
-    if (!window.isObjectiveInputFocused) return;
+    if (!isObjectiveInputActive()) return;
+
     const objectiveInput = document.getElementById('objectiveInput');
     if (!objectiveInput) return;
 
     switch (event.key) {
         case 'Enter':
             event.preventDefault();
+
             if (objectiveInput.value.trim() !== '') {
-                const index = Array.from(document.querySelectorAll('#objectiveList li')).findIndex(li => li.textContent === objectiveInput.dataset.originalValue);
+                const index = Array.from(
+                    document.querySelectorAll('#objectiveList li')
+                ).findIndex(
+                    li => li.textContent === objectiveInput.dataset.originalValue
+                );
+
                 if (index !== -1) {
-                    document.querySelector(`#objectiveList li:nth-child(${index + 1})`).textContent = objectiveInput.value.trim();
+                    document.querySelector(
+                        `#objectiveList li:nth-child(${index + 1})`
+                    ).textContent = objectiveInput.value.trim();
+
                     saveObjectives(classes[currentClassIndex].objectivesKey);
                 }
             }
+
             objectiveInput.closest('div').remove();
             window.isObjectiveInputFocused = false;
             break;
+
         case 'Escape':
             event.preventDefault();
             objectiveInput.closest('div').remove();
@@ -225,6 +262,7 @@ function handleObjectiveInputKeys(event) {
 
 function displayStudentName(name) {
     let container = document.querySelector('.student-name-display');
+
     if (!container) {
         container = document.createElement('div');
         container.className = 'student-name-display';
@@ -243,6 +281,7 @@ function displayStudentName(name) {
         container.style.flexDirection = 'column';
         container.style.alignItems = 'center';
         container.style.gap = '10px';
+
         document.body.appendChild(container);
     }
 
@@ -261,6 +300,7 @@ function displayStudentName(name) {
     // Set new timeout for fade-out
     container.timeoutId = setTimeout(() => {
         container.style.opacity = '0';
+
         setTimeout(() => {
             container.remove();
         }, 500);
@@ -269,35 +309,53 @@ function displayStudentName(name) {
 
 function cycleClass(direction) {
     currentClassIndex = (currentClassIndex + direction + classes.length) % classes.length;
-    calledStudents = []; 
+    calledStudents = [];
     updateClassDisplay();
 }
 
 function handleGlobalHotkeys(event) {
-    if (window.isObjectiveInputFocused) {
+    const objectiveInput = document.getElementById('objectiveInput');
+    const objectiveInputIsActive = isObjectiveInputActive();
+
+    // Only suppress global hotkeys while the objective input
+    // is actually focused—not just because a flag is stale.
+    if (objectiveInput && objectiveInputIsActive) {
         if (['Control', 'Meta', 'Alt', 'Shift'].includes(event.key)) return;
+
         if (event.metaKey || event.ctrlKey) {
             const allowedShortcuts = ['a', 'c', 'v', 'x', 'z', 'y', '='];
+
             if (allowedShortcuts.includes(event.key.toLowerCase())) return;
             if (event.key.toLowerCase() === 'r') return;
         }
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Backspace', 'Delete', 'Tab'].includes(event.key)) return;
+
+        if ([
+            'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+            'Home', 'End', 'Backspace', 'Delete', 'Tab'
+        ].includes(event.key)) return;
+
         if (event.key.length === 1) return;
+
         if (['Enter', 'Escape'].includes(event.key)) {
             handleObjectiveInputKeys(event);
             return;
         }
+
         event.preventDefault();
         return;
     }
 
+    // Close the topmost menu with Escape.
     if (event.key === 'Escape' && menuStack.length > 0) {
         closeTopMenu();
         event.preventDefault();
         return;
     }
 
-    if ((event.key === '?' || (event.altKey && event.key === '/')) && currentMode === MODES.GLOBAL) {
+    if (
+        (event.key === '?' || (event.altKey && event.key === '/')) &&
+        currentMode === MODES.GLOBAL
+    ) {
         toggleOverlay();
         event.preventDefault();
         return;
@@ -306,10 +364,11 @@ function handleGlobalHotkeys(event) {
     // Enter after random student call(s)
     if (event.key === 'Enter' && currentMode === MODES.GLOBAL) {
         const display = document.querySelector('.student-name-display');
+
         if (display) {
             const names = Array.from(display.querySelectorAll('h2'))
-                            .map(h => h.textContent.trim())
-                            .filter(Boolean);
+                .map(h => h.textContent.trim())
+                .filter(Boolean);
 
             if (names.length === 1) {
                 showFloatingMenu(null, names[0]);
@@ -317,7 +376,6 @@ function handleGlobalHotkeys(event) {
                 showStudentsGroupMenu(names);
             }
 
-            // optional: clear the name display immediately
             display.remove();
             event.preventDefault();
             return;
@@ -329,6 +387,7 @@ function handleGlobalHotkeys(event) {
             createSearchBox();
             event.preventDefault();
         }
+
         return;
     }
 
@@ -336,42 +395,71 @@ function handleGlobalHotkeys(event) {
     const floatingMenu = document.getElementById('floating-menu');
     const teacherMode = document.getElementById('teacher-mode');
 
-    // Allow Cmd + ArrowLeft / ArrowRight even if they're not in validKeys
-    const isClassSwitch = event.metaKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight');
+    const isClassSwitch =
+        event.metaKey &&
+        (event.key === 'ArrowLeft' || event.key === 'ArrowRight');
 
-    const validKeys = ['t', 'a', useDevices ? 'd' : 's', useDevices ? 'e' : 'i', 'r', 
-                      useDevices ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 
-                      'ArrowRight', 'Enter', 'h', '=', '+', '?'];
+    const validKeys = [
+        't', 'a',
+        useDevices ? 'd' : 's',
+        useDevices ? 'e' : 'i',
+        'r',
+        useDevices ? 'p' : 'e',
+        '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+        'Enter', 'h', '=', '+', '?'
+    ];
 
     if (!validKeys.includes(event.key) && !isClassSwitch) {
         return;
     }
 
-    if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 && !event.metaKey && !event.ctrlKey) {
-        // Filter students who are not marked as "EX" or "Absent" and not yet called
-        let eligibleStudents = students.filter(student => 
-            student.attendance !== "EX" && student.attendance !== "Absent" && !calledStudents.includes(student.name)
+    // Randomly call a student who is not UNX, EX, or Absent.
+    if (
+        event.key === 'r' &&
+        currentMode === MODES.GLOBAL &&
+        menuStack.length === 0 &&
+        !event.metaKey &&
+        !event.ctrlKey
+    ) {
+        let eligibleStudents = students.filter(student =>
+            student.attendance !== 'UNX' &&
+            student.attendance !== 'EX' &&
+            student.attendance !== 'Absent' &&
+            student.score !== 'UNX' &&
+            student.score !== 'EX' &&
+            !calledStudents.includes(student.name)
         );
 
-        // If no eligible students are left, reset the called students list
+        // If everyone eligible has already been called, start a new round.
         if (eligibleStudents.length === 0) {
             calledStudents = [];
-            // Repopulate with all students who are not "EX" or "Absent"
-            eligibleStudents = students.filter(student => 
-                student.attendance !== "EX" && student.attendance !== "Absent"
+
+            eligibleStudents = students.filter(student =>
+                student.attendance !== 'UNX' &&
+                student.attendance !== 'EX' &&
+                student.attendance !== 'Absent' &&
+                student.score !== 'UNX' &&
+                student.score !== 'EX'
             );
         }
 
-        // Select a random student from eligible students
         if (eligibleStudents.length > 0) {
             const randomIndex = Math.floor(Math.random() * eligibleStudents.length);
             const randomStudent = eligibleStudents[randomIndex];
+
             if (randomStudent && randomStudent.name) {
-                // Add student to calledStudents *before* displaying to prevent re-selection
                 calledStudents.push(randomStudent.name);
-                const masterStudent = masterList.find(s => s.name === randomStudent.name);
-                const displayText = randomStudent.name; // Display the name field
-                const speechText = masterStudent && masterStudent.altName ? masterStudent.altName : randomStudent.name; // Speak the altName
+
+                const masterStudent = masterList.find(
+                    s => s.name === randomStudent.name
+                );
+
+                const displayText = randomStudent.name;
+                const speechText =
+                    masterStudent && masterStudent.altName
+                        ? masterStudent.altName
+                        : randomStudent.name;
+
                 displayStudentName(displayText);
                 window.speechSynthesis.cancel();
 
@@ -383,14 +471,18 @@ function handleGlobalHotkeys(event) {
                 window.speechSynthesis.speak(utterance);
             }
         }
+
         event.preventDefault();
         return;
     }
 
-    // Main switch
+    // Main keyboard shortcut switch
     switch (event.key) {
         case 'h':
-            if (currentStudentIndex !== -1 || floatingMenu.style.display === 'block') {
+            if (
+                currentStudentIndex !== -1 ||
+                floatingMenu.style.display === 'block'
+            ) {
                 toggleHouseShield();
                 event.preventDefault();
             }
@@ -402,6 +494,7 @@ function handleGlobalHotkeys(event) {
             } else {
                 enterTeacherMode();
             }
+
             event.preventDefault();
             break;
 
@@ -412,16 +505,14 @@ function handleGlobalHotkeys(event) {
             }
             break;
 
-        // Class switching with Cmd + Arrow
         case 'ArrowRight':
         case 'ArrowLeft':
             if (event.metaKey) {
-                const direction = (event.code === 'ArrowRight') ? 1 : -1;
+                const direction = event.key === 'ArrowRight' ? 1 : -1;
                 cycleClass(direction);
                 event.preventDefault();
             } else {
-                // Plain arrow without Cmd = navigate to next/previous student
-                const direction = (event.key === 'ArrowRight') ? 1 : -1;
+                const direction = event.key === 'ArrowRight' ? 1 : -1;
                 navigateStudentMenu(direction);
                 event.preventDefault();
             }
@@ -433,16 +524,27 @@ function handleGlobalHotkeys(event) {
                 const isGroup = !!floatingMenu.dataset.groupStudents;
 
                 if (part) {
-                    if (event.altKey) updateHousePointsForInstrumentPart(part, 10);
-                    else updateScoreForInstrumentPart(part, 10);
+                    if (event.altKey) {
+                        updateHousePointsForInstrumentPart(part, 10);
+                    } else {
+                        updateScoreForInstrumentPart(part, 10);
+                    }
                 } else if (isGroup) {
-                    if (event.altKey) updateHousePointsForGroup(10);
-                    else updateScoreForGroup(10);
+                    if (event.altKey) {
+                        updateHousePointsForGroup(10);
+                    } else {
+                        updateScoreForGroup(10);
+                    }
                 } else {
-                    const studentName = floatingMenu.querySelector('h3').textContent;
-                    if (event.altKey) updateHousePoints(studentName, 10);
-                    else updateScore(studentName, 10);
+                    const studentName = floatingMenu.querySelector('h3').textContent.trim();
+
+                    if (event.altKey) {
+                        updateHousePoints(studentName, 10);
+                    } else {
+                        updateScore(studentName, 10);
+                    }
                 }
+
                 event.preventDefault();
             }
             break;
@@ -453,16 +555,27 @@ function handleGlobalHotkeys(event) {
                 const isGroup = !!floatingMenu.dataset.groupStudents;
 
                 if (part) {
-                    if (event.altKey) updateHousePointsForInstrumentPart(part, -10);
-                    else updateScoreForInstrumentPart(part, -10);
+                    if (event.altKey) {
+                        updateHousePointsForInstrumentPart(part, -10);
+                    } else {
+                        updateScoreForInstrumentPart(part, -10);
+                    }
                 } else if (isGroup) {
-                    if (event.altKey) updateHousePointsForGroup(-10);
-                    else updateScoreForGroup(-10);
+                    if (event.altKey) {
+                        updateHousePointsForGroup(-10);
+                    } else {
+                        updateScoreForGroup(-10);
+                    }
                 } else {
-                    const studentName = floatingMenu.querySelector('h3').textContent;
-                    if (event.altKey) updateHousePoints(studentName, -10);
-                    else updateScore(studentName, -10);
+                    const studentName = floatingMenu.querySelector('h3').textContent.trim();
+
+                    if (event.altKey) {
+                        updateHousePoints(studentName, -10);
+                    } else {
+                        updateScore(studentName, -10);
+                    }
                 }
+
                 event.preventDefault();
             }
             break;
@@ -475,17 +588,32 @@ function handleGlobalHotkeys(event) {
         case 'r':
         case 'p':
             if (floatingMenu.style.display === 'block') {
-                const studentName = floatingMenu.querySelector('h3').textContent;
+                const studentName = floatingMenu.querySelector('h3').textContent.trim();
                 handleFloatingMenuHotkeys(event, studentName);
                 event.preventDefault();
             } else if (teacherMode.style.display === 'block') {
                 switch (event.key) {
-                    case 'a': cycleAttendance(); break;
-                    case useDevices ? 'd' : 's': toggleAllCheckboxes(useDevices ? 'devices' : 'stands'); break;
-                    case useDevices ? 'e' : 'i': toggleAllCheckboxes(useDevices ? 'engagement' : 'intonation'); break;
-                    case 'r': toggleAllCheckboxes(useDevices ? 'review' : 'returned'); break;
-                    case useDevices ? 'p' : 'e': toggleAllCheckboxes(useDevices ? 'progress' : 'engagement'); break;
+                    case 'a':
+                        cycleAttendance();
+                        break;
+
+                    case useDevices ? 'd' : 's':
+                        toggleAllCheckboxes(useDevices ? 'devices' : 'stands');
+                        break;
+
+                    case useDevices ? 'e' : 'i':
+                        toggleAllCheckboxes(useDevices ? 'engagement' : 'intonation');
+                        break;
+
+                    case 'r':
+                        toggleAllCheckboxes(useDevices ? 'review' : 'returned');
+                        break;
+
+                    case useDevices ? 'p' : 'e':
+                        toggleAllCheckboxes(useDevices ? 'progress' : 'engagement');
+                        break;
                 }
+
                 event.preventDefault();
             }
             break;

@@ -574,7 +574,7 @@ select.attendance-dropdown-select.absent {
     
     .secondary-labels {
         font-size: clamp(10px, 1vw, 14px);
-        bottom: -150%;  
+        bottom: -50px;  
         cursor: pointer;  
         z-index: 5;   
     }
@@ -586,6 +586,11 @@ select.attendance-dropdown-select.absent {
 
     .bar-label .score {
         display: none;
+    }
+
+        .secondary-labels:has(.unx-label) {
+        top: auto;
+        bottom: 50px;
     }
 }
 
@@ -746,3 +751,9 @@ transition: transform 0.3s ease;
 transform: translateY(-5px);
 }
 
+.unx-label {
+    color: #000;
+    font-size: 10px;
+    font-weight: normal;
+    line-height: 1.2;
+}

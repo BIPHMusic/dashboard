@@ -33,8 +33,19 @@
     <div id="graph-container"></div>
     <div id="teacher-mode">
         <span class="close-button" onclick="closeTopMenu()">&times;</span>
-        <button class="export-button" onclick="exportScores()">Export Scores</button>
-        <button class="reset-button" onclick="resetAllStudents()">Reset All</button>
+        
+<div class="teacher-menu-buttons">
+    <button class="export-button" onclick="exportScores()">Export Scores</button>
+    <button class="reset-button" onclick="resetAllStudents()">Reset All</button>
+    <button
+        id="copy-unxs-button"
+        class="reset-button"
+        onclick="copyUNXStudents()"
+        style="display: none;"
+    >
+        Copy UNXs
+    </button>
+</div>
         <div class="spreadsheet">
             <div class="spreadsheet-header"><strong>Student</strong></div>
             <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
@@ -385,6 +396,12 @@ function getCurrentClass() {
 
 function updateClassDisplay() {
     const cls = classes[currentClassIndex];
+    const copyUNXsButton = document.getElementById('copy-unxs-button');
+
+        if (copyUNXsButton) {
+            copyUNXsButton.style.display =
+                cls.name === 'Tech Theater' ? '' : 'none';
+        }
     document.querySelector('#title h1').textContent = cls.name;
     document.querySelector('#timeRange').textContent = cls.timeRange;
 
@@ -657,10 +674,9 @@ let hasResetReturned = false;
 let isActive = false;
 let currentPoints = 0;
 
+
 function globalKeydownHandler(event) {
-    // Sticky-note editing takes priority over the application's global hotkeys.
-    // This prevents letters such as t, h, r, etc. from being intercepted if
-    // the mode has momentarily returned to GLOBAL while clicking back into a note.
+    // Let sticky-note editing handle its own keyboard input.
     const stickyNoteContent = event.target && event.target.closest
         ? event.target.closest('.sticky-note-content')
         : null;
@@ -673,35 +689,80 @@ function globalKeydownHandler(event) {
         return;
     }
 
+    // Keep objective-input focus detection synchronized with the DOM.
+    const objectiveInput = document.getElementById('objectiveInput');
+    window.isObjectiveInputFocused =
+        !!objectiveInput && document.activeElement === objectiveInput;
+
+    // Preserve the existing global search shortcut.
     if (event.key === '/' && currentMode === MODES.GLOBAL) {
         event.preventDefault();
         toggleSearchBox();
         return;
     }
+
+    // Preserve Escape behavior for open menus.
     if (event.key === 'Escape' && menuStack.length > 0) {
         closeTopMenu();
         return;
     }
+
+    // Give the visible floating menu priority over other keyboard modes.
+    const floatingMenu = document.getElementById('floating-menu');
+    const floatingMenuIsOpen =
+        floatingMenu && floatingMenu.style.display === 'block';
+
+    if (floatingMenuIsOpen) {
+        const useDevices = isDevicesCriteriaClass();
+
+        const floatingMenuKeys = [
+            'a',
+            useDevices ? 'd' : 's',
+            useDevices ? 'e' : 'i',
+            'r',
+            useDevices ? 'p' : 'e',
+            'ArrowUp',
+            'ArrowDown',
+            'ArrowLeft',
+            'ArrowRight'
+        ];
+
+        if (floatingMenuKeys.includes(event.key)) {
+            handleGlobalHotkeys(event);
+            return;
+        }
+    }
+
+    // Route all other keys through the normal application modes.
     switch (currentMode) {
         case MODES.GLOBAL:
             handleGlobalHotkeys(event);
-            if (event.ctrlKey && event.key === 'n' && isStickyNoteAllowed()) {
+
+            if (
+                event.ctrlKey &&
+                event.key === 'n' &&
+                isStickyNoteAllowed()
+            ) {
                 event.preventDefault();
                 createStickyNote();
             }
             break;
+
         case MODES.SEARCH:
             handleSearchBoxKeys(event);
             break;
+
         case MODES.HOUSESHIELD:
             handleActiveHouseshield(event);
             break;
+
         case MODES.STICKY_NOTE:
             break;
     }
 }
 
 document.addEventListener('keydown', globalKeydownHandler);
+
 
 function openMenu(menuId) {
     try {
@@ -780,6 +841,8 @@ function closeSpecificMenu(menuId) {
 function populateStudents() {
     const spreadsheet = document.querySelector('.spreadsheet');
     const useDevices = isDevicesCriteriaClass();
+    const attendanceOptions = getAttendanceOptions();
+
     spreadsheet.innerHTML = `
         <div class="spreadsheet-header"><strong>Student</strong></div>
         <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
@@ -790,44 +853,72 @@ function populateStudents() {
         <div class="spreadsheet-header"><strong>Participation</strong></div>
         <div class="spreadsheet-header"><strong>House Points</strong></div>
     `;
+
     teacherModeOrder.forEach(name => {
         const student = students.find(s => s.name === name);
-        const isAbsent = student.attendance === 'Absent';
+        if (!student) return;
+
+        const isLocked = isAttendanceLocked(student);
+        const scoreText =
+            student.score === 'EX' || student.score === 'UNX'
+                ? student.score
+                : `${student.score}%`;
+
         const row = document.createElement('div');
         row.className = 'spreadsheet-row';
         row.dataset.studentName = student.name;
+
         row.innerHTML = `
             <div class="student-name">${student.name}</div>
+
             <div class="attendance-dropdown">
-                <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}" onchange="syncAttendance('${student.name}', this)">
-                    <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
-                    <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
-                    <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+                <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}"
+                        onchange="syncAttendance('${student.name}', this)">
+                    ${attendanceOptions.map(option => `
+                        <option value="${option}" ${student.attendance === option ? 'selected' : ''}>
+                            ${option}
+                        </option>
+                    `).join('')}
                 </select>
             </div>
+
             <div class="checkbox-container">
-                <input type="checkbox" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
+                <input type="checkbox" ${student[currentCriteria[0]] ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
             </div>
+
             <div class="checkbox-container">
-                <input type="checkbox" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
+                <input type="checkbox" ${student[currentCriteria[1]] ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
             </div>
+
             <div class="checkbox-container">
-                <input type="checkbox" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
+                <input type="checkbox" ${student[currentCriteria[2]] ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
             </div>
+
             <div class="checkbox-container">
-                <input type="checkbox" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
+                <input type="checkbox" ${student[currentCriteria[3]] ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
             </div>
+
             <div class="stepper">
                 <button onclick="updateScore('${student.name}', -10)">-</button>
-                <span class="score">${student.score === 'EX' ? 'EX' : student.score + '%'}</span>
+                <span class="score">${scoreText}</span>
                 <button onclick="updateScore('${student.name}', 10)">+</button>
             </div>
+
             <div class="stepper">
                 <button onclick="updateHousePoints('${student.name}', -10)">-</button>
                 <span>${student.housePoints}</span>
                 <button onclick="updateHousePoints('${student.name}', 10)">+</button>
             </div>
         `;
+
         spreadsheet.appendChild(row);
     });
 }
@@ -917,39 +1008,62 @@ function exitTeacherMode() {
 
 function syncAttendance(name, select) {
     const student = students.find(s => s.name === name);
-    if (student) {
-        student.attendance = select.value;
-        calculateScore(student);
-        updateScoreDisplay(student);
-        updateTardyLabel(student);
-        updateBarGraph(student);
-        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
-        if (teacherRow) {
-            const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
-            if (attendanceSelect) {
-                attendanceSelect.value = student.attendance;
-                attendanceSelect.classList.remove('present', 'tardy', 'absent');
-                attendanceSelect.classList.add(student.attendance.toLowerCase());
-            }
-            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.disabled = student.attendance === 'Absent';
-            });
+
+    if (!student) return;
+
+    student.attendance = select.value;
+
+    calculateScore(student);
+    updateScoreDisplay(student);
+    updateTardyLabel(student);
+    updateBarGraph(student);
+
+    const isLocked = isAttendanceLocked(student);
+
+    const teacherRow = document.querySelector(
+        `.spreadsheet-row[data-student-name="${student.name}"]`
+    );
+
+    if (teacherRow) {
+        const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+
+        if (attendanceSelect) {
+            attendanceSelect.value = student.attendance;
+            attendanceSelect.classList.remove('present', 'tardy', 'absent', 'unx', 'ex');
+            attendanceSelect.classList.add(student.attendance.toLowerCase());
         }
-        const floatingMenu = document.getElementById('floating-menu');
-        if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
-            const floatingSelect = floatingMenu.querySelector('select');
-            if (floatingSelect) {
-                floatingSelect.value = student.attendance;
-                floatingSelect.classList.remove('present', 'tardy', 'absent');
-                floatingSelect.classList.add(student.attendance.toLowerCase());
-            }
-            const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
-            floatingCheckboxes.forEach(checkbox => {
-                checkbox.disabled = student.attendance === 'Absent';
-            });
-            updateFloatingMenu(student);
+
+        const checkboxes = teacherRow.querySelectorAll(
+            '.checkbox-container input[type="checkbox"]'
+        );
+
+        checkboxes.forEach(checkbox => {
+            checkbox.disabled = isLocked;
+        });
+    }
+
+    const floatingMenu = document.getElementById('floating-menu');
+
+    if (
+        floatingMenu &&
+        floatingMenu.style.display === 'block' &&
+        floatingMenu.querySelector('h3')?.textContent === student.name
+    ) {
+        const floatingSelect = floatingMenu.querySelector('select');
+
+        if (floatingSelect) {
+            floatingSelect.value = student.attendance;
+            floatingSelect.classList.remove('present', 'tardy', 'absent', 'unx', 'ex');
+            floatingSelect.classList.add(student.attendance.toLowerCase());
         }
+
+        const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+
+        floatingCheckboxes.forEach(checkbox => {
+            checkbox.disabled = isLocked;
+        });
+
+        updateFloatingMenu(student);
     }
 }
 
@@ -967,112 +1081,156 @@ function syncCheckbox(name, checkbox, type) {
 
 function updateScore(name, change) {
     const student = students.find(s => s.name === name);
-    if (student && student.score !== 'EX') {
-        const newScore = Math.max(0, Math.min(100, student.score + change));
-        if (newScore !== student.score) {
-            student.manualAdjustment = (student.manualAdjustment || 0) + (newScore - student.score);
-            student.score = newScore;
-            const bar = document.getElementById(`bar-${name}`);
-            bar.style.height = `${student.score}%`;
-            bar.querySelector('.bar-label').innerHTML = `${name}<br>${student.score}%`;
-            bar.style.setProperty('--flash-color', change > 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
-            bar.classList.remove('flash-animation');
-            void bar.offsetWidth;
-            bar.classList.add('flash-animation');
-            updateScoreDisplay(student);
-            updateFloatingMenu(student);
-            if (change > 0) {
-                playRandomSound(positiveEffects);
-            } else {
-                if (newScore === 0) {
-                    const audio = new Audio(negativeEffect0);
-                    audio.play();
-                } else if (newScore >= 50) {
-                    playRandomSound(negativeEffects50Plus);
-                } else if (newScore >= 10) {
-                    playRandomSound(negativeEffects10to50);
-                }
-            }
+
+    if (
+        !student ||
+        student.score === 'EX' ||
+        student.score === 'UNX'
+    ) {
+        return;
+    }
+
+    const newScore = Math.max(0, Math.min(100, student.score + change));
+
+    if (newScore === student.score) return;
+
+    student.manualAdjustment =
+        (student.manualAdjustment || 0) + (newScore - student.score);
+
+    student.score = newScore;
+
+    const bar = document.getElementById(`bar-${name}`);
+
+    if (bar) {
+        bar.style.height = `${student.score}%`;
+
+        bar.style.setProperty(
+            '--flash-color',
+            change > 0
+                ? 'rgba(46, 204, 113, 0.6)'
+                : 'rgba(231, 76, 60, 0.6)'
+        );
+
+        bar.classList.remove('flash-animation');
+        void bar.offsetWidth;
+        bar.classList.add('flash-animation');
+    }
+
+    updateScoreDisplay(student);
+    updateFloatingMenu(student);
+
+    if (change > 0) {
+        playRandomSound(positiveEffects);
+    } else {
+        if (newScore === 0) {
+            const audio = new Audio(negativeEffect0);
+            audio.play();
+        } else if (newScore >= 50) {
+            playRandomSound(negativeEffects50Plus);
+        } else if (newScore >= 10) {
+            playRandomSound(negativeEffects10to50);
         }
     }
 }
 
 function calculateScore(student) {
-    if (student.attendance === 'Absent') {
-        student.score = 'EX';
-    } else {
-        let baseScore = 60;
-        if (student.attendance === 'Tardy') {
-            // Tech Theater (and AE / AP Music Theory) only lose 10 % for being tardy
-            baseScore -= isDevicesCriteriaClass() ? 10 : 20;
-        }
-        if (student[currentCriteria[0]]) baseScore += 10;
-        if (student[currentCriteria[1]]) baseScore += 10;
-        if (student[currentCriteria[2]]) baseScore += 10;
-        if (student[currentCriteria[3]]) baseScore += 10;
-        let manualAdjustment = student.manualAdjustment || 0;
-        student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
+    if (student.attendance === 'UNX') {
+        student.score = 'UNX';
+        return;
     }
+
+    if (
+        student.attendance === 'EX' ||
+        student.attendance === 'Absent'
+    ) {
+        student.score = 'EX';
+        return;
+    }
+
+    let baseScore = 60;
+
+    if (student.attendance === 'Tardy') {
+        // Classes using device criteria lose 10 points for being tardy.
+        // Other classes retain their existing 20-point deduction.
+        baseScore -= isDevicesCriteriaClass() ? 10 : 20;
+    }
+
+    if (student[currentCriteria[0]]) baseScore += 10;
+    if (student[currentCriteria[1]]) baseScore += 10;
+    if (student[currentCriteria[2]]) baseScore += 10;
+    if (student[currentCriteria[3]]) baseScore += 10;
+
+    const manualAdjustment = student.manualAdjustment || 0;
+
+    student.score = Math.max(
+        0,
+        Math.min(100, baseScore + manualAdjustment)
+    );
 }
 
 function updateScoreDisplay(student) {
     const bar = document.getElementById(`bar-${student.name}`);
-    if (bar) {
-        const isStudentsBirthday = isBirthday(student.birthdate);
-        if (isStudentsBirthday) {
-            bar.classList.add('bdaycolorful');
-        } else {
-            bar.classList.remove('bdaycolorful');
-        }
-        bar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
 
-        // Keep / re-apply instrument color
-        applyBarColor(bar, student);
+    if (!bar) return;
 
-        const houseInfo = masterList.find(s => s.name === student.name);
-        const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
-        if (student.score === 'EX') {
-            bar.classList.add('ex-score');
-            bar.style.height = '0%';
-            bar.innerHTML = `
-                <div class="bar-label">
-                    <div class="main-labels">
-                        <span>${student.name}</span>
-                        <span class="score">EX</span>
-                    </div>
-                    <div class="secondary-labels">
-                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                    </div>
-                </div>
-            `;
-        } else {
-            bar.classList.remove('ex-score');
-            bar.style.height = `${student.score}%`;
-            bar.innerHTML = `
-                <div class="value-label">${student.score}%</div>
-                <div class="bar-label">
-                    <div class="main-labels">
-                        <span>${student.name}</span>
-                        <span class="score">${student.score}%</span>
-                    </div>
-                    <div class="secondary-labels">
-                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-        const scoreSpan = bar.querySelector('.score');
-        if (scoreSpan) {
-            scoreSpan.removeAttribute('style');
-        }
-        updateTeacherMenu(student);
-        updateFloatingMenu(student);
-        const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
-        if (participationSpan) {
-            participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
-        }
+    const isStudentsBirthday = isBirthday(student.birthdate);
+
+    if (isStudentsBirthday) {
+        bar.classList.add('bdaycolorful');
+    } else {
+        bar.classList.remove('bdaycolorful');
+    }
+
+    bar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
+
+    applyBarColor(bar, student);
+
+    const houseInfo = masterList.find(s => s.name === student.name);
+    const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+
+    const isSpecialScore = student.score === 'EX' || student.score === 'UNX';
+    const scoreText = isSpecialScore ? student.score : `${student.score}%`;
+
+    if (isSpecialScore) {
+        bar.classList.add('ex-score');
+        bar.style.height = '0%';
+    } else {
+        bar.classList.remove('ex-score');
+        bar.style.height = `${student.score}%`;
+    }
+
+    bar.innerHTML = `
+        ${!isSpecialScore ? `<div class="value-label">${student.score}%</div>` : ''}
+        <div class="bar-label">
+            <div class="main-labels">
+                <span>${student.name}</span>
+                <span class="score">${scoreText}</span>
+            </div>
+            <div class="secondary-labels">
+                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                ${student.score === 'UNX' ? '<div class="unx-label">❌</div>' : ''}
+                ${student.housePoints !== 0
+                    ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>`
+                    : ''}
+            </div>
+        </div>
+    `;
+
+    const scoreSpan = bar.querySelector('.score');
+
+    if (scoreSpan) {
+        scoreSpan.removeAttribute('style');
+    }
+
+    updateTeacherMenu(student);
+    updateFloatingMenu(student);
+
+    const participationSpan = document.querySelector(
+        `.spreadsheet-row[data-student-name="${student.name}"] .stepper span`
+    );
+
+    if (participationSpan) {
+        participationSpan.textContent = scoreText;
     }
 }
 
@@ -1081,11 +1239,21 @@ window.addEventListener('resize', () => {
 });
 
 function updateTeacherMenu(student) {
-    const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+    const participationSpan = document.querySelector(
+        `.spreadsheet-row[data-student-name="${student.name}"] .stepper span`
+    );
+
     if (participationSpan) {
-        participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+        participationSpan.textContent =
+            student.score === 'EX' || student.score === 'UNX'
+                ? student.score
+                : `${student.score}%`;
     }
-    const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
+
+    const housePointsSpan = document.querySelector(
+        `.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`
+    );
+
     if (housePointsSpan) {
         housePointsSpan.textContent = student.housePoints;
     }
@@ -1093,130 +1261,186 @@ function updateTeacherMenu(student) {
 
 function updateFloatingMenu(student) {
     const floatingMenu = document.getElementById('floating-menu');
+
     if (!floatingMenu || floatingMenu.style.display !== 'block') {
         return;
     }
-    if (floatingMenu.querySelector('h3').textContent !== student.name) {
-        return;
-    }
+
+if (floatingMenu.querySelector('h3').textContent.trim() !== student.name) {
+    return;
+}
 
     setTimeout(() => {
-        const istechTheater = classes[currentClassIndex].name === "Tech Theater";
         const attendanceSelect = floatingMenu.querySelector('select');
+
         if (attendanceSelect) {
             attendanceSelect.value = student.attendance;
         }
+
         const checkboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+
         checkboxes.forEach(checkbox => {
             const property = checkbox.id.replace('checkbox-', '');
-            checkbox.checked = student[property];
+            checkbox.checked = !!student[property];
+            checkbox.disabled = isAttendanceLocked(student);
         });
-        
-        let participationSpan = floatingMenu.querySelector('.stepper:nth-child(7) .score');
-        if (!participationSpan) {
-            participationSpan = floatingMenu.querySelector('.stepper .score');
-        }
+
+        const participationSpan =
+            floatingMenu.querySelector('.stepper:nth-child(7) .score') ||
+            floatingMenu.querySelector('.stepper .score');
+
         if (participationSpan) {
-            const displayText = student.score === 'EX' ? 'EX' : `${student.score}%`;
-            participationSpan.textContent = displayText;
+            participationSpan.textContent =
+                student.score === 'EX' || student.score === 'UNX'
+                    ? student.score
+                    : `${student.score}%`;
         }
-        
-        let housePointsSpan = floatingMenu.querySelector('.stepper:nth-child(8) span:nth-child(3)');
-        if (!housePointsSpan) {
-            housePointsSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
-        }
+
+        const housePointsSpan =
+            floatingMenu.querySelector('.stepper:nth-child(8) span:nth-child(3)') ||
+            floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
+
         if (housePointsSpan) {
-            housePointsSpan.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
+            housePointsSpan.textContent =
+                student.housePoints > 0
+                    ? `+${student.housePoints}`
+                    : student.housePoints;
         }
     }, 100);
 }
 
 function showStudentsGroupMenu(studentNames) {
     const floatingMenu = document.getElementById('floating-menu');
+
     const matchingStudents = studentNames
         .map(name => students.find(s => s.name === name))
         .filter(Boolean);
 
     if (matchingStudents.length === 0) return;
 
-    // Re-use the same group machinery we already built for instrument parts
     currentStudentIndex = -1;
-    floatingMenu.dataset.instrumentPart = '';           // clear
-floatingMenu.dataset.groupStudents = JSON.stringify(studentNames);
+    floatingMenu.dataset.instrumentPart = '';
+    floatingMenu.dataset.groupStudents = JSON.stringify(studentNames);
 
-    const allHave = (prop) => matchingStudents.every(s => s[prop]);
-    const someHave = (prop) => matchingStudents.some(s => s[prop]);
+    const attendanceOptions = getAttendanceOptions();
+    const allHave = prop => matchingStudents.every(s => s[prop]);
+    const someHave = prop => matchingStudents.some(s => s[prop]);
+    const isLocked = matchingStudents.some(s => isAttendanceLocked(s));
 
     let commonAttendance = matchingStudents[0].attendance;
+
     if (!matchingStudents.every(s => s.attendance === commonAttendance)) {
         commonAttendance = 'Present';
     }
 
-    const numericScores = matchingStudents.filter(s => typeof s.score === 'number').map(s => s.score);
+    const numericScores = matchingStudents
+        .filter(s => typeof s.score === 'number')
+        .map(s => s.score);
+
     const avgScore = numericScores.length
         ? Math.round(numericScores.reduce((a, b) => a + b, 0) / numericScores.length)
-        : 'EX';
-    const houseSum = matchingStudents.reduce((sum, s) => sum + (s.housePoints || 0), 0);
+        : matchingStudents.every(s => s.score === 'UNX') ? 'UNX' : 'EX';
+
+    const houseSum = matchingStudents.reduce(
+        (sum, s) => sum + (s.housePoints || 0),
+        0
+    );
 
     const title = matchingStudents.length === 1
         ? matchingStudents[0].name
         : `Selected (${matchingStudents.length})`;
 
+    const useDevices = isDevicesCriteriaClass();
+
     floatingMenu.innerHTML = `
         <span class="close-button" onclick="closeTopMenu()">&times;</span>
         <h3>${title}</h3>
+
         <div class="checkbox-row">
-            <select class="attendance-dropdown-select ${commonAttendance.toLowerCase()}" 
+            <select class="attendance-dropdown-select ${commonAttendance.toLowerCase()}"
                     onchange="setAttendanceForGroup(this.value)">
-                <option value="Absent"  ${commonAttendance === 'Absent'  ? 'selected' : ''}>Absent</option>
-                <option value="Present" ${commonAttendance === 'Present' ? 'selected' : ''}>Present</option>
-                <option value="Tardy"   ${commonAttendance === 'Tardy'   ? 'selected' : ''}>Tardy</option>
+                ${attendanceOptions.map(option => `
+                    <option value="${option}" ${commonAttendance === option ? 'selected' : ''}>
+                        ${option}
+                    </option>
+                `).join('')}
             </select>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" 
-                ${allHave(currentCriteria[0]) ? 'checked' : ''} 
-                onchange="toggleCheckboxForGroup('${currentCriteria[0]}', this.checked)"> Stands</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" 
-                ${allHave(currentCriteria[1]) ? 'checked' : ''} 
-                onchange="toggleCheckboxForGroup('${currentCriteria[1]}', this.checked)"> Intonation</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" 
-                ${allHave(currentCriteria[2]) ? 'checked' : ''} 
-                onchange="toggleCheckboxForGroup('${currentCriteria[2]}', this.checked)"> Returned</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" 
-                ${allHave(currentCriteria[3]) ? 'checked' : ''} 
-                onchange="toggleCheckboxForGroup('${currentCriteria[3]}', this.checked)"> Engagement</label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[0]}"
+                    ${allHave(currentCriteria[0]) ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="toggleCheckboxForGroup('${currentCriteria[0]}', this.checked)">
+                ${useDevices ? 'Devices' : 'Stands'}
+            </label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[1]}"
+                    ${allHave(currentCriteria[1]) ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="toggleCheckboxForGroup('${currentCriteria[1]}', this.checked)">
+                ${useDevices ? 'Engagement' : 'Intonation'}
+            </label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[2]}"
+                    ${allHave(currentCriteria[2]) ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="toggleCheckboxForGroup('${currentCriteria[2]}', this.checked)">
+                ${useDevices ? 'Review' : 'Returned'}
+            </label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[3]}"
+                    ${allHave(currentCriteria[3]) ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="toggleCheckboxForGroup('${currentCriteria[3]}', this.checked)">
+                ${useDevices ? 'Progress' : 'Engagement'}
+            </label>
         </div>
+
         <div class="stepper">
             <button onclick="updateScoreForGroup(-10)">-</button>
-            <span class="score">${avgScore === 'EX' ? 'EX' : avgScore + '%'}</span>
+            <span class="score">${avgScore === 'EX' || avgScore === 'UNX' ? avgScore : `${avgScore}%`}</span>
             <button onclick="updateScoreForGroup(10)">+</button>
         </div>
+
         <div class="stepper">
             <span>House Points</span>
             <button onclick="updateHousePointsForGroup(-10)">-</button>
             <span>${houseSum > 0 ? '+' : ''}${houseSum}</span>
             <button onclick="updateHousePointsForGroup(10)">+</button>
         </div>
+
         <button onclick="closeFloatingMenu()">Close</button>
     `;
 
-    // indeterminate state
     currentCriteria.forEach(crit => {
-        const cb = floatingMenu.querySelector(`#checkbox-${crit}`);
-        if (cb) cb.indeterminate = someHave(crit) && !allHave(crit);
+        const checkbox = floatingMenu.querySelector(`#checkbox-${crit}`);
+
+        if (checkbox) {
+            checkbox.indeterminate = someHave(crit) && !allHave(crit);
+        }
     });
 
     floatingMenu.style.left = '50%';
-    floatingMenu.style.top  = '50%';
+    floatingMenu.style.top = '50%';
+
     openMenu('floating-menu');
 
-    // highlight the bars
     resetBarHighlights();
-    matchingStudents.forEach(s => {
-        const bar = document.getElementById(`bar-${s.name}`);
+
+    matchingStudents.forEach(student => {
+        const bar = document.getElementById(`bar-${student.name}`);
+
         if (bar) {
             bar.style.opacity = '1';
+
             const nameSpan = bar.querySelector('.main-labels span:first-child');
-            if (nameSpan) nameSpan.style.fontWeight = 'bold';
+
+            if (nameSpan) {
+                nameSpan.style.fontWeight = 'bold';
+            }
         }
     });
 }
@@ -1230,55 +1454,103 @@ function getGroupStudents() {
 
 function updateStudentsGroupMenu() {
     const floatingMenu = document.getElementById('floating-menu');
+
     if (!floatingMenu || !floatingMenu.dataset.groupStudents) return;
 
     const matching = getGroupStudents();
+
     if (matching.length === 0) return;
 
-    const allHave = (prop) => matching.every(s => s[prop]);
-    const someHave = (prop) => matching.some(s => s[prop]);
+    const allHave = prop => matching.every(s => s[prop]);
+    const someHave = prop => matching.some(s => s[prop]);
 
-    // attendance
     let commonAttendance = matching[0].attendance;
-    if (!matching.every(s => s.attendance === commonAttendance)) commonAttendance = null;
 
-    const attSelect = floatingMenu.querySelector('select');
-    if (attSelect && commonAttendance) {
-        attSelect.value = commonAttendance;
-        attSelect.className = `attendance-dropdown-select ${commonAttendance.toLowerCase()}`;
+    if (!matching.every(s => s.attendance === commonAttendance)) {
+        commonAttendance = null;
     }
 
-    // checkboxes
+    const attSelect = floatingMenu.querySelector('select');
+
+    if (attSelect && commonAttendance) {
+        attSelect.value = commonAttendance;
+        attSelect.className =
+            `attendance-dropdown-select ${commonAttendance.toLowerCase()}`;
+    }
+
+    const isLocked = matching.some(s => isAttendanceLocked(s));
+
     currentCriteria.forEach(crit => {
-        const cb = floatingMenu.querySelector(`#checkbox-${crit}`);
-        if (cb) {
-            cb.checked = allHave(crit);
-            cb.indeterminate = someHave(crit) && !allHave(crit);
+        const checkbox = floatingMenu.querySelector(`#checkbox-${crit}`);
+
+        if (checkbox) {
+            checkbox.checked = allHave(crit);
+            checkbox.indeterminate = someHave(crit) && !allHave(crit);
+            checkbox.disabled = isLocked;
         }
     });
 
-    // average score
-    const numericScores = matching.filter(s => typeof s.score === 'number').map(s => s.score);
+    const numericScores = matching
+        .filter(s => typeof s.score === 'number')
+        .map(s => s.score);
+
     const avgScore = numericScores.length
         ? Math.round(numericScores.reduce((a, b) => a + b, 0) / numericScores.length)
-        : 'EX';
-    const scoreSpan = floatingMenu.querySelector('.stepper .score');
-    if (scoreSpan) scoreSpan.textContent = avgScore === 'EX' ? 'EX' : `${avgScore}%`;
+        : matching.every(s => s.score === 'UNX') ? 'UNX' : 'EX';
 
-    // house points sum
-    const houseSum = matching.reduce((sum, s) => sum + (s.housePoints || 0), 0);
-    const houseSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
-    if (houseSpan) houseSpan.textContent = houseSum > 0 ? `+${houseSum}` : houseSum;
+    const scoreSpan = floatingMenu.querySelector('.stepper .score');
+
+    if (scoreSpan) {
+        scoreSpan.textContent =
+            avgScore === 'EX' || avgScore === 'UNX'
+                ? avgScore
+                : `${avgScore}%`;
+    }
+
+    const houseSum = matching.reduce(
+        (sum, s) => sum + (s.housePoints || 0),
+        0
+    );
+
+    const houseSpan = floatingMenu.querySelector(
+        '.stepper:last-of-type span:nth-child(3)'
+    );
+
+    if (houseSpan) {
+        houseSpan.textContent = houseSum > 0 ? `+${houseSum}` : houseSum;
+    }
 }
 
 function setAttendanceForGroup(value) {
-    getGroupStudents().forEach(s => {
-        s.attendance = value;
-        calculateScore(s);
-        updateScoreDisplay(s);
-        updateTardyLabel(s);
-        updateBarGraph(s);
+    getGroupStudents().forEach(student => {
+        student.attendance = value;
+
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+        updateBarGraph(student);
+
+        const teacherRow = document.querySelector(
+            `.spreadsheet-row[data-student-name="${student.name}"]`
+        );
+
+        if (teacherRow) {
+            const select = teacherRow.querySelector('.attendance-dropdown select');
+
+            if (select) {
+                select.value = value;
+                select.classList.remove('present', 'tardy', 'absent', 'unx', 'ex');
+                select.classList.add(value.toLowerCase());
+            }
+
+            teacherRow.querySelectorAll(
+                '.checkbox-container input[type="checkbox"]'
+            ).forEach(checkbox => {
+                checkbox.disabled = isAttendanceLocked(student);
+            });
+        }
     });
+
     updateStudentsGroupMenu();
 }
 
@@ -1341,75 +1613,130 @@ function getStudentsByPart(part) {
 function showInstrumentPartMenu(part) {
     const floatingMenu = document.getElementById('floating-menu');
     const matchingStudents = getStudentsByPart(part);
+
     if (matchingStudents.length === 0) return;
 
     currentStudentIndex = -1;
     floatingMenu.dataset.instrumentPart = part;
 
-    const allHave = (prop) => matchingStudents.every(s => s[prop]);
-    const someHave = (prop) => matchingStudents.some(s => s[prop]);
+    const attendanceOptions = getAttendanceOptions();
+    const allHave = prop => matchingStudents.every(s => s[prop]);
+    const someHave = prop => matchingStudents.some(s => s[prop]);
+    const isLocked = matchingStudents.some(s => isAttendanceLocked(s));
 
     let commonAttendance = matchingStudents[0].attendance;
+
     if (!matchingStudents.every(s => s.attendance === commonAttendance)) {
         commonAttendance = 'Present';
     }
 
-    const numericScores = matchingStudents.filter(s => typeof s.score === 'number').map(s => s.score);
+    const numericScores = matchingStudents
+        .filter(s => typeof s.score === 'number')
+        .map(s => s.score);
+
     const avgScore = numericScores.length
         ? Math.round(numericScores.reduce((a, b) => a + b, 0) / numericScores.length)
-        : 'EX';
-    const houseSum = matchingStudents.reduce((sum, s) => sum + (s.housePoints || 0), 0);
+        : matchingStudents.every(s => s.score === 'UNX') ? 'UNX' : 'EX';
+
+    const houseSum = matchingStudents.reduce(
+        (sum, s) => sum + (s.housePoints || 0),
+        0
+    );
+
+    const useDevices = isDevicesCriteriaClass();
 
     floatingMenu.innerHTML = `
         <span class="close-button" onclick="closeTopMenu()">&times;</span>
         <h3>${part} (${matchingStudents.length})</h3>
+
         <div class="checkbox-row">
-            <select class="attendance-dropdown-select ${commonAttendance.toLowerCase()}" onchange="setAttendanceForInstrumentPart('${part}', this.value)">
-                <option value="Absent" ${commonAttendance === 'Absent' ? 'selected' : ''}>Absent</option>
-                <option value="Present" ${commonAttendance === 'Present' ? 'selected' : ''}>Present</option>
-                <option value="Tardy" ${commonAttendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+            <select class="attendance-dropdown-select ${commonAttendance.toLowerCase()}"
+                    onchange="setAttendanceForInstrumentPart('${part}', this.value)">
+                ${attendanceOptions.map(option => `
+                    <option value="${option}" ${commonAttendance === option ? 'selected' : ''}>
+                        ${option}
+                    </option>
+                `).join('')}
             </select>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${allHave(currentCriteria[0]) ? 'checked' : ''} onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[0]}', this.checked)"> Stands</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${allHave(currentCriteria[1]) ? 'checked' : ''} onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[1]}', this.checked)"> Intonation</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${allHave(currentCriteria[2]) ? 'checked' : ''} onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[2]}', this.checked)"> Returned</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${allHave(currentCriteria[3]) ? 'checked' : ''} onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[3]}', this.checked)"> Engagement</label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[0]}"
+                    ${allHave(currentCriteria[0]) ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[0]}', this.checked)">
+                ${useDevices ? 'Devices' : 'Stands'}
+            </label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[1]}"
+                    ${allHave(currentCriteria[1]) ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[1]}', this.checked)">
+                ${useDevices ? 'Engagement' : 'Intonation'}
+            </label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[2]}"
+                    ${allHave(currentCriteria[2]) ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[2]}', this.checked)">
+                ${useDevices ? 'Review' : 'Returned'}
+            </label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[3]}"
+                    ${allHave(currentCriteria[3]) ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="toggleCheckboxForInstrumentPart('${part}', '${currentCriteria[3]}', this.checked)">
+                ${useDevices ? 'Progress' : 'Engagement'}
+            </label>
         </div>
+
         <div class="stepper">
             <button onclick="updateScoreForInstrumentPart('${part}', -10)">-</button>
-            <span class="score">${avgScore === 'EX' ? 'EX' : avgScore + '%'}</span>
+            <span class="score">${avgScore === 'EX' || avgScore === 'UNX' ? avgScore : `${avgScore}%`}</span>
             <button onclick="updateScoreForInstrumentPart('${part}', 10)">+</button>
         </div>
+
         <div class="stepper">
             <span>House Points</span>
             <button onclick="updateHousePointsForInstrumentPart('${part}', -10)">-</button>
             <span>${houseSum > 0 ? '+' : ''}${houseSum}</span>
             <button onclick="updateHousePointsForInstrumentPart('${part}', 10)">+</button>
         </div>
+
         <button onclick="closeFloatingMenu()">Close</button>
     `;
 
-    // Set indeterminate state for mixed checkboxes
     currentCriteria.forEach(crit => {
-        const cb = floatingMenu.querySelector(`#checkbox-${crit}`);
-        if (cb) {
-            cb.indeterminate = someHave(crit) && !allHave(crit);
+        const checkbox = floatingMenu.querySelector(`#checkbox-${crit}`);
+
+        if (checkbox) {
+            checkbox.indeterminate = someHave(crit) && !allHave(crit);
         }
     });
 
-    floatingMenu.style.left = `50%`;
-    floatingMenu.style.top = `50%`;
+    floatingMenu.style.left = '50%';
+    floatingMenu.style.top = '50%';
+
     openMenu('floating-menu');
 
-    // Highlight all bars belonging to this instrument part
     resetBarHighlights();
-    matchingStudents.forEach(s => {
-        const bar = document.getElementById(`bar-${s.name}`);
+
+    matchingStudents.forEach(student => {
+        const bar = document.getElementById(`bar-${student.name}`);
+
         if (bar) {
             bar.style.opacity = '1';
+
             const nameSpan = bar.querySelector('.main-labels span:first-child');
-            if (nameSpan) nameSpan.style.fontWeight = 'bold';
+
+            if (nameSpan) {
+                nameSpan.style.fontWeight = 'bold';
+            }
         }
     });
+
     document.querySelectorAll('.bar').forEach(bar => {
         if (!matchingStudents.some(s => bar.id === `bar-${s.name}`)) {
             bar.style.opacity = '0.7';
@@ -1419,26 +1746,36 @@ function showInstrumentPartMenu(part) {
 
 function setAttendanceForInstrumentPart(part, value) {
     const matching = getStudentsByPart(part);
-    matching.forEach(s => {
-        s.attendance = value;
-        calculateScore(s);
-        updateScoreDisplay(s);
-        updateTardyLabel(s);
-        updateBarGraph(s);
-        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${s.name}"]`);
+
+    matching.forEach(student => {
+        student.attendance = value;
+
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+        updateBarGraph(student);
+
+        const teacherRow = document.querySelector(
+            `.spreadsheet-row[data-student-name="${student.name}"]`
+        );
+
         if (teacherRow) {
             const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+
             if (attendanceSelect) {
-                attendanceSelect.value = s.attendance;
-                attendanceSelect.classList.remove('present', 'tardy', 'absent');
-                attendanceSelect.classList.add(s.attendance.toLowerCase());
+                attendanceSelect.value = value;
+                attendanceSelect.classList.remove('present', 'tardy', 'absent', 'unx', 'ex');
+                attendanceSelect.classList.add(value.toLowerCase());
             }
-            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.disabled = s.attendance === 'Absent';
+
+            teacherRow.querySelectorAll(
+                '.checkbox-container input[type="checkbox"]'
+            ).forEach(checkbox => {
+                checkbox.disabled = isAttendanceLocked(student);
             });
         }
     });
+
     updateInstrumentPartMenu(part);
 }
 
@@ -1464,31 +1801,48 @@ function toggleCheckboxForInstrumentPart(part, type, forceValue = null) {
 
 function cycleAttendanceForInstrumentPart(part) {
     const matching = getStudentsByPart(part);
+
     if (matching.length === 0) return;
-    const options = ['Present', 'Tardy', 'Absent'];
+
+    const options = getAttendanceOptions();
     const current = matching[0].attendance;
-    const nextIndex = (options.indexOf(current) + 1) % options.length;
+    const currentIndex = options.indexOf(current);
+    const nextIndex = (currentIndex + 1) % options.length;
     const next = options[nextIndex];
-    matching.forEach(s => {
-        s.attendance = next;
-        calculateScore(s);
-        updateScoreDisplay(s);
-        updateTardyLabel(s);
-        updateBarGraph(s);
-        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${s.name}"]`);
+
+    matching.forEach(student => {
+        student.attendance = next;
+
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+        updateBarGraph(student);
+
+        const isLocked = isAttendanceLocked(student);
+
+        const teacherRow = document.querySelector(
+            `.spreadsheet-row[data-student-name="${student.name}"]`
+        );
+
         if (teacherRow) {
             const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+
             if (attendanceSelect) {
-                attendanceSelect.value = s.attendance;
-                attendanceSelect.classList.remove('present', 'tardy', 'absent');
-                attendanceSelect.classList.add(s.attendance.toLowerCase());
+                attendanceSelect.value = student.attendance;
+                attendanceSelect.classList.remove('present', 'tardy', 'absent', 'unx', 'ex');
+                attendanceSelect.classList.add(student.attendance.toLowerCase());
             }
-            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+
+            const checkboxes = teacherRow.querySelectorAll(
+                '.checkbox-container input[type="checkbox"]'
+            );
+
             checkboxes.forEach(checkbox => {
-                checkbox.disabled = s.attendance === 'Absent';
+                checkbox.disabled = isLocked;
             });
         }
     });
+
     updateInstrumentPartMenu(part);
 }
 
@@ -1541,47 +1895,78 @@ function updateHousePointsForInstrumentPart(part, change) {
 
 function updateInstrumentPartMenu(part) {
     const floatingMenu = document.getElementById('floating-menu');
-    if (!floatingMenu || floatingMenu.style.display !== 'block' || floatingMenu.dataset.instrumentPart !== part) {
+
+    if (
+        !floatingMenu ||
+        floatingMenu.style.display !== 'block' ||
+        floatingMenu.dataset.instrumentPart !== part
+    ) {
         return;
     }
+
     const matching = getStudentsByPart(part);
+
     if (matching.length === 0) return;
 
-    const allHave = (prop) => matching.every(s => s[prop]);
-    const someHave = (prop) => matching.some(s => s[prop]);
+    const allHave = prop => matching.every(s => s[prop]);
+    const someHave = prop => matching.some(s => s[prop]);
 
     let commonAttendance = matching[0].attendance;
-    const allSameAttendance = matching.every(s => s.attendance === commonAttendance);
+
+    const allSameAttendance = matching.every(
+        s => s.attendance === commonAttendance
+    );
+
     if (!allSameAttendance) {
         commonAttendance = null;
     }
 
     const attSelect = floatingMenu.querySelector('select');
+
     if (attSelect && commonAttendance) {
         attSelect.value = commonAttendance;
-        attSelect.classList.remove('present', 'tardy', 'absent');
+        attSelect.classList.remove('present', 'tardy', 'absent', 'unx', 'ex');
         attSelect.classList.add(commonAttendance.toLowerCase());
     }
 
+    const isLocked = matching.some(s => isAttendanceLocked(s));
+
     currentCriteria.forEach(crit => {
-        const cb = floatingMenu.querySelector(`#checkbox-${crit}`);
-        if (cb) {
-            cb.checked = allHave(crit);
-            cb.indeterminate = someHave(crit) && !allHave(crit);
+        const checkbox = floatingMenu.querySelector(`#checkbox-${crit}`);
+
+        if (checkbox) {
+            checkbox.checked = allHave(crit);
+            checkbox.indeterminate = someHave(crit) && !allHave(crit);
+            checkbox.disabled = isLocked;
         }
     });
 
-    const numericScores = matching.filter(s => typeof s.score === 'number').map(s => s.score);
+    const numericScores = matching
+        .filter(s => typeof s.score === 'number')
+        .map(s => s.score);
+
     const avgScore = numericScores.length
         ? Math.round(numericScores.reduce((a, b) => a + b, 0) / numericScores.length)
-        : 'EX';
+        : matching.every(s => s.score === 'UNX') ? 'UNX' : 'EX';
+
     const scoreSpan = floatingMenu.querySelector('.stepper .score');
+
     if (scoreSpan) {
-        scoreSpan.textContent = avgScore === 'EX' ? 'EX' : `${avgScore}%`;
+        scoreSpan.textContent =
+            avgScore === 'EX' || avgScore === 'UNX'
+                ? avgScore
+                : `${avgScore}%`;
     }
 
-    const houseSum = matching.reduce((sum, s) => sum + (s.housePoints || 0), 0);
-    const houseValueSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
+    const houseSum = matching.reduce(
+        (sum, s) => sum + (s.housePoints || 0),
+        0
+    );
+
+    const houseValueSpan = floatingMenu.querySelector(
+        '.stepper:last-of-type span:nth-child(3)'
+    );
+
     if (houseValueSpan) {
         houseValueSpan.textContent = houseSum > 0 ? `+${houseSum}` : houseSum;
     }
@@ -1612,55 +1997,80 @@ function updateTardyLabel(student) {
 function createBars() {
     const container = document.getElementById('graph-container');
     container.innerHTML = '';
+
     students.forEach(student => {
         const bar = document.createElement('div');
         bar.className = 'bar';
+
         const isBday = isBirthday(student.birthdate);
+
         if (isBday) {
             bar.classList.add('bdaycolorful');
         }
-        if (student.score === 'EX') {
+
+        const isSpecialScore = student.score === 'EX' || student.score === 'UNX';
+        const scoreText = isSpecialScore ? student.score : `${student.score}%`;
+
+        if (isSpecialScore) {
             bar.classList.add('ex-score');
         }
+
         bar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
-        bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
+        bar.style.height = isSpecialScore ? '0%' : `${student.score}%`;
         bar.id = `bar-${student.name}`;
         bar.dataset.studentName = student.name;
 
-        // Apply instrument-based color (or fallback)
         applyBarColor(bar, student);
 
         const houseInfo = masterList.find(s => s.name === student.name);
         const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+
         bar.innerHTML = `
-            ${student.score !== 'EX' ? `<div class="value-label">${student.score}%</div>` : ''}
+            ${!isSpecialScore ? `<div class="value-label">${student.score}%</div>` : ''}
             <div class="bar-label">
                 <div class="main-labels">
                     <span ${isBday ? 'class="colorful"' : ''}>${student.name}</span>
-                    <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
+                    <span class="score">${scoreText}</span>
                 </div>
                 <div class="secondary-labels">
                     ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                    ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                    ${student.score === 'UNX' ? '<div class="unx-label">❌</div>' : ''}
+                    ${student.housePoints !== 0
+                        ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>`
+                        : ''}
                 </div>
             </div>
         `;
+
         bar.addEventListener('mouseover', () => highlightBar(student.name));
         bar.addEventListener('mouseout', () => resetBarHighlights());
+
         bar.addEventListener('click', (event) => {
             const nameSpan = event.target.closest('.main-labels span:first-child');
             const scoreSpan = event.target.closest('.main-labels span.score');
             const tardyLabel = event.target.closest('.secondary-labels .tardy-label');
+            const unxLabel = event.target.closest('.secondary-labels .unx-label');
             const housePoints = event.target.closest('.secondary-labels .house-points');
             const isNarrowView = window.matchMedia('(max-width: 1200px)').matches;
+
             if (nameSpan || (!isNarrowView && scoreSpan)) {
                 cycleAttendanceForStudent(student);
-            } else if (isNarrowView && (scoreSpan || tardyLabel || housePoints)) {
+            } else if (
+                isNarrowView &&
+                (scoreSpan || tardyLabel || unxLabel || housePoints)
+            ) {
                 showFloatingMenu(event, student.name);
-            } else if (!nameSpan && !scoreSpan && !tardyLabel && !housePoints) {
+            } else if (
+                !nameSpan &&
+                !scoreSpan &&
+                !tardyLabel &&
+                !unxLabel &&
+                !housePoints
+            ) {
                 showFloatingMenu(event, student.name);
             }
         });
+
         container.appendChild(bar);
     });
 }
@@ -1740,44 +2150,96 @@ function navigateStudentMenu(direction) {
 function showFloatingMenu(event, studentName) {
     const floatingMenu = document.getElementById('floating-menu');
     const student = students.find(s => s.name === studentName);
+
+    if (!student) return;
+
     const useDevices = isDevicesCriteriaClass();
+    const attendanceOptions = getAttendanceOptions();
+
     currentStudentIndex = students.findIndex(s => s.name === studentName);
+
     if (currentStudentIndex === -1) {
         return;
     }
-    // Clear any previous instrument-part group mode
+
     delete floatingMenu.dataset.instrumentPart;
 
-    const isAbsent = student.attendance === 'Absent';
+    const isLocked = isAttendanceLocked(student);
+    const scoreText =
+        student.score === 'EX' || student.score === 'UNX'
+            ? student.score
+            : `${student.score}%`;
+
     floatingMenu.innerHTML = `
         <span class="close-button" onclick="closeTopMenu()">&times;</span>
-        <h3 onclick="cycleAttendanceForStudent(students[${currentStudentIndex}])">${student.name}</h3>
+
+        <h3 onclick="cycleAttendanceForStudent(students[${currentStudentIndex}])">
+            ${student.name}
+        </h3>
+
         <div class="checkbox-row">
-            <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}" onchange="syncAttendance('${student.name}', this)">
-                <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
-                <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
-                <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+            <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}"
+                    onchange="syncAttendance('${student.name}', this)">
+                ${attendanceOptions.map(option => `
+                    <option value="${option}" ${student.attendance === option ? 'selected' : ''}>
+                        ${option}
+                    </option>
+                `).join('')}
+
             </select>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${useDevices ? 'Devices' : 'Stands'}</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${useDevices ? 'Engagement' : 'Intonation'}</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${useDevices ? 'Review' : 'Returned'}</label>
-            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${useDevices ? 'Progress' : 'Engagement'}</label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[0]}"
+                    ${student[currentCriteria[0]] ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
+                ${useDevices ? 'Devices' : 'Stands'}
+            </label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[1]}"
+                    ${student[currentCriteria[1]] ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
+                ${useDevices ? 'Engagement' : 'Intonation'}
+            </label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[2]}"
+                    ${student[currentCriteria[2]] ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
+                ${useDevices ? 'Review' : 'Returned'}
+            </label>
+
+            <label>
+                <input type="checkbox" id="checkbox-${currentCriteria[3]}"
+                    ${student[currentCriteria[3]] ? 'checked' : ''}
+                    ${isLocked ? 'disabled' : ''}
+                    onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
+                ${useDevices ? 'Progress' : 'Engagement'}
+            </label>
         </div>
+
         <div class="stepper">
             <button onclick="updateScore('${student.name}', -10)">-</button>
-            <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
+            <span class="score">${scoreText}</span>
             <button onclick="updateScore('${student.name}', 10)">+</button>
         </div>
+
         <div class="stepper">
             <span>House Points</span>
             <button onclick="updateHousePoints('${student.name}', -10)">-</button>
             <span>${student.housePoints > 0 ? '+' : ''}${student.housePoints}</span>
             <button onclick="updateHousePoints('${student.name}', 10)">+</button>
         </div>
+
         <button onclick="closeFloatingMenu()">Close</button>
     `;
-    floatingMenu.style.left = `50%`;
-    floatingMenu.style.top = `50%`;
+
+    floatingMenu.style.left = '50%';
+    floatingMenu.style.top = '50%';
+
     openMenu('floating-menu');
     highlightBar(student.name);
 }
@@ -1793,42 +2255,85 @@ function updateDateTime() {
     document.getElementById('currentDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
 }
 
+function getAttendanceOptions() {
+    if (classes[currentClassIndex].name === 'Tech Theater') {
+        return ['UNX', 'EX', 'Present', 'Tardy'];
+    }
+
+    // Keep the existing attendance options for all other classes.
+    return ['Absent', 'Present', 'Tardy'];
+}
+
+function isAttendanceLocked(student) {
+    if (classes[currentClassIndex].name === 'Tech Theater') {
+        return ['UNX', 'EX'].includes(student.attendance);
+    }
+
+    // Preserve the existing behavior for other classes.
+    return student.attendance === 'Absent';
+}
+
 function cycleAttendance() {
-    const attendanceOptions = ['Absent', 'Present', 'Tardy'];
+    if (students.length === 0) return;
+
+    const attendanceOptions = getAttendanceOptions();
     const currentIndex = attendanceOptions.indexOf(students[0].attendance);
     const nextIndex = (currentIndex + 1) % attendanceOptions.length;
     const nextAttendance = attendanceOptions[nextIndex];
+
     students.forEach(student => {
         student.attendance = nextAttendance;
+
         calculateScore(student);
         updateScoreDisplay(student);
         updateTardyLabel(student);
         updateBarGraph(student);
-        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
+
+        const isLocked = isAttendanceLocked(student);
+
+        const teacherRow = document.querySelector(
+            `.spreadsheet-row[data-student-name="${student.name}"]`
+        );
+
         if (teacherRow) {
             const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+
             if (attendanceSelect) {
                 attendanceSelect.value = student.attendance;
-                attendanceSelect.classList.remove('present', 'tardy', 'absent');
+                attendanceSelect.classList.remove('present', 'tardy', 'absent', 'unx', 'ex');
                 attendanceSelect.classList.add(student.attendance.toLowerCase());
             }
-            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+
+            const checkboxes = teacherRow.querySelectorAll(
+                '.checkbox-container input[type="checkbox"]'
+            );
+
             checkboxes.forEach(checkbox => {
-                checkbox.disabled = student.attendance === 'Absent';
+                checkbox.disabled = isLocked;
             });
         }
+
         const floatingMenu = document.getElementById('floating-menu');
-        if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
+
+        if (
+            floatingMenu &&
+            floatingMenu.style.display === 'block' &&
+            floatingMenu.querySelector('h3')?.textContent === student.name
+        ) {
             const floatingSelect = floatingMenu.querySelector('select');
+
             if (floatingSelect) {
                 floatingSelect.value = student.attendance;
-                floatingSelect.classList.remove('present', 'tardy', 'absent');
+                floatingSelect.classList.remove('present', 'tardy', 'absent', 'unx', 'ex');
                 floatingSelect.classList.add(student.attendance.toLowerCase());
             }
+
             const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+
             floatingCheckboxes.forEach(checkbox => {
-                checkbox.disabled = student.attendance === 'Absent';
+                checkbox.disabled = isLocked;
             });
+
             updateFloatingMenu(student);
         }
     });
@@ -2225,10 +2730,12 @@ function deactivateHouseshield() {
 }
 
 function cycleAttendanceForStudent(student) {
-    const attendanceOptions = ['Present', 'Tardy', 'Absent'];
+    const attendanceOptions = getAttendanceOptions();
     const currentIndex = attendanceOptions.indexOf(student.attendance);
     const nextIndex = (currentIndex + 1) % attendanceOptions.length;
+
     student.attendance = attendanceOptions[nextIndex];
+
     syncAttendance(student.name, { value: student.attendance });
 }
 
@@ -2360,6 +2867,7 @@ function exportScores() {
     if (isMsBandThursday) {
         studentsToExport = msBandStudents.map(student => {
             const thursdayStudent = msBandThursdayStudents.find(s => s.name === student.name);
+
             if (thursdayStudent) {
                 return students.find(s => s.name === student.name) || {
                     ...student,
@@ -2386,12 +2894,14 @@ function exportScores() {
                 };
             }
         });
-    } 
-    else if (istechTheater && currentClass.fullStudentList) {
+    } else if (istechTheater && currentClass.fullStudentList) {
         studentsToExport = currentClass.fullStudentList.map(fullStudent => {
             const name = fullStudent.name;
 
-            if (isSeniorProjectPeriod() && currentClass.seniorProjects.includes(name)) {
+            if (
+                isSeniorProjectPeriod() &&
+                currentClass.seniorProjects.includes(name)
+            ) {
                 return {
                     name: name,
                     attendance: 'Absent',
@@ -2407,6 +2917,7 @@ function exportScores() {
             }
 
             const visibleStudent = students.find(s => s.name === name);
+
             if (visibleStudent) {
                 return {
                     ...visibleStudent,
@@ -2416,71 +2927,141 @@ function exportScores() {
 
             return { ...fullStudent };
         });
-    }
-    else {
-        // For regular band classes: export in the original definition order (not the instrument-sorted display order)
+    } else {
+        // Export regular classes in their original definition order.
         studentsToExport = currentClass.students.slice();
-        // Overlay current live values onto the original-order list
+
         studentsToExport = studentsToExport.map(orig => {
             const live = students.find(s => s.name === orig.name);
             return live ? { ...live } : { ...orig };
         });
     }
 
-    // ==================== ORIGINAL CSV LOGIC FROM HERE DOWN (unchanged) ====================
+    // Don't export if every student is still marked Absent/EX.
+    // UNX and EX in Tech Theater are valid statuses and can be exported.
     let allAbsent = true;
+
     for (const student of studentsToExport) {
         if (student.attendance !== 'Absent' || student.score !== 'EX') {
             allAbsent = false;
             break;
         }
     }
-   
+
     if (allAbsent) {
-        showTemporaryMessage('No changes detected—all students absent/EX. CSV not exported.');
+        showTemporaryMessage(
+            'No changes detected—all students absent/EX. CSV not exported.'
+        );
         return;
     }
 
     const regularStudents = studentsToExport.filter(s => !s.isAdditional);
     const additionalStudents = studentsToExport.filter(s => s.isAdditional);
-    const headers = ['Name', ...regularStudents.map(student => `"${student.name}"`)];
-    const classworkRow = ['Classwork', ...regularStudents.map(student => `"${student.score === 'EX' ? 'EX' : `${student.score}%`}"`)];
+
+    const headers = [
+        'Name',
+        ...regularStudents.map(student => `"${student.name}"`)
+    ];
+
+    const classworkRow = [
+        'Classwork',
+        ...regularStudents.map(student => {
+            const value =
+                student.score === 'EX' || student.score === 'UNX'
+                    ? student.score
+                    : `${student.score}%`;
+
+            return `"${value}"`;
+        })
+    ];
+
     const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
+
+    const dateStr = now.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
+
     const housePointsItemized = studentsToExport
         .filter(student => student.housePoints !== 0)
         .map(student => {
             const masterStudent = getMasterStudent(student.name);
-            const liveschoolName = masterStudent ? masterStudent.liveschoolName : student.name;
-            return { name: liveschoolName, points: student.housePoints };
+            const liveschoolName = masterStudent
+                ? masterStudent.liveschoolName
+                : student.name;
+
+            return {
+                name: liveschoolName,
+                points: student.housePoints
+            };
         })
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map(item => `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`);
+        .map(item =>
+            `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`
+        );
+
     const tardiesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Tardy')
-        .map(student => `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`);
+        .map(student =>
+            `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`
+        );
+
     const absencesItemized = (isMsBandThursday ? students : studentsToExport)
-        .filter(student => student.attendance === 'Absent')
-        .map(student => `"${student.name}",Absent,=DATEVALUE("${dateStr}")`);
+        .filter(student =>
+            student.attendance === 'Absent' ||
+            (istechTheater && student.attendance === 'EX')
+        )
+        .map(student =>
+            `"${student.name}",Absent,=DATEVALUE("${dateStr}")`
+        );
+
     const additionalStudentsMessage = additionalStudents.length > 0
         ? additionalStudents.map(s => `"${s.name}",Additional`)
         : [];
+
     const finalCsvRows = [
         headers.join(','),
         classworkRow.join(','),
-        ...(housePointsItemized.length > 0 ? ['', 'House Points', ...housePointsItemized] : []),
-        ...(tardiesItemized.length > 0 ? ['', 'Tardies', ...tardiesItemized] : []),
-        ...(absencesItemized.length > 0 ? ['', 'Absences', ...absencesItemized] : []),
-        ...(additionalStudentsMessage.length > 0 ? additionalStudentsMessage : [])
+        ...(housePointsItemized.length > 0
+            ? ['', 'House Points', ...housePointsItemized]
+            : []),
+        ...(tardiesItemized.length > 0
+            ? ['', 'Tardies', ...tardiesItemized]
+            : []),
+        ...(absencesItemized.length > 0
+            ? ['', 'Absences', ...absencesItemized]
+            : []),
+        ...(additionalStudentsMessage.length > 0
+            ? additionalStudentsMessage
+            : [])
     ];
-    const csvFileDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
-    const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_').replace(/_{2,}/g, '_').replace(/^_|_$/g, '');
+
+    const csvFileDateStr = now.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).replace(/\//g, '-');
+
+    const className = classes[currentClassIndex].name
+        .replace(/[^a-zA-Z0-9]/g, '_')
+        .replace(/_{2,}/g, '_')
+        .replace(/^_|_$/g, '');
+
     const csvContent = finalCsvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;'
+    });
+
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
+
     link.setAttribute('href', url);
-    link.setAttribute('download', `${className}_Scores_${csvFileDateStr}.csv`);
+    link.setAttribute(
+        'download',
+        `${className}_Scores_${csvFileDateStr}.csv`
+    );
+
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -2493,20 +3074,36 @@ function exportScores() {
             return `${name.replace(/"/g, '')}: ${points}`;
         }).join('\n')
         : 'No house points';
+
     const tardiesDisplay = tardiesItemized.length > 0
         ? `Tardies:\n${tardiesItemized.map(item => {
             const [name] = item.split(',');
             return `${name.replace(/"/g, '')}`;
         }).join('\n')}`
         : 'No tardies';
+
     const absencesDisplay = absencesItemized.length > 0
         ? `Absences:\n${absencesItemized.map(item => {
             const [name] = item.split(',');
             return `${name.replace(/"/g, '')}`;
         }).join('\n')}`
         : 'No absences';
-    const separator = housePointsItemized.length === 0 && tardiesItemized.length === 0 && absencesItemized.length === 0 ? '\n' : '\n\n';
-    const message = `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}\n\n${absencesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
+
+    const separator =
+        housePointsItemized.length === 0 &&
+        tardiesItemized.length === 0 &&
+        absencesItemized.length === 0
+            ? '\n'
+            : '\n\n';
+
+    const message =
+        `House points for today:\n${housePointsDisplay}` +
+        `${separator}${tardiesDisplay}\n\n${absencesDisplay}` +
+        `${additionalStudentsMessage.length > 0
+            ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}`
+            : ''}` +
+        '\n\nReset scores?';
+
     showCustomAlert(message);
     showTemporaryMessage('Scores exported as CSV');
     closeSpecificMenu('teacher-mode');
@@ -2608,27 +3205,72 @@ function showTemporaryMessage(message) {
     }, 1000);
 }
 
+function initializeTechTheaterAttendance() {
+    const techTheater = classes.find(cls => cls.name === 'Tech Theater');
+
+    if (!techTheater || !techTheater.fullStudentList) {
+        return;
+    }
+
+    techTheater.fullStudentList.forEach(student => {
+        student.attendance = 'UNX';
+        student.score = 'UNX';
+    });
+}
+
+async function copyUNXStudents() {
+    const unxStudents = students
+        .filter(student => student.attendance === 'UNX')
+        .map(student => student.name);
+
+    if (unxStudents.length === 0) {
+        showTemporaryMessage('No UNX students found.');
+        return;
+    }
+
+    const textToCopy = `${unxStudents.join('\n')}`;
+
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        showTemporaryMessage('Successfully copied to clipboard!');
+    } catch (error) {
+        showTemporaryMessage('Could not copy UNX students. Check clipboard permissions.');
+        console.error('Failed to copy UNX students:', error);
+    }
+}
+
 function resetAllStudents() {
+    const isTechTheater = classes[currentClassIndex].name === 'Tech Theater';
+    const resetAttendance = isTechTheater ? 'UNX' : 'Absent';
+    const resetScore = isTechTheater ? 'UNX' : 'EX';
+
     students.forEach(student => {
-        student.attendance = 'Absent';
+        student.attendance = resetAttendance;
+
         student.stands = false;
-        student.intonation = false;   // ← changed
+        student.intonation = false;
         student.devices = false;
         student.review = false;
         student.returned = false;
         student.progress = false;
         student.engagement = false;
-        student.score = 'EX';
+
+        student.score = resetScore;
+        student.manualAdjustment = 0;
         student.housePoints = 0;
+
         updateScoreDisplay(student);
     });
 
     document.querySelectorAll('.attendance-dropdown select').forEach(select => {
-        select.value = 'Absent';
+        select.value = resetAttendance;
+        select.classList.remove('present', 'tardy', 'absent', 'unx', 'ex');
+        select.classList.add(resetAttendance.toLowerCase());
     });
 
     document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach(checkbox => {
         checkbox.checked = false;
+        checkbox.disabled = isTechTheater;
     });
 
     document.querySelectorAll('.spreadsheet-row .stepper:last-child span').forEach(span => {
@@ -2636,14 +3278,22 @@ function resetAllStudents() {
     });
 
     const bars = document.querySelectorAll('.bar');
+
     bars.forEach(bar => {
         bar.style.transition = 'height 0.5s ease-in-out, width 0.5s ease-in-out';
         bar.style.height = '0px';
     });
+
     setTimeout(() => {
         createBars();
+
+        if (document.getElementById('teacher-mode').style.display === 'block') {
+            populateStudents();
+        }
     }, 500);
 }
+
+initializeTechTheaterAttendance();
 
 createBars();
 updateDateTime();

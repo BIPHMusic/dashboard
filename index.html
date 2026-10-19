@@ -1139,6 +1139,11 @@ function calculateScore(student) {
         return;
     }
 
+    if (student.attendance === '>15m') {
+        student.score = 0;
+        return;
+    }
+
     if (
         student.attendance === 'EX' ||
         student.attendance === 'Absent'
@@ -1173,6 +1178,7 @@ function updateScoreDisplay(student) {
 
     if (!bar) return;
 
+    const isNarrowView = window.matchMedia('(max-width: 1200px)').matches;
     const isStudentsBirthday = isBirthday(student.birthdate);
 
     if (isStudentsBirthday) {
@@ -1186,10 +1192,24 @@ function updateScoreDisplay(student) {
     applyBarColor(bar, student);
 
     const houseInfo = masterList.find(s => s.name === student.name);
-    const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+    const houseColor = houseInfo
+        ? getHouseColor(houseInfo.house)
+        : '#808080';
 
-    const isSpecialScore = student.score === 'EX' || student.score === 'UNX';
-    const scoreText = isSpecialScore ? student.score : `${student.score}%`;
+    const isSpecialScore =
+        student.score === 'EX' || student.score === 'UNX';
+
+    const scoreText = isSpecialScore
+        ? student.score
+        : `${student.score}%`;
+
+    const showPrimaryValue =
+        typeof student.score === 'number' && student.score >= 10;
+
+    const showLowScoreBlack =
+        isNarrowView &&
+        typeof student.score === 'number' &&
+        student.score < 10;
 
     if (isSpecialScore) {
         bar.classList.add('ex-score');
@@ -1199,16 +1219,34 @@ function updateScoreDisplay(student) {
         bar.style.height = `${student.score}%`;
     }
 
+    const statusLabel = student.score === 'UNX'
+        ? '<div class="unx-label">❌</div>'
+        : student.attendance === '>15m'
+            ? `<div class="unx-label late-label" style="${isNarrowView ? 'transform: none;' : ''}">&gt;15m</div>`
+            : '';
+
     bar.innerHTML = `
-        ${!isSpecialScore ? `<div class="value-label">${student.score}%</div>` : ''}
+        ${showPrimaryValue
+            ? `<div class="value-label">${student.score}%</div>`
+            : ''}
+
         <div class="bar-label">
             <div class="main-labels">
-                <span>${student.name}</span>
+                <span ${isStudentsBirthday ? 'class="colorful"' : ''}
+                    style="${showLowScoreBlack ? 'color: black !important;' : ''}">
+                    ${student.name}
+                </span>
+
                 <span class="score">${scoreText}</span>
             </div>
+
             <div class="secondary-labels">
-                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                ${student.score === 'UNX' ? '<div class="unx-label">❌</div>' : ''}
+                ${student.attendance === 'Tardy'
+                    ? '<div class="tardy-label">Tardy</div>'
+                    : ''}
+
+                ${statusLabel}
+
                 ${student.housePoints !== 0
                     ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>`
                     : ''}
@@ -1974,29 +2012,63 @@ function updateInstrumentPartMenu(part) {
 
 function updateTardyLabel(student) {
     const bar = document.getElementById(`bar-${student.name}`);
-    if (bar) {
-        const secondaryLabels = bar.querySelector('.secondary-labels');
-        if (secondaryLabels) {
-            const tardyLabel = secondaryLabels.querySelector('.tardy-label');
-            if (student.attendance === 'Tardy') {
-                if (!tardyLabel) {
-                    const newTardyLabel = document.createElement('div');
-                    newTardyLabel.className = 'tardy-label';
-                    newTardyLabel.textContent = 'Tardy';
-                    secondaryLabels.appendChild(newTardyLabel);
-                }
-            } else {
-                if (tardyLabel) {
-                    tardyLabel.remove();
-                }
-            }
+
+    if (!bar) return;
+
+    const secondaryLabels = bar.querySelector('.secondary-labels');
+
+    if (!secondaryLabels) return;
+
+    const isNarrowView = window.matchMedia('(max-width: 1200px)').matches;
+
+    // Keep the Tardy label synchronized.
+    let tardyLabel = secondaryLabels.querySelector('.tardy-label');
+
+    if (student.attendance === 'Tardy') {
+        if (!tardyLabel) {
+            tardyLabel = document.createElement('div');
+            tardyLabel.className = 'tardy-label';
+            tardyLabel.textContent = 'Tardy';
+            secondaryLabels.appendChild(tardyLabel);
         }
+    } else if (tardyLabel) {
+        tardyLabel.remove();
+    }
+
+    // Keep the UNX ❌ and >15m labels in the same position.
+    let statusLabel = secondaryLabels.querySelector('.unx-label');
+
+    const isUNX = student.score === 'UNX';
+    const isOver15Minutes = student.attendance === '>15m';
+
+    if (isUNX || isOver15Minutes) {
+        if (!statusLabel) {
+            statusLabel = document.createElement('div');
+            secondaryLabels.appendChild(statusLabel);
+        }
+
+        statusLabel.className = isOver15Minutes
+            ? 'unx-label late-label'
+            : 'unx-label';
+
+        statusLabel.textContent = isUNX ? '❌' : '>15m';
+
+        // Only the >15m label should be horizontal in narrow mode.
+        if (isOver15Minutes && isNarrowView) {
+            statusLabel.style.transform = 'none';
+        } else {
+            statusLabel.style.removeProperty('transform');
+        }
+    } else if (statusLabel) {
+        statusLabel.remove();
     }
 }
 
 function createBars() {
     const container = document.getElementById('graph-container');
     container.innerHTML = '';
+
+    const isNarrowView = window.matchMedia('(max-width: 1200px)').matches;
 
     students.forEach(student => {
         const bar = document.createElement('div');
@@ -2008,8 +2080,20 @@ function createBars() {
             bar.classList.add('bdaycolorful');
         }
 
-        const isSpecialScore = student.score === 'EX' || student.score === 'UNX';
-        const scoreText = isSpecialScore ? student.score : `${student.score}%`;
+        const isSpecialScore =
+            student.score === 'EX' || student.score === 'UNX';
+
+        const scoreText = isSpecialScore
+            ? student.score
+            : `${student.score}%`;
+
+        const showPrimaryValue =
+            typeof student.score === 'number' && student.score >= 10;
+
+        const showLowScoreBlack =
+            isNarrowView &&
+            typeof student.score === 'number' &&
+            student.score < 10;
 
         if (isSpecialScore) {
             bar.classList.add('ex-score');
@@ -2023,18 +2107,38 @@ function createBars() {
         applyBarColor(bar, student);
 
         const houseInfo = masterList.find(s => s.name === student.name);
-        const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+        const houseColor = houseInfo
+            ? getHouseColor(houseInfo.house)
+            : '#808080';
+
+        const statusLabel = student.score === 'UNX'
+            ? '<div class="unx-label">❌</div>'
+            : student.attendance === '>15m'
+                ? `<div class="unx-label late-label" style="${isNarrowView ? 'transform: none;' : ''}">&gt;15m</div>`
+                : '';
 
         bar.innerHTML = `
-            ${!isSpecialScore ? `<div class="value-label">${student.score}%</div>` : ''}
+            ${showPrimaryValue
+                ? `<div class="value-label">${student.score}%</div>`
+                : ''}
+
             <div class="bar-label">
                 <div class="main-labels">
-                    <span ${isBday ? 'class="colorful"' : ''}>${student.name}</span>
+                    <span ${isBday ? 'class="colorful"' : ''}
+                        style="${showLowScoreBlack ? 'color: black !important;' : ''}">
+                        ${student.name}
+                    </span>
+
                     <span class="score">${scoreText}</span>
                 </div>
+
                 <div class="secondary-labels">
-                    ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                    ${student.score === 'UNX' ? '<div class="unx-label">❌</div>' : ''}
+                    ${student.attendance === 'Tardy'
+                        ? '<div class="tardy-label">Tardy</div>'
+                        : ''}
+
+                    ${statusLabel}
+
                     ${student.housePoints !== 0
                         ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>`
                         : ''}
@@ -2046,12 +2150,28 @@ function createBars() {
         bar.addEventListener('mouseout', () => resetBarHighlights());
 
         bar.addEventListener('click', (event) => {
-            const nameSpan = event.target.closest('.main-labels span:first-child');
-            const scoreSpan = event.target.closest('.main-labels span.score');
-            const tardyLabel = event.target.closest('.secondary-labels .tardy-label');
-            const unxLabel = event.target.closest('.secondary-labels .unx-label');
-            const housePoints = event.target.closest('.secondary-labels .house-points');
-            const isNarrowView = window.matchMedia('(max-width: 1200px)').matches;
+            const nameSpan = event.target.closest(
+                '.main-labels span:first-child'
+            );
+
+            const scoreSpan = event.target.closest(
+                '.main-labels span.score'
+            );
+
+            const tardyLabel = event.target.closest(
+                '.secondary-labels .tardy-label'
+            );
+
+            const unxLabel = event.target.closest(
+                '.secondary-labels .unx-label'
+            );
+
+            const housePoints = event.target.closest(
+                '.secondary-labels .house-points'
+            );
+
+            const isNarrowView =
+                window.matchMedia('(max-width: 1200px)').matches;
 
             if (nameSpan || (!isNarrowView && scoreSpan)) {
                 cycleAttendanceForStudent(student);
@@ -2257,10 +2377,10 @@ function updateDateTime() {
 
 function getAttendanceOptions() {
     if (classes[currentClassIndex].name === 'Tech Theater') {
-        return ['UNX', 'EX', 'Present', 'Tardy'];
+        return ['UNX', 'Present', 'Tardy', '>15m', 'EX'];
     }
 
-    // Keep the existing attendance options for all other classes.
+    // Preserve the existing attendance options for all other classes.
     return ['Absent', 'Present', 'Tardy'];
 }
 
@@ -2858,6 +2978,7 @@ window.onload = function() {
     setInterval(updateCountdowns, 1000);
 };
 
+
 function exportScores() {
     let studentsToExport = students;
     const currentClass = classes[currentClassIndex];
@@ -2866,7 +2987,9 @@ function exportScores() {
 
     if (isMsBandThursday) {
         studentsToExport = msBandStudents.map(student => {
-            const thursdayStudent = msBandThursdayStudents.find(s => s.name === student.name);
+            const thursdayStudent = msBandThursdayStudents.find(
+                s => s.name === student.name
+            );
 
             if (thursdayStudent) {
                 return students.find(s => s.name === student.name) || {
@@ -2880,19 +3003,19 @@ function exportScores() {
                     housePoints: 0,
                     manualAdjustment: 0
                 };
-            } else {
-                return {
-                    ...student,
-                    attendance: 'Absent',
-                    score: 'EX',
-                    stands: false,
-                    intonation: false,
-                    returned: false,
-                    engagement: false,
-                    housePoints: 0,
-                    manualAdjustment: 0
-                };
             }
+
+            return {
+                ...student,
+                attendance: 'Absent',
+                score: 'EX',
+                stands: false,
+                intonation: false,
+                returned: false,
+                engagement: false,
+                housePoints: 0,
+                manualAdjustment: 0
+            };
         });
     } else if (istechTheater && currentClass.fullStudentList) {
         studentsToExport = currentClass.fullStudentList.map(fullStudent => {
@@ -2903,7 +3026,7 @@ function exportScores() {
                 currentClass.seniorProjects.includes(name)
             ) {
                 return {
-                    name: name,
+                    name,
                     attendance: 'Absent',
                     score: 'EX',
                     devices: false,
@@ -2921,7 +3044,7 @@ function exportScores() {
             if (visibleStudent) {
                 return {
                     ...visibleStudent,
-                    name: name
+                    name
                 };
             }
 
@@ -2929,24 +3052,19 @@ function exportScores() {
         });
     } else {
         // Export regular classes in their original definition order.
-        studentsToExport = currentClass.students.slice();
-
-        studentsToExport = studentsToExport.map(orig => {
+        studentsToExport = currentClass.students.slice().map(orig => {
             const live = students.find(s => s.name === orig.name);
             return live ? { ...live } : { ...orig };
         });
     }
 
     // Don't export if every student is still marked Absent/EX.
-    // UNX and EX in Tech Theater are valid statuses and can be exported.
-    let allAbsent = true;
-
-    for (const student of studentsToExport) {
-        if (student.attendance !== 'Absent' || student.score !== 'EX') {
-            allAbsent = false;
-            break;
-        }
-    }
+    // UNX, EX, and >15m are valid Tech Theater statuses.
+    const allAbsent = studentsToExport.every(
+        student =>
+            student.attendance === 'Absent' &&
+            student.score === 'EX'
+    );
 
     if (allAbsent) {
         showTemporaryMessage(
@@ -2966,10 +3084,18 @@ function exportScores() {
     const classworkRow = [
         'Classwork',
         ...regularStudents.map(student => {
-            const value =
-                student.score === 'EX' || student.score === 'UNX'
-                    ? student.score
-                    : `${student.score}%`;
+            let value;
+
+            if (istechTheater && student.attendance === '>15m') {
+                value = '>15m';
+            } else if (
+                student.score === 'EX' ||
+                student.score === 'UNX'
+            ) {
+                value = student.score;
+            } else {
+                value = `${student.score}%`;
+            }
 
             return `"${value}"`;
         })
@@ -2981,7 +3107,13 @@ function exportScores() {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit'
-    }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
+    });
+
+    const csvFileDateStr = now.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).replace(/\//g, '-');
 
     const housePointsItemized = studentsToExport
         .filter(student => student.housePoints !== 0)
@@ -3001,11 +3133,26 @@ function exportScores() {
             `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`
         );
 
-    const tardiesItemized = (isMsBandThursday ? students : studentsToExport)
-        .filter(student => student.attendance === 'Tardy')
-        .map(student =>
-            `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`
+    // Both Tardy and >15m students appear in the Tardies section.
+    // Students marked >15m receive an additional note in the CSV.
+    const tardiesStudents = (isMsBandThursday ? students : studentsToExport)
+        .filter(student =>
+            student.attendance === 'Tardy' ||
+            (istechTheater && student.attendance === '>15m')
         );
+
+    const tardiesItemized = tardiesStudents.map(student => {
+        const isOver15Minutes =
+            istechTheater && student.attendance === '>15m';
+
+        return {
+            name: student.name,
+            note: isOver15Minutes ? '>15m late' : '',
+            csv: isOver15Minutes
+                ? `"${student.name}",Tardy,=DATEVALUE("${dateStr}"),">15m late"`
+                : `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`
+        };
+    });
 
     const absencesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student =>
@@ -3027,7 +3174,7 @@ function exportScores() {
             ? ['', 'House Points', ...housePointsItemized]
             : []),
         ...(tardiesItemized.length > 0
-            ? ['', 'Tardies', ...tardiesItemized]
+            ? ['', 'Tardies', ...tardiesItemized.map(item => item.csv)]
             : []),
         ...(absencesItemized.length > 0
             ? ['', 'Absences', ...absencesItemized]
@@ -3036,12 +3183,6 @@ function exportScores() {
             ? additionalStudentsMessage
             : [])
     ];
-
-    const csvFileDateStr = now.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-    }).replace(/\//g, '-');
 
     const className = classes[currentClassIndex].name
         .replace(/[^a-zA-Z0-9]/g, '_')
@@ -3076,16 +3217,17 @@ function exportScores() {
         : 'No house points';
 
     const tardiesDisplay = tardiesItemized.length > 0
-        ? `Tardies:\n${tardiesItemized.map(item => {
-            const [name] = item.split(',');
-            return `${name.replace(/"/g, '')}`;
-        }).join('\n')}`
+        ? `Tardies:\n${tardiesItemized.map(item =>
+            item.note
+                ? `${item.name} (${item.note})`
+                : item.name
+        ).join('\n')}`
         : 'No tardies';
 
     const absencesDisplay = absencesItemized.length > 0
         ? `Absences:\n${absencesItemized.map(item => {
             const [name] = item.split(',');
-            return `${name.replace(/"/g, '')}`;
+            return name.replace(/"/g, '');
         }).join('\n')}`
         : 'No absences';
 
@@ -3108,6 +3250,7 @@ function exportScores() {
     showTemporaryMessage('Scores exported as CSV');
     closeSpecificMenu('teacher-mode');
 }
+
 
 function showCustomAlert(message) {
     const alertOverlay = document.createElement('div');
@@ -3218,26 +3361,52 @@ function initializeTechTheaterAttendance() {
     });
 }
 
+
 async function copyUNXStudents() {
     const unxStudents = students
         .filter(student => student.attendance === 'UNX')
-        .map(student => student.name);
+        .map(student => student.name)
+        .sort((a, b) => a.localeCompare(b));
 
-    if (unxStudents.length === 0) {
-        showTemporaryMessage('No UNX students found.');
-        return;
-    }
+    const over15MinutesStudents = students
+        .filter(student => student.attendance === '>15m')
+        .map(student => student.name)
+        .sort((a, b) => a.localeCompare(b));
 
-    const textToCopy = `${unxStudents.join('\n')}`;
+    const message = [
+        'UNX (no-show)',
+        ...unxStudents,
+        '',
+        'UNX (>15m late)',
+        ...over15MinutesStudents
+    ].join('\n');
 
     try {
-        await navigator.clipboard.writeText(textToCopy);
-        showTemporaryMessage('Successfully copied to clipboard!');
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(message);
+        } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = message;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            const copied = document.execCommand('copy');
+            textarea.remove();
+
+            if (!copied) {
+                throw new Error('Clipboard copy failed.');
+            }
+        }
+
+        showTemporaryMessage('UNX list copied to clipboard!');
     } catch (error) {
-        showTemporaryMessage('Could not copy UNX students. Check clipboard permissions.');
-        console.error('Failed to copy UNX students:', error);
+        console.error('Could not copy UNX list:', error);
+        showTemporaryMessage('Could not copy UNX list. Please try again.');
     }
 }
+
 
 function resetAllStudents() {
     const isTechTheater = classes[currentClassIndex].name === 'Tech Theater';

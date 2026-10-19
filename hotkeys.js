@@ -260,6 +260,61 @@ function handleObjectiveInputKeys(event) {
     }
 }
 
+function callRandomStudent() {
+    let eligibleStudents = students.filter(student =>
+        student.attendance !== 'UNX' &&
+        student.attendance !== 'EX' &&
+        student.attendance !== 'Absent' &&
+        student.score !== 'UNX' &&
+        student.score !== 'EX' &&
+        !calledStudents.includes(student.name)
+    );
+
+    // If everyone eligible has already been called, start a new round.
+    if (eligibleStudents.length === 0) {
+        calledStudents = [];
+
+        eligibleStudents = students.filter(student =>
+            student.attendance !== 'UNX' &&
+            student.attendance !== 'EX' &&
+            student.attendance !== 'Absent' &&
+            student.score !== 'UNX' &&
+            student.score !== 'EX'
+        );
+    }
+
+    if (eligibleStudents.length > 0) {
+        const randomIndex = Math.floor(
+            Math.random() * eligibleStudents.length
+        );
+        const randomStudent = eligibleStudents[randomIndex];
+
+        if (randomStudent && randomStudent.name) {
+            calledStudents.push(randomStudent.name);
+
+            const masterStudent = masterList.find(
+                s => s.name === randomStudent.name
+            );
+
+            const displayText = randomStudent.name;
+            const speechText =
+                masterStudent && masterStudent.altName
+                    ? masterStudent.altName
+                    : randomStudent.name;
+
+            displayStudentName(displayText);
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.volume = 1.0;
+            utterance.rate = 1.25;
+            utterance.pitch = 1.0;
+
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+}
+
 function displayStudentName(name) {
     let container = document.querySelector('.student-name-display');
 
@@ -414,67 +469,18 @@ function handleGlobalHotkeys(event) {
     }
 
     // Randomly call a student who is not UNX, EX, or Absent.
-    if (
-        event.key === 'r' &&
-        currentMode === MODES.GLOBAL &&
-        menuStack.length === 0 &&
-        !event.metaKey &&
-        !event.ctrlKey
-    ) {
-        let eligibleStudents = students.filter(student =>
-            student.attendance !== 'UNX' &&
-            student.attendance !== 'EX' &&
-            student.attendance !== 'Absent' &&
-            student.score !== 'UNX' &&
-            student.score !== 'EX' &&
-            !calledStudents.includes(student.name)
-        );
+if (
+    event.key === 'r' &&
+    currentMode === MODES.GLOBAL &&
+    menuStack.length === 0 &&
+    !event.metaKey &&
+    !event.ctrlKey
+) {
+    callRandomStudent();
+    event.preventDefault();
+    return;
+}
 
-        // If everyone eligible has already been called, start a new round.
-        if (eligibleStudents.length === 0) {
-            calledStudents = [];
-
-            eligibleStudents = students.filter(student =>
-                student.attendance !== 'UNX' &&
-                student.attendance !== 'EX' &&
-                student.attendance !== 'Absent' &&
-                student.score !== 'UNX' &&
-                student.score !== 'EX'
-            );
-        }
-
-        if (eligibleStudents.length > 0) {
-            const randomIndex = Math.floor(Math.random() * eligibleStudents.length);
-            const randomStudent = eligibleStudents[randomIndex];
-
-            if (randomStudent && randomStudent.name) {
-                calledStudents.push(randomStudent.name);
-
-                const masterStudent = masterList.find(
-                    s => s.name === randomStudent.name
-                );
-
-                const displayText = randomStudent.name;
-                const speechText =
-                    masterStudent && masterStudent.altName
-                        ? masterStudent.altName
-                        : randomStudent.name;
-
-                displayStudentName(displayText);
-                window.speechSynthesis.cancel();
-
-                const utterance = new SpeechSynthesisUtterance(speechText);
-                utterance.volume = 1.0;
-                utterance.rate = 1.25;
-                utterance.pitch = 1.0;
-
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        event.preventDefault();
-        return;
-    }
 
     // Main keyboard shortcut switch
     switch (event.key) {
@@ -625,5 +631,54 @@ function handleGlobalHotkeys(event) {
                 event.preventDefault();
             }
             break;
+    }
+}
+
+
+
+
+
+async function enableRandomStudentMIDI() {
+    if (!navigator.requestMIDIAccess) {
+        return;
+    }
+
+    try {
+        const midi = await navigator.requestMIDIAccess();
+
+        function connectInputs() {
+            for (const input of midi.inputs.values()) {
+                if (
+                    input.name === "Bus 1" ||
+                    input.name.includes("IAC Driver Bus 1")
+                ) {
+                    input.onmidimessage = (event) => {
+                        const [status, data1, data2] = event.data;
+
+                        const messageType = status & 0xF0;
+                        const channel = (status & 0x0F) + 1;
+
+                        if (
+                            messageType === 0xA0 &&
+                            channel === 6 &&
+                            data1 === 7 &&
+                            data2 === 67
+                        ) {
+                            if (typeof callRandomStudent === "function") {
+                                callRandomStudent();
+                            }
+                        }
+                    };
+                }
+            }
+        }
+
+        connectInputs();
+
+        midi.onstatechange = () => {
+            connectInputs();
+        };
+    } catch (error) {
+        // MIDI initialization failed; fail silently.
     }
 }

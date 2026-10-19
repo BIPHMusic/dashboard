@@ -2961,22 +2961,31 @@ document.addEventListener('click', function(event) {
 document.addEventListener('keydown', (event) => {
 }, true);
 
+
 window.onload = function() {
     preloadHouseImages();
     currentClassIndex = getCurrentClass();
     updateClassDisplay();
     updateDateTime();
     loadStickyNotes();
+
     setInterval(updateDateTime, 60000);
+
     setInterval(() => {
-    const newIndex = getCurrentClass();
-    if (newIndex !== currentClassIndex) {
-        currentClassIndex = newIndex;
-        updateClassDisplay();
-    }
-}, 10000); 
+        const newIndex = getCurrentClass();
+
+        if (newIndex !== currentClassIndex) {
+            currentClassIndex = newIndex;
+            updateClassDisplay();
+        }
+    }, 10000);
+
     setInterval(updateCountdowns, 1000);
+
+    // Initialize the MIDI listener
+    enableRandomStudentMIDI();
 };
+
 
 
 function exportScores() {

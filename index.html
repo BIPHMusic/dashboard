@@ -3482,23 +3482,37 @@ function initializeTechTheaterAttendance() {
 
 
 async function copyUNXStudents() {
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    const fifteenMinuteCutoff = 8 * 60 + 15;
+
     const unxStudents = students
         .filter(student => student.attendance === 'UNX')
         .map(student => student.name)
         .sort((a, b) => a.localeCompare(b));
 
-    const over15MinutesStudents = students
-        .filter(student => student.attendance === '>15m')
-        .map(student => student.name)
-        .sort((a, b) => a.localeCompare(b));
+    const messageLines = [
+        'Still Missing:',
+        ...unxStudents
+    ];
 
-    const message = [
-        'UNX (no-show)',
-        ...unxStudents,
-        '',
-        'UNX (>15m late)',
-        ...over15MinutesStudents
-    ].join('\n');
+    // Only include students marked >15m once 8:15 has arrived.
+    if (currentTime >= fifteenMinuteCutoff) {
+        const over15MinutesStudents = students
+            .filter(student => student.attendance === '>15m')
+            .map(student => student.name)
+            .sort((a, b) => a.localeCompare(b));
+
+        if (over15MinutesStudents.length > 0) {
+            messageLines.push(
+                '',
+                '>15m Late:',
+                ...over15MinutesStudents
+            );
+        }
+    }
+
+    const message = messageLines.join('\n');
 
     try {
         if (navigator.clipboard && window.isSecureContext) {

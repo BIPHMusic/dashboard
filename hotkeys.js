@@ -71,65 +71,126 @@ function handleHouseShieldHotkey(event) {
 }
 
 function handleFloatingMenuHotkeys(event, studentName) {
-    // Do not run menu shortcuts while the objective field is being edited.
     if (isObjectiveInputActive()) return;
 
     const floatingMenu = document.getElementById('floating-menu');
     const part = floatingMenu ? floatingMenu.dataset.instrumentPart : null;
+    const isGroup = !!(floatingMenu && floatingMenu.dataset.groupStudents);
+    const useDevices = isDevicesCriteriaClass();
 
-    if (part) {
-        // Group (instrument part) mode
+    // Group and instrument-part menus
+    if (part || isGroup) {
+        const targets = part
+            ? getStudentsByPart(part)
+            : getGroupStudents();
+
         switch (event.key) {
             case 'a':
-                cycleAttendanceForInstrumentPart(part);
+                if (part) {
+                    cycleAttendanceForInstrumentPart(part);
+                } else {
+                    const options = getAttendanceOptions();
+                    const first = targets[0];
+
+                    if (first && options.length) {
+                        const next = options[
+                            (options.indexOf(first.attendance) + 1) %
+                            options.length
+                        ];
+                        setAttendanceForGroup(next);
+                    }
+                }
                 break;
-            case 's':
-                toggleCheckboxForInstrumentPart(part, 'stands');
+
+            case useDevices ? 'd' : 's':
+                if (part) {
+                    toggleCheckboxForInstrumentPart(part, currentCriteria[0]);
+                } else {
+                    toggleCheckboxForGroup(currentCriteria[0]);
+                }
                 break;
-            case 'i':
-                toggleCheckboxForInstrumentPart(part, 'intonation');
+
+            case useDevices ? 'e' : 'i':
+                if (part) {
+                    toggleCheckboxForInstrumentPart(part, currentCriteria[1]);
+                } else {
+                    toggleCheckboxForGroup(currentCriteria[1]);
+                }
                 break;
+
             case 'r':
-                toggleCheckboxForInstrumentPart(part, 'returned');
+                if (part) {
+                    toggleCheckboxForInstrumentPart(part, currentCriteria[2]);
+                } else {
+                    toggleCheckboxForGroup(currentCriteria[2]);
+                }
                 break;
-            case 'e':
-                toggleCheckboxForInstrumentPart(part, 'engagement');
+
+            case useDevices ? 'p' : 'e':
+                if (part) {
+                    toggleCheckboxForInstrumentPart(part, currentCriteria[3]);
+                } else {
+                    toggleCheckboxForGroup(currentCriteria[3]);
+                }
                 break;
+
             case 'h':
-                // House shield not supported for groups
+                toggleHouseShield();
                 break;
         }
 
-        updateInstrumentPartMenu(part);
+        if (part) {
+            updateInstrumentPartMenu(part);
+        } else {
+            updateStudentsGroupMenu();
+        }
+
         return;
     }
 
-    // Original single-student logic
+    // Original single-student behavior
     const student = students.find(s => s.name === studentName);
     if (!student) return;
 
     if (currentStudentIndex === -1) {
-        currentStudentIndex = students.findIndex(s => s.name === studentName);
+        currentStudentIndex = students.findIndex(
+            s => s.name === studentName
+        );
     }
-
-    const useDevices = isDevicesCriteriaClass();
 
     switch (event.key) {
         case 'a':
             cycleAttendanceForStudent(student);
             break;
+
         case useDevices ? 'd' : 's':
-            toggleCheckboxForStudent(student, useDevices ? 'devices' : 'stands');
+            toggleCheckboxForStudent(
+                student,
+                useDevices ? 'devices' : 'stands'
+            );
             break;
+
         case useDevices ? 'e' : 'i':
-            toggleCheckboxForStudent(student, useDevices ? 'engagement' : 'intonation');
+            toggleCheckboxForStudent(
+                student,
+                useDevices ? 'engagement' : 'intonation'
+            );
             break;
+
         case 'r':
-            toggleCheckboxForStudent(student, useDevices ? 'review' : 'returned');
+            toggleCheckboxForStudent(
+                student,
+                useDevices ? 'review' : 'returned'
+            );
             break;
+
         case useDevices ? 'p' : 'e':
-            toggleCheckboxForStudent(student, useDevices ? 'progress' : 'engagement');
+            toggleCheckboxForStudent(
+                student,
+                useDevices ? 'progress' : 'engagement'
+            );
             break;
+
         case 'h':
             toggleHouseShield();
             break;
@@ -201,24 +262,89 @@ function handleSearchBoxKeys(event) {
 }
 
 function handleActiveHouseshield(event) {
-    if (currentStudentIndex === -1 || currentStudentIndex >= students.length) {
+    if (isObjectiveInputActive()) return;
+
+    const floatingMenu = document.getElementById('floating-menu');
+
+    const isPart = !!(
+        floatingMenu &&
+        floatingMenu.dataset.instrumentPart
+    );
+
+    const isGroup = !!(
+        floatingMenu &&
+        floatingMenu.dataset.groupStudents
+    );
+
+    // Multiple students or an entire instrument part
+    if (isPart || isGroup) {
+
+        if (event.key === 'h') {
+            toggleHouseShield();
+
+        } else if (
+            event.key === 'ArrowUp' ||
+            event.key === 'ArrowDown'
+        ) {
+            const change =
+                event.key === 'ArrowUp' ? 10 : -10;
+
+            // Apply the adjustment immediately to every student.
+            if (isPart) {
+                updateHousePointsForInstrumentPart(
+                    floatingMenu.dataset.instrumentPart,
+                    change
+                );
+            } else {
+                updateHousePointsForGroup(change);
+            }
+
+            currentPoints += change;
+            updatePoints();
+
+            event.preventDefault();
+
+        } else if (event.key === 'Enter') {
+            deactivateHouseshield();
+            event.preventDefault();
+
+        } else if (event.key === 'Escape') {
+            deactivateHouseshield();
+            event.preventDefault();
+        }
+
+        return;
+    }
+
+    // Original single-student behavior
+    if (
+        currentStudentIndex === -1 ||
+        currentStudentIndex >= students.length
+    ) {
         deactivateHouseshield();
         return;
     }
 
     if (event.key.toLowerCase() === 'h') {
         toggleHouseShield();
+
     } else if (event.key === 'ArrowUp') {
         currentPoints = Math.min(currentPoints + 10, 100);
         updatePoints();
+        event.preventDefault();
+
     } else if (event.key === 'ArrowDown') {
         currentPoints = Math.max(currentPoints - 10, -100);
         updatePoints();
+        event.preventDefault();
+
     } else if (event.key === 'Enter') {
         applyHousePointsChange();
-        deactivateHouseshield();
+        event.preventDefault();
+
     } else if (event.key === 'Escape') {
         deactivateHouseshield();
+        event.preventDefault();
     }
 }
 

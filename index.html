@@ -691,6 +691,7 @@ function globalKeydownHandler(event) {
 
     // Keep objective-input focus detection synchronized with the DOM.
     const objectiveInput = document.getElementById('objectiveInput');
+
     window.isObjectiveInputFocused =
         !!objectiveInput && document.activeElement === objectiveInput;
 
@@ -707,8 +708,17 @@ function globalKeydownHandler(event) {
         return;
     }
 
+    // IMPORTANT: An active houseshield gets keyboard priority.
+    // This prevents the floating menu from interpreting its arrows
+    // as participation adjustments.
+    if (currentMode === MODES.HOUSESHIELD || isActive) {
+        handleActiveHouseshield(event);
+        return;
+    }
+
     // Give the visible floating menu priority over other keyboard modes.
     const floatingMenu = document.getElementById('floating-menu');
+
     const floatingMenuIsOpen =
         floatingMenu && floatingMenu.style.display === 'block';
 
@@ -1655,6 +1665,7 @@ function showInstrumentPartMenu(part) {
     if (matchingStudents.length === 0) return;
 
     currentStudentIndex = -1;
+    delete floatingMenu.dataset.groupStudents;
     floatingMenu.dataset.instrumentPart = part;
 
     const attendanceOptions = getAttendanceOptions();
@@ -2283,6 +2294,7 @@ function showFloatingMenu(event, studentName) {
     }
 
     delete floatingMenu.dataset.instrumentPart;
+    delete floatingMenu.dataset.groupStudents;
 
     const isLocked = isAttendanceLocked(student);
     const scoreText =
@@ -2717,44 +2729,131 @@ function toggleHouseShield() {
     }
 }
 
+function getHouseShieldTargets() {
+    const floatingMenu = document.getElementById('floating-menu');
+
+    if (!floatingMenu || floatingMenu.style.display !== 'block') {
+        return [];
+    }
+
+    if (floatingMenu.dataset.groupStudents) {
+        return getGroupStudents();
+    }
+
+    if (floatingMenu.dataset.instrumentPart) {
+        return getStudentsByPart(
+            floatingMenu.dataset.instrumentPart
+        );
+    }
+
+    return [];
+}
+
 function activateHouseshield() {
     const houseshield = document.getElementById('houseshield');
     const points = document.getElementById('points');
     const studentName = document.getElementById('student-name');
+    const floatingMenu = document.getElementById('floating-menu');
+
+    const isGroup = !!(
+        floatingMenu && floatingMenu.dataset.groupStudents
+    );
+
+    const part = floatingMenu
+        ? floatingMenu.dataset.instrumentPart
+        : '';
+
+    const isMulti = isGroup || !!part;
+
+    const targets = isMulti
+        ? getHouseShieldTargets()
+        : [];
+
+    if (isMulti && targets.length === 0) return;
+
     currentZIndex++;
     houseshield.style.zIndex = currentZIndex;
-    if (currentStudentIndex === -1) {
-        const floatingMenu = document.getElementById('floating-menu');
-        if (floatingMenu && floatingMenu.style.display === 'block') {
-            const currentStudentName = floatingMenu.querySelector('h3').textContent;
-            currentStudentIndex = students.findIndex(s => s.name === currentStudentName);
+
+    // Individual student: recover the current student index if necessary.
+    if (!isMulti && currentStudentIndex === -1) {
+        if (
+            floatingMenu &&
+            floatingMenu.style.display === 'block'
+        ) {
+            const heading = floatingMenu.querySelector('h3');
+
+            const currentStudentName = heading
+                ? heading.textContent.trim()
+                : '';
+
+            currentStudentIndex = students.findIndex(
+                s => s.name === currentStudentName
+            );
         }
     }
-    if (currentStudentIndex === -1 || currentStudentIndex >= students.length) {
+
+    if (
+        !isMulti &&
+        (
+            currentStudentIndex === -1 ||
+            currentStudentIndex >= students.length
+        )
+    ) {
         return;
     }
-    const student = students[currentStudentIndex];
-    const houseInfo = getMasterStudent(student.name);   // ← was masterList.find(...)
-    if (!houseInfo) {
-        return;
+
+    if (isMulti) {
+
+        // Use the multiple-houses image.
+        houseshield.style.backgroundImage =
+            "url('images/multhouses.png')";
+
+        if (studentName) {
+            studentName.textContent = isGroup
+                ? `Selected (${targets.length})`
+                : `${part} (${targets.length})`;
+
+            studentName.classList.add('active');
+        }
+
+        // The displayed number represents the cumulative adjustment.
+        currentPoints = 0;
+
+    } else {
+
+        // Original individual-house behavior.
+        const student = students[currentStudentIndex];
+
+        const houseInfo = getMasterStudent(student.name);
+
+        if (!houseInfo) return;
+
+        houseshield.style.backgroundImage =
+            `url('images/${houseInfo.house.toLowerCase()}house.webp')`;
+
+        if (studentName) {
+            studentName.textContent = student.name;
+            studentName.classList.add('active');
+        }
+
+        currentPoints = student.housePoints;
     }
+
     if (houseshield) {
-        houseshield.style.backgroundImage = `url('images/${houseInfo.house.toLowerCase()}house.webp')`;
         houseshield.style.display = 'block';
         void houseshield.offsetWidth;
         houseshield.classList.add('active');
     }
+
     if (points) {
         points.classList.add('active');
     }
-    if (studentName) {
-        studentName.textContent = student.name;
-        studentName.classList.add('active');
-    }
-    currentPoints = student.housePoints;
+
     updatePoints();
+
     isActive = true;
     currentMode = MODES.HOUSESHIELD;
+
     openMenu('houseshield');
 }
 
@@ -3067,6 +3166,17 @@ function exportScores() {
         });
     }
 
+    // Tech Theater: if everyone is UNX, nothing has been changed.
+    if (
+        istechTheater &&
+        students.length > 0 &&
+        students.every(student => student.score === 'UNX')
+    ) {
+        showTemporaryMessage(
+            'No changes detected—all Tech Theater students are UNX. CSV not exported.'
+        );
+        return;
+    }
     // Don't export if every student is still marked Absent/EX.
     // UNX, EX, and >15m are valid Tech Theater statuses.
     const allAbsent = studentsToExport.every(
